@@ -1,4 +1,5 @@
 <h1>{{ device.name }} ({{ device.location.name }})</h1>
+<a href="{% url 'devices:location' device.location_id %}">Back to location</a>
 <table>
     <tr>
         <td>
@@ -20,6 +21,17 @@
         </td>
         <td>
             {{ device.address }}
+        </td>
+    </tr>
+    <tr>
+        <td>
+            value
+        </td>
+        <td>
+            :
+        </td>
+        <td>
+            {{ device.value }}
         </td>
     </tr>
 </table>
