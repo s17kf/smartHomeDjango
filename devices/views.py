@@ -46,4 +46,4 @@ def location_update(request, location_id):
         else:
             device.value = value
             device.save()
-    return HttpResponseRedirect(reverse('location', args=(location_id,)))
+    return HttpResponseRedirect(reverse('devices:location', args=(location_id,)))

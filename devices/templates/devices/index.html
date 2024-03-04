@@ -1,7 +1,7 @@
 {% if locations %}
     <ul>
     {% for location in locations %}
-        <li><a href="{% url 'location' location.id %}">{{ location }}</a></li>
+        <li><a href="{% url 'devices:location' location.id %}">{{ location }}</a></li>
     {% endfor %}
     </ul>
 {% else %}

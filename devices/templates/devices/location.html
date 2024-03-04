@@ -1,13 +1,13 @@
 <h1>{{ location_name }}</h1>
 {% if devices %}
-    <form action="{% url 'location_update' location_id %}" method="post">
+    <form action="{% url 'devices:location_update' location_id %}" method="post">
     {% csrf_token %}
         <fieldset>
             <table>
                 {% for device in devices %}
                     <tr>
                         <td>
-                            <a href="{% url 'device' device.id %}">{{ device }}</a>
+                            <a href="{% url 'devices:device' device.id %}">{{ device }}</a>
                         </td>
                         <td>
                             --->
