@@ -1,0 +1,35 @@
+<h1>{{ location_name }}</h1>
+{% if devices %}
+    <form action="{% url 'location_update' location_id %}" method="post">
+    {% csrf_token %}
+        <fieldset>
+            <table>
+                {% for device in devices %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'device' device.id %}">{{ device }}</a>
+                        </td>
+                        <td>
+                            --->
+                        </td>
+                        <td>
+                            {% for control_input_type in device.get_control_input_type %}
+                                {% if control_input_type.label %}
+                                    <label for="device_{{ device.id }}">{{ control_input_type.label }}</label>
+                                {% endif %}
+                                <input type="{{ control_input_type.type }}" id="device_{{ device.id }}"
+                                       name="device_{{ device.id }}"
+                                {% for param, value in control_input_type.params.items %}
+                                    {{ param }}="{{ value }}"
+                                {% endfor %} >
+                            {% endfor %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </fieldset>
+        <input type="submit">
+    </form>
+{% else %}
+    <p>No devices available in {{ location_name }}.</p>
+{% endif %}
