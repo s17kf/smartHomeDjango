@@ -14,13 +14,13 @@
                             --->
                         </td>
                         <td>
-                            {% for control_input_type in device.get_control_input_type %}
-                                {% if control_input_type.label %}
-                                    <label for="device_{{ device.id }}">{{ control_input_type.label }}</label>
+                            {% for control_input_params in device.get_control_input_params_list %}
+                                {% if control_input_params.label %}
+                                    <label for="device_{{ device.id }}">{{ control_input_params.label }}</label>
                                 {% endif %}
-                                <input type="{{ control_input_type.type }}" id="device_{{ device.id }}"
+                                <input type="{{ control_input_params.type }}" id="device_{{ device.id }}"
                                        name="device_{{ device.id }}"
-                                {% for param, value in control_input_type.params.items %}
+                                {% for param, value in control_input_params.params.items %}
                                     {{ param }}="{{ value }}"
                                 {% endfor %} >
                             {% endfor %}

@@ -17,11 +17,14 @@ class Device(models.Model):
         SWITCH = 'SW', _('Switch')
         PWM = 'PWM', _('PWM regulator')
 
-    class ControlInputType:
+    class ControlInputParams:
         def __init__(self, input_type: str, label: str = None, params: dict = ()):
             self.type = input_type
             self.label = label
             self.params = params
+
+        def __eq__(self, other):
+            return self.type == other.type and self.label == other.label and self.params == other.params
 
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
@@ -40,22 +43,22 @@ class Device(models.Model):
         max_length=100,
     )
 
-    def get_control_input_type(self) -> list[ControlInputType]:
+    def get_control_input_params_list(self) -> list[ControlInputParams]:
         match self.type:
             case Device.DeviceType.SWITCH:
-                l_params = {'value': 0}
-                p_params = {'value': 1}
+                params0 = {'value': 0}
+                params1 = {'value': 1}
                 if self.value == 0:
-                    l_params['checked'] = ''
+                    params0['checked'] = ''
                 else:
-                    p_params['checked'] = ''
+                    params1['checked'] = ''
                 return [
-                    Device.ControlInputType('radio', 'L', l_params),
-                    Device.ControlInputType('radio', 'P', p_params),
+                    Device.ControlInputParams('radio', '0', params0),
+                    Device.ControlInputParams('radio', '1', params1),
                 ]
             case Device.DeviceType.PWM:
                 params = json_loads(self.params)
-                return [Device.ControlInputType('range', params={
+                return [Device.ControlInputParams('range', params={
                     'value': self.value,
                     'min': params['min'],
                     'max': params['max'],
