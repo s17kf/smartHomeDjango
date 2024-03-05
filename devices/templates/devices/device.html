@@ -1,47 +1,54 @@
-<h1>{{ device.name }} ({{ device.location.name }})</h1>
-<a href="{% url 'devices:location' device.location_id %}">Back to location</a>
-<table>
-    <tr>
-        <td>
-            type
-        </td>
-        <td>
-            :
-        </td>
-        <td>
-            {{ device_type_label }}
-        </td>
-    </tr>
-    <tr>
-        <td>
-            address
-        </td>
-        <td>
-            :
-        </td>
-        <td>
-            {{ device.address }}
-        </td>
-    </tr>
-    <tr>
-        <td>
-            value
-        </td>
-        <td>
-            :
-        </td>
-        <td>
-            {{ device.value }}
-        </td>
-    </tr>
-</table>
-{% for control_input_params in device.get_control_input_params_list %}
-    {% if control_input_params.label %}
-        <label for="device_{{ device.id }}">{{ control_input_params.label }}</label>
-    {% endif %}
-    <input type="{{ control_input_params.type }}" id="device_{{ device.id }}"
-           name="device_{{ device.id }}"
-    {% for param, value in control_input_params.params.items %}
-        {{ param }}="{{ value }}"
-    {% endfor %} >
-{% endfor %}
+{% extends 'devices/base.html' %}
+
+{% block page_title %}
+    {{ device.name }} ({{ device.location.name }})
+{% endblock %}
+
+{% block content %}
+    <a href="{% url 'devices:location' device.location_id %}">Back to location</a>
+    <table>
+        <tr>
+            <td>
+                type
+            </td>
+            <td>
+                :
+            </td>
+            <td>
+                {{ device_type_label }}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                address
+            </td>
+            <td>
+                :
+            </td>
+            <td>
+                {{ device.address }}
+            </td>
+        </tr>
+        <tr>
+            <td>
+                value
+            </td>
+            <td>
+                :
+            </td>
+            <td>
+                {{ device.value }}
+            </td>
+        </tr>
+    </table>
+    {% for control_input_params in device.get_control_input_params_list %}
+        {% if control_input_params.label %}
+            <label for="device_{{ device.id }}">{{ control_input_params.label }}</label>
+        {% endif %}
+        <input type="{{ control_input_params.type }}" id="device_{{ device.id }}"
+               name="device_{{ device.id }}"
+        {% for param, value in control_input_params.params.items %}
+            {{ param }}="{{ value }}"
+        {% endfor %} >
+    {% endfor %}
+{% endblock %}

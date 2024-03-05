@@ -1,36 +1,44 @@
-<h1>{{ location_name }}</h1>
-<a href="{% url 'devices:index' %}">Back to locations</a>
-{% if device_list %}
-    <form action="{% url 'devices:location_update' location_id %}" method="post">
-    {% csrf_token %}
-        <fieldset>
-            <table>
-                {% for device in device_list %}
-                    <tr>
-                        <td>
-                            <a href="{% url 'devices:device' device.id %}">{{ device.name }}</a>
-                        </td>
-                        <td>
-                            --->
-                        </td>
-                        <td>
-                            {% for control_input_params in device.get_control_input_params_list %}
-                                {% if control_input_params.label %}
-                                    <label for="device_{{ device.id }}">{{ control_input_params.label }}</label>
-                                {% endif %}
-                                <input type="{{ control_input_params.type }}" id="device_{{ device.id }}"
-                                       name="device_{{ device.id }}"
-                                {% for param, value in control_input_params.params.items %}
-                                    {{ param }}="{{ value }}"
-                                {% endfor %} >
-                            {% endfor %}
-                        </td>
-                    </tr>
-                {% endfor %}
-            </table>
-        </fieldset>
-        <input type="submit">
-    </form>
-{% else %}
-    <p>No devices available in {{ location_name }}.</p>
-{% endif %}
+{% extends 'devices/base.html' %}
+
+{% block page_title %}
+    {{ location_name }}
+{% endblock %}
+
+{% block content %}
+    <a href="{% url 'devices:index' %}">Back to locations</a>
+    {% if device_list %}
+        <form action="{% url 'devices:location_update' location_id %}" method="post">
+            {% csrf_token %}
+            <fieldset>
+                <table>
+                    {% for device in device_list %}
+                        <tr>
+                            <td>
+                                <a href="{% url 'devices:device' device.id %}">{{ device.name }}</a>
+                            </td>
+                            <td>
+                                --->
+                            </td>
+                            <td>
+                                {% for control_input_params in device.get_control_input_params_list %}
+                                    {% if control_input_params.label %}
+                                        <label for="device_{{ device.id }}">{{ control_input_params.label }}</label>
+                                    {% endif %}
+                                    <input type="{{ control_input_params.type }}" id="device_{{ device.id }}"
+                                           name="device_{{ device.id }}"
+                                    {% for param, value in control_input_params.params.items %}
+                                        {{ param }}="{{ value }}"
+                                    {% endfor %} >
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </fieldset>
+            <input type="submit">
+        </form>
+    {% else %}
+        <p>No devices available in {{ location_name }}.</p>
+    {% endif %}
+
+{% endblock %}

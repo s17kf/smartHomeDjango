@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Smart home app{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    {% load static %}
+    {% block stylesheets %}
+        <link rel="stylesheet" href="{% static 'devices/style.css' %}">
+    {% endblock %}
+</head>
+<body>
+<div id="wrapper">
+    {% block wrapper %}
+        <header>
+            {% block header %}
+                <h1>
+                    {% block page_title %}{% endblock %}
+                </h1>
+            {% endblock %}
+        </header>
+        <div id="content">
+            {% block content %}{% endblock %}
+        </div>
+    {% endblock %}
+</div>
+
+</body>
+</html>

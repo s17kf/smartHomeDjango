@@ -1,9 +1,19 @@
-{% if locations %}
-    <ul>
-    {% for location in locations %}
-        <li><a href="{% url 'devices:location' location.id %}">{{ location }}</a></li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No locations available.</p>
-{% endif %}
+{% extends 'devices/base.html' %}
+
+{% block page_title %}
+	Locations
+{% endblock %}
+
+{% block content %}
+
+    {% if locations %}
+        <ul>
+            {% for location in locations %}
+                <li><a href="{% url 'devices:location' location.id %}">{{ location }}</a></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No locations available.</p>
+    {% endif %}
+
+{% endblock %}

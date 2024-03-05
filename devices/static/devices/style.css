@@ -1,0 +1,40 @@
+header {
+  padding: 1px 0 1px 0;
+  margin: 0 1vw 0 0;
+  background-color: #192114;
+}
+
+header h1 {
+  color: #b3d4fc;
+  text-align: center;
+}
+
+#wrapper {
+  width: 100%;
+  overflow: hidden;
+  margin: 0 auto;
+  background: #111;
+}
+
+#content {
+  background: #293124;
+  color: #a1afc0;
+  padding: 1vw 1vw 1vw 1vw;
+  margin: 0 1vw 0 0;
+}
+
+a {
+  color: inherit;
+}
+
+fieldset {
+  border-color: #a1afc0;
+}
+
+html, body {
+  background-color: #000;
+  color: #aaa;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+}
