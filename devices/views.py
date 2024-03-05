@@ -1,38 +1,43 @@
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404, get_list_or_404
 from django.urls import reverse
+from django.views import generic
 
 from .models import Location, Device
 
 
-# Create your views here.
-def index(request):
-    locations = Location.objects.all()
-    context = {
-        'locations': locations,
-    }
-    return render(request, 'devices/index.html', context)
+class IndexView(generic.ListView):
+    template_name = 'devices/index.html'
+    context_object_name = 'locations'
+
+    def get_queryset(self):
+        return Location.objects.all()
 
 
-def location(request, location_id):
-    location_name = get_object_or_404(Location, pk=location_id).name
+class DeviceView(generic.DetailView):
+    template_name = 'devices/device.html'
+    model = Device
 
-    devices = Device.objects.filter(location=location_id)
-    context = {
-        'location_id': location_id,
-        'location_name': location_name,
-        'devices': devices,
-    }
-    return render(request, 'devices/location.html', context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['device_type_label'] = Device.DeviceType(context['device'].type).label
+        return context
 
 
-def device_details(request, device_id):
-    device = get_object_or_404(Device, pk=device_id)
+class LocationView(generic.ListView):
+    template_name = 'devices/location.html'
 
-    context = {
-        'device': device,
-    }
-    return render(request, 'devices/device.html', context)
+    def get_queryset(self):
+        return Device.objects.filter(location=self.kwargs['location_id'])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        location_id = self.kwargs['location_id']
+        context.update({
+            'location_id': location_id,
+            'location_name': get_object_or_404(Location, pk=location_id),
+        })
+        return context
 
 
 def location_update(request, location_id):
@@ -41,7 +46,7 @@ def location_update(request, location_id):
     for device in devices:
         try:
             value = request.POST[f'device_{device.id}']
-        except (KeyError):
+        except KeyError:
             continue
         else:
             device.value = value

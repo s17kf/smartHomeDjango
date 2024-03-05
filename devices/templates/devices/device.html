@@ -9,7 +9,7 @@
             :
         </td>
         <td>
-            {{ device.type }}
+            {{ device_type_label }}
         </td>
     </tr>
     <tr>
@@ -35,3 +35,13 @@
         </td>
     </tr>
 </table>
+{% for control_input_type in device.get_control_input_type %}
+    {% if control_input_type.label %}
+        <label for="device_{{ device.id }}">{{ control_input_type.label }}</label>
+    {% endif %}
+    <input type="{{ control_input_type.type }}" id="device_{{ device.id }}"
+           name="device_{{ device.id }}"
+    {% for param, value in control_input_type.params.items %}
+        {{ param }}="{{ value }}"
+    {% endfor %} >
+{% endfor %}
