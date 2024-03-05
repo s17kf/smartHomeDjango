@@ -17,7 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from .views import redirect_view
+
 urlpatterns = [
+    path('', redirect_view, {'target': 'devices/'}),
     path('devices/', include('devices.urls')),
     path('admin/', admin.site.urls),
 ]
