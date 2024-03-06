@@ -23,4 +23,5 @@ urlpatterns = [
     path('', redirect_view, {'target': 'devices/'}),
     path('devices/', include('devices.urls')),
     path('admin/', admin.site.urls),
+    path('__debug__', include('debug_toolbar.urls')),
 ]
