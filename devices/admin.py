@@ -1,8 +1,25 @@
 from django.contrib import admin
 
-# Register your models here.
-
 from .models import Location, Device
 
-admin.site.register(Location)
-admin.site.register(Device)
+
+# Register your models here.
+class DeviceInline(admin.TabularInline):
+    model = Device
+    extra = 0
+
+
+class DeviceAdmin(admin.ModelAdmin):
+    fieldsets = [
+        (None, {'fields': ['location']}),
+        ('General', {'fields': ['name', 'type']}),
+        ('Specific', {'fields': ['value', 'params', 'address']})
+    ]
+
+
+class LocationAdmin(admin.ModelAdmin):
+    inlines = [DeviceInline]
+
+
+admin.site.register(Location, LocationAdmin)
+admin.site.register(Device, DeviceAdmin)
