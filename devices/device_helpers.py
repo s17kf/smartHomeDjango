@@ -12,18 +12,12 @@ class DeviceConfig:
 
     @staticmethod
     def parse_device(device: Device):
-        try:
-            config_file = open(device.config_file)
-        except IOError:
-            return MissingConfigFileDeviceConfig(device)
-        data = json.load(config_file)
-        type = data["type"]
-        match type:
-            case DeviceConfig.DeviceType.SWITCH:
+        match device.type:
+            case Device.DeviceType.SWITCH:
                 return SwitchDeviceConfig(device)
-            case DeviceConfig.DeviceType.RELAY_PERIODIC:
+            case Device.DeviceType.RELAY_PERIODIC:
                 return RelayPeriodicDeviceConfig(device)
-        return UnknownTypeDeviceConfig(device, type)
+        return UnknownTypeDeviceConfig(device, device.type)
 
     def get_control_html(self):
         pass

@@ -12,7 +12,7 @@ class DeviceInline(admin.TabularInline):
 class DeviceAdmin(admin.ModelAdmin):
     fieldsets = [
         (None, {'fields': ['location']}),
-        ('General', {'fields': ['name']}),
+        ('General', {'fields': ['name', 'type']}),
         ('Specific', {'fields': ['config_file']})
     ]
 

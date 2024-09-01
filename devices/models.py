@@ -14,8 +14,8 @@ class Location(models.Model):
 
 class Device(models.Model):
     class DeviceType(models.TextChoices):
-        SWITCH = 'SW', _('Switch')
-        PWM = 'PWM', _('PWM regulator')
+        SWITCH = 'switch', _('Switch')
+        RELAY_PERIODIC = 'relay - periodic', _('Periodic relay')
 
     class ControlInputParams:
         def __init__(self, input_type: str, label: str = None, params: dict = ()):
@@ -28,6 +28,8 @@ class Device(models.Model):
 
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
+    type = models.CharField(max_length=20,
+                            choices=DeviceType.choices)
     config_file = models.CharField(max_length=100)
 
     def __str__(self):
