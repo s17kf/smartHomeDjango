@@ -28,41 +28,8 @@ class Device(models.Model):
 
     location = models.ForeignKey(Location, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
-    type = models.CharField(
-        max_length=10,
-        choices=DeviceType,
-    )
-    value = models.IntegerField()
-    params = models.CharField(
-        max_length=200,
-        blank=True,
-        default='',
-    )
-    address = models.CharField(
-        "HW address",
-        max_length=100,
-    )
-
-    def get_control_input_params_list(self) -> list[ControlInputParams]:
-        match self.type:
-            case Device.DeviceType.SWITCH:
-                params0 = {'value': 0}
-                params1 = {'value': 1}
-                if self.value == 0:
-                    params0['checked'] = ''
-                else:
-                    params1['checked'] = ''
-                return [
-                    Device.ControlInputParams('radio', '0', params0),
-                    Device.ControlInputParams('radio', '1', params1),
-                ]
-            case Device.DeviceType.PWM:
-                params = json_loads(self.params)
-                return [Device.ControlInputParams('range', params={
-                    'value': self.value,
-                    'min': params['min'],
-                    'max': params['max'],
-                })]
+    config_file = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"{self.name}({self.type})"
+        return (f"{self.name}: "
+                f"config_file={self.config_file}")

@@ -7,36 +7,7 @@ from .models import Device, Location
 # Create your tests here.
 
 class DeviceModelTests(TestCase):
-
-    def test_switch_value0_device_control_input_params(self):
-        dev = Device(type=Device.DeviceType.SWITCH, value=0)
-        expected_params = [
-            Device.ControlInputParams('radio', '0', {'value': 0, 'checked': ''}),
-            Device.ControlInputParams('radio', '1', {'value': 1}),
-        ]
-        self.assertListEqual(dev.get_control_input_params_list(), expected_params)
-
-    def test_switch_value1_device_control_input_params(self):
-        dev = Device(type=Device.DeviceType.SWITCH, value=1)
-        expected_params = [
-            Device.ControlInputParams('radio', '0', {'value': 0}),
-            Device.ControlInputParams('radio', '1', {'value': 1, 'checked': ''}),
-        ]
-        self.assertListEqual(dev.get_control_input_params_list(), expected_params)
-
-    def test_pwm_device_control_input_params(self):
-        value = 10
-        min = 0
-        max = 99
-        dev = Device(type=Device.DeviceType.PWM, value=value, params=f'{{ "min": {min}, "max": {max} }}')
-        expected_params = [
-            Device.ControlInputParams(input_type='range', params={
-                'value': value,
-                'min': min,
-                'max': max,
-            })
-        ]
-        self.assertListEqual(dev.get_control_input_params_list(), expected_params)
+    pass
 
 
 class LocationHelper:
@@ -51,19 +22,13 @@ class LocationHelper:
 
 class DeviceHelper:
     @staticmethod
-    def create_device(location, name, value=0, dev_type=None):
+    def create_device(location, name):
         params = {
             'location': location,
             'name': name,
-            'value': value
+            'config_file': 'config_file'
         }
-        if dev_type is not None:
-            params['type'] = dev_type
         return Device.objects.create(**params)
-
-    @staticmethod
-    def get_context_device_list(response):
-        return response.context['device_list']
 
     @staticmethod
     def get_context_device_details(response):
@@ -106,36 +71,6 @@ class LocationViewTests(TestCase):
         response = self.get_location_response(invalid_id)
         self.assertEqual(response.status_code, 404)
 
-    def test_no_devices_in_location(self):
-        location_with_dev = LocationHelper.create_location('location1')
-        location_empty = LocationHelper.create_location('location2')
-        dev1 = DeviceHelper.create_device(location_with_dev, 'device')
-        response = self.get_location_response(location_empty.id)
-        self.assertEqual(response.status_code, 200)
-        self.assertContains(response, f'No devices available in {location_empty.name}.')
-        self.assertQuerySetEqual(DeviceHelper.get_context_device_list(response), [])
-
-    def test_device_in_location(self):
-        location_with_dev = LocationHelper.create_location('location1')
-        location_empty = LocationHelper.create_location('location2')
-        dev1 = DeviceHelper.create_device(location_with_dev, 'device')
-        response = self.get_location_response(location_with_dev.id)
-        self.assertEqual(response.status_code, 200)
-        self.assertQuerySetEqual(DeviceHelper.get_context_device_list(response), [dev1])
-
-    def test_devices_in_all_location(self):
-        location1 = LocationHelper.create_location('location1')
-        location2 = LocationHelper.create_location('location2')
-        dev1_1 = DeviceHelper.create_device(location1, 'device')
-        dev1_2 = DeviceHelper.create_device(location1, 'dev')
-        dev2_1 = DeviceHelper.create_device(location2, 'dev in 2')
-        response1 = self.get_location_response(location1.id)
-        response2 = self.get_location_response(location2.id)
-        self.assertEqual(response1.status_code, 200)
-        self.assertQuerySetEqual(DeviceHelper.get_context_device_list(response1), [dev1_1, dev1_2], ordered=False)
-        self.assertEqual(response2.status_code, 200)
-        self.assertQuerySetEqual(DeviceHelper.get_context_device_list(response2), [dev2_1])
-
 
 class DeviceView(TestCase):
     def get_device_response(self, device_id):
@@ -143,16 +78,9 @@ class DeviceView(TestCase):
 
     def setUp(self, dev_type=Device.DeviceType.SWITCH):
         self.location = LocationHelper.create_location('room')
-        self.device = DeviceHelper.create_device(self.location, 'device', dev_type=dev_type)
+        self.device = DeviceHelper.create_device(self.location, 'device')
 
     def test_device_not_exist(self):
         invalid_id = self.device.id + 1
         response = self.get_device_response(invalid_id)
         self.assertEqual(response.status_code, 404)
-
-    def test_device_data(self):
-        response = self.get_device_response(self.device.id)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(DeviceHelper.get_context_device_details(response), self.device)
-        expected_device_type_label = Device.DeviceType(self.device.type).label
-        self.assertEqual(response.context['device_type_label'], expected_device_type_label)

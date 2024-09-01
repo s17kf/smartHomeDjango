@@ -6,30 +6,21 @@
 
 {% block content %}
     <a href="{% url 'devices:index' %}">Back to locations</a>
-    {% if device_list %}
+    {% if device_config_list %}
         <form action="{% url 'devices:location_update' location_id %}" method="post">
             {% csrf_token %}
             <fieldset>
                 <table>
-                    {% for device in device_list %}
+                    {% for device_config in device_config_list %}
                         <tr>
                             <td>
-                                <a href="{% url 'devices:device' device.id %}">{{ device.name }}</a>
+                                <a href="{% url 'devices:device' device_config.device.id %}">{{ device_config.device.name }}</a>
                             </td>
                             <td>
                                 --->
                             </td>
                             <td>
-                                {% for control_input_params in device.get_control_input_params_list %}
-                                    {% if control_input_params.label %}
-                                        <label for="device_{{ device.id }}">{{ control_input_params.label }}</label>
-                                    {% endif %}
-                                    <input type="{{ control_input_params.type }}" id="device_{{ device.id }}"
-                                           name="device_{{ device.id }}"
-                                    {% for param, value in control_input_params.params.items %}
-                                        {{ param }}="{{ value }}"
-                                    {% endfor %} >
-                                {% endfor %}
+                                {{ device_config.get_control_html | safe }}
                             </td>
                         </tr>
                     {% endfor %}

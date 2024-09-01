@@ -4,6 +4,7 @@ from django.urls import reverse
 from django.views import generic
 
 from .models import Location, Device
+from .device_helpers import DeviceConfig
 
 
 class IndexView(generic.ListView):
@@ -20,7 +21,7 @@ class DeviceView(generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['device_type_label'] = Device.DeviceType(context['device'].type).label
+        context['device_config'] = DeviceConfig.parse_device(context['device'])
         return context
 
 
@@ -28,14 +29,18 @@ class LocationView(generic.ListView):
     template_name = 'devices/location.html'
 
     def get_queryset(self):
-        return Device.objects.filter(location=self.kwargs['location_id'])
+        return
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         location_id = self.kwargs['location_id']
+        devices = []
+        for device in Device.objects.filter(location=self.kwargs['location_id']):
+            devices.append(DeviceConfig.parse_device(device))
         context.update({
             'location_id': location_id,
             'location_name': get_object_or_404(Location, pk=location_id),
+            'device_config_list': devices,
         })
         return context
 
