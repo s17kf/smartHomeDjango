@@ -15,7 +15,7 @@ class Location(models.Model):
 class Device(models.Model):
     class DeviceType(models.TextChoices):
         SWITCH = 'switch', _('Switch')
-        RELAY_PERIODIC = 'relay - periodic', _('Periodic relay')
+        RELAY_PERIODIC = 'relay-periodic', _('Periodic relay')
 
     class ControlInputParams:
         def __init__(self, input_type: str, label: str = None, params: dict = ()):
@@ -34,6 +34,7 @@ class Device(models.Model):
 
     def __str__(self):
         return (f"{self.name}: "
+                f"type={self.type}, "
                 f"config_file={self.config_file}")
 
 
