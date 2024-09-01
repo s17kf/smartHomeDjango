@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Location, Device
+from .models import Location, Device, RelayPeriodicPeriod, RelayPeriodicDay
 
 
 # Register your models here.
@@ -17,9 +17,19 @@ class DeviceAdmin(admin.ModelAdmin):
     ]
 
 
+class RelayPeriodicDayAdmin(admin.ModelAdmin):
+    pass
+
+
+class RelayPeriodicPeriodAdmin(admin.ModelAdmin):
+    pass
+
+
 class LocationAdmin(admin.ModelAdmin):
     inlines = [DeviceInline]
 
 
 admin.site.register(Location, LocationAdmin)
 admin.site.register(Device, DeviceAdmin)
+admin.site.register(RelayPeriodicPeriod, RelayPeriodicPeriodAdmin)
+admin.site.register(RelayPeriodicDay, RelayPeriodicDayAdmin)

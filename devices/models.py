@@ -33,3 +33,32 @@ class Device(models.Model):
     def __str__(self):
         return (f"{self.name}: "
                 f"config_file={self.config_file}")
+
+
+class RelayPeriodicPeriod(models.Model):
+    device = models.ForeignKey(Device, on_delete=models.CASCADE)
+    begin = models.TimeField()
+    end = models.TimeField()
+
+    def __str__(self):
+        return (f"{self.device.name}: "
+                f"begin={self.begin}, "
+                f"end={self.end}")
+
+
+class RelayPeriodicDay(models.Model):
+    class DaysChoices(models.IntegerChoices):
+        MONDAY = 0, _('Monday')
+        TUESDAY = 1, _('Tuesday')
+        WEDNESDAY = 2, _('Wednesday')
+        THURSDAY = 3, _('Thursday')
+        FRIDAY = 4, _('Friday')
+        SATURDAY = 5, _('Saturday')
+        SUNDAY = 6, _('Sunday')
+
+    device = models.ForeignKey(Device, on_delete=models.CASCADE)
+    day = models.IntegerField(choices=DaysChoices)
+
+    def __str__(self):
+        return (f"{self.device.name}: "
+                f"day={self.day}")

@@ -1,5 +1,5 @@
 import json
-from .models import Device
+from .models import Device, RelayPeriodicPeriod, RelayPeriodicDay
 
 
 class DeviceConfig:
@@ -28,6 +28,9 @@ class DeviceConfig:
     def get_control_html(self):
         pass
 
+    def get_details_html(self):
+        return f"Device type: {self.device.name}"
+
 
 class SwitchDeviceConfig(DeviceConfig):
     def __init__(self, device: Device):
@@ -49,6 +52,27 @@ class RelayPeriodicDeviceConfig(DeviceConfig):
     def get_control_html(self):
         # Todo: add proper html content
         return "periodic relay"
+
+    def get_details_html(self):
+        active_days = RelayPeriodicDay.objects.filter(device=self.device)
+        active_periods = RelayPeriodicPeriod.objects.filter(device=self.device)
+        html_content = (
+            f"Active days:"
+            f"<ul>"
+        )
+        for day in active_days:
+            html_content += f"<li>{day.get_day_display()}</li>"
+        html_content += (
+            f"</ul>"
+            f"Active periods:"
+            f"<ul>"
+        )
+        for period in active_periods:
+            html_content += f"<li>{period.begin.strftime('%H:%M')} - {period.end.strftime('%H:%M')}</li>"
+        html_content += (
+            f"</ul>"
+        )
+        return html_content
 
 
 class MissingConfigFileDeviceConfig(DeviceConfig):
