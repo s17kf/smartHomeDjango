@@ -1,5 +1,6 @@
 import json
 from .models import Device, RelayPeriodicPeriod, RelayPeriodicDay
+import gpiocontrol as gpio
 
 
 class DeviceConfig:
@@ -25,6 +26,9 @@ class DeviceConfig:
     def get_details_html(self):
         return f"Device type: {self.device.name}"
 
+    def get_status_html(self):
+        return f"Device status for <b>{self.device.type}</b> is not implemented yet"
+
 
 class SwitchDeviceConfig(DeviceConfig):
     def __init__(self, device: Device):
@@ -42,6 +46,11 @@ class SwitchDeviceConfig(DeviceConfig):
 class RelayPeriodicDeviceConfig(DeviceConfig):
     def __init__(self, device: Device):
         super().__init__(device)
+        try:
+            config_file = open(device.config_file)
+            self.config = json.load(config_file)
+        except IOError:
+            self.config = None
 
     def get_control_html(self):
         # Todo: add proper html content
@@ -66,6 +75,21 @@ class RelayPeriodicDeviceConfig(DeviceConfig):
         html_content += (
             f"</ul>"
         )
+        return html_content
+
+    def get_status_html(self):
+        if self.config is None:
+            return "Missing config file!"
+        pin_number = self.config["pinNumber"]
+        try:
+            pin_state = gpio.get(pin_number)
+        except Exception:
+            return "<span style='color:red;'>Error reading pin state!</span>"
+        html_content = ""
+        if pin_state == gpio.State.LOW:
+            html_content = "Relay is <span style='color:green;'>ON</span>"
+        else:
+            html_content = "Relay is <span style='color:red;'>OFF</span>"
         return html_content
 
 
