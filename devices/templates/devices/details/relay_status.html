@@ -1,0 +1,27 @@
+{% if device_config.state_available %}
+    <label for="radio0">0</label>
+    <input type="radio" id="radio0" name="state" value="off"
+           form="form_update_relay{{ device.id }}"
+           onchange="this.form.submit()"
+            {% if not device_config.is_active %}
+           checked
+            {% endif %}
+    >
+    <label for="radio1">1</label>
+    <input type="radio" id="radio1" name="state" value="on"
+           form="form_update_relay{{ device.id }}"
+           onchange="this.form.submit()"
+            {% if device_config.is_active %}
+           checked
+            {% endif %}
+    >
+    <form action="{% url 'devices:relay_update' device.id %}" method="post"
+          id="form_update_relay{{ device.id }}">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.path }}">
+
+    </form>
+
+{% else %}
+    <span style="color: gray;">Relay state not available</span>
+{% endif %}

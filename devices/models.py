@@ -14,7 +14,7 @@ class Location(models.Model):
 
 class Device(models.Model):
     class DeviceType(models.TextChoices):
-        SWITCH = 'switch', _('Switch')
+        RELAY = 'relay', _('Relay')
         RELAY_PERIODIC = 'relay-periodic', _('Periodic relay')
 
     class ControlInputParams:
@@ -43,6 +43,11 @@ class RelayPeriodicPeriod(models.Model):
     begin = models.TimeField()
     end = models.TimeField()
 
+    def get_begin_display(self):
+        return self.begin.strftime('%H:%M')
+
+    def get_end_display(self):
+        return self.end.strftime('%H:%M')
     def __str__(self):
         return (f"{self.device.name}: "
                 f"begin={self.begin}, "

@@ -76,7 +76,7 @@ class DeviceView(TestCase):
     def get_device_response(self, device_id):
         return self.client.get(reverse('devices:device', args=(device_id,)))
 
-    def setUp(self, dev_type=Device.DeviceType.SWITCH):
+    def setUp(self, dev_type=Device.DeviceType.RELAY):
         self.location = LocationHelper.create_location('room')
         self.device = DeviceHelper.create_device(self.location, 'device')
 

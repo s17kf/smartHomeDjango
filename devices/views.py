@@ -4,7 +4,8 @@ from django.urls import reverse
 from django.views import generic
 
 from .models import Location, Device
-from .device_helpers import DeviceConfig
+from .device_helpers import DeviceConfig, RelayDeviceConfig
+import gpiocontrol as gpio
 
 
 class IndexView(generic.ListView):
@@ -57,3 +58,16 @@ def location_update(request, location_id):
             device.value = value
             device.save()
     return HttpResponseRedirect(reverse('devices:location', args=(location_id,)))
+
+
+def relay_update(request, device_id):
+    next = request.POST.get('next', '/')
+    new_state = gpio.State.LOW if request.POST.get('state', 'off') == 'on' else gpio.State.HIGH
+    try:
+        device = Device.objects.get(pk=device_id)
+    except Device.DoesNotExist:
+        # todo: log error
+        return HttpResponseRedirect(next)
+    device_config = RelayDeviceConfig(device)
+    device_config.setstate(new_state)
+    return HttpResponseRedirect(next)

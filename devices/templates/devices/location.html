@@ -7,27 +7,23 @@
 {% block content %}
     <a href="{% url 'devices:index' %}">Back to locations</a>
     {% if device_config_list %}
-        <form action="{% url 'devices:location_update' location_id %}" method="post">
-            {% csrf_token %}
-            <fieldset>
-                <table>
-                    {% for device_config in device_config_list %}
-                        <tr>
-                            <td>
-                                <a href="{% url 'devices:device' device_config.device.id %}">{{ device_config.device.name }}</a>
-                            </td>
-                            <td>
-                                --->
-                            </td>
-                            <td>
-                                {{ device_config.get_status_html | safe }}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </table>
-            </fieldset>
-            <input type="submit">
-        </form>
+        <fieldset>
+            <table>
+                {% for device_config in device_config_list %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'devices:device' device_config.device.id %}">{{ device_config.device.name }}</a>
+                        </td>
+                        <td>
+                            --->
+                        </td>
+                        <td>
+                            {% include device_config.get_status_template with device=device_config.device %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </fieldset>
     {% else %}
         <p>No devices available in {{ location_name }}.</p>
     {% endif %}

@@ -8,9 +8,9 @@
     <a href="{% url 'devices:location' device.location_id %}">Back to location</a>
 
     <p>
-        {{ device_config.get_status_html | safe }}
+        {% include device_config.get_status_template %}
     </p>
     <p>
-        {{ device_config.get_details_html | safe }}
+        {% include device_config.get_details_template %}
     </p>
 {% endblock %}

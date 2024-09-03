@@ -1,0 +1,12 @@
+Active days:
+<ul>
+    {% for day in device_config.get_active_days %}
+        <li>{{ day.get_day_display }}</li>
+    {% endfor %}
+</ul>
+Active periods:
+<ul>
+    {% for period in device_config.get_active_periods %}
+        <li>{{ period.get_begin_display }} - {{ period.get_end_display }}</li>
+    {% endfor %}
+</ul>

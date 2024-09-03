@@ -1,0 +1,9 @@
+{% if device_config.state_available %}
+    {% if device_config.is_active %}
+        Relay is <span style="color: green;">ON</span>
+    {% else %}
+        Relay is <span style="color: red;">OFF</span>
+    {% endif %}
+{% else %}
+    <span style="color: gray;">Relay state not available</span>
+{% endif %}
