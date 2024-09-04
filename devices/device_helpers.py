@@ -1,6 +1,8 @@
 import json
+
 from .models import Device, RelayPeriodicPeriod, RelayPeriodicDay
 import gpiocontrol as gpio
+from datetime import datetime
 
 
 class DeviceConfig:
@@ -24,60 +26,53 @@ class DeviceConfig:
         return "devices/details/not_implemented_status.html"
 
 
-class RelayDeviceConfig(DeviceConfig):
+class RelayDeviceCommonConfig(DeviceConfig):
     def __init__(self, device: Device):
-        assert device.type == Device.DeviceType.RELAY
         super().__init__(device)
         self.state_available = False
         try:
             config_file = open(device.config_file)
             self.config = json.load(config_file)
-        except IOError:
+        except IOError as e:
             self.config = None
+            print(f"config file error: {str(e)}")
             return
         try:
             self.pin_number = self.config["pinNumber"]
             self.state = gpio.get(self.pin_number)
-        except Exception:
+            self.active_state = gpio.State(self.config['activeState'])
+        except Exception as e:
+            print(f"gpio error: {str(e)}")
             # todo: log error
             return
+        self.inactive_state = gpio.State.HIGH if self.active_state == gpio.State.LOW else gpio.State.LOW
         self.state_available = True
 
     def is_active(self):
-        return self.state == gpio.State.LOW
-
-    def get_status_template(self):
-        return "devices/details/relay_status.html"
+        return self.state == self.active_state
 
     def setstate(self, state: gpio.State):
         try:
             gpio.set(self.pin_number, state)
-        except Exception:
+        except Exception as e:
             # todo: log error
+            print(f"{self.device.name} set state gpio error: {str(e)}")
             pass
 
 
-class RelayPeriodicDeviceConfig(DeviceConfig):
+class RelayDeviceConfig(RelayDeviceCommonConfig):
+    def __init__(self, device: Device):
+        assert device.type == Device.DeviceType.RELAY
+        super().__init__(device)
+
+    def get_status_template(self):
+        return "devices/details/relay_status.html"
+
+
+class RelayPeriodicDeviceConfig(RelayDeviceCommonConfig):
     def __init__(self, device: Device):
         assert device.type == Device.DeviceType.RELAY_PERIODIC
         super().__init__(device)
-        self.state_available = False
-        try:
-            config_file = open(device.config_file)
-            self.config = json.load(config_file)
-        except IOError:
-            self.config = None
-            return
-        try:
-            self.pin_number = self.config["pinNumber"]
-            self.state = gpio.get(self.pin_number)
-        except Exception:
-            # todo: log error
-            return
-        self.state_available = True
-
-    def is_active(self):
-        return self.state == gpio.State.LOW
 
     def get_active_days(self):
         return RelayPeriodicDay.objects.filter(device=self.device)

@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 from devices.models import Device, RelayPeriodicPeriod, RelayPeriodicDay
+from devices.device_helpers import RelayPeriodicDeviceConfig
 from datetime import datetime
 import json, subprocess
 import gpiocontrol as gpio
@@ -18,13 +19,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         now = datetime.now()
         for device in Device.objects.filter(type=Device.DeviceType.RELAY_PERIODIC):
-            try:
-                config_file = open(device.config_file)
-            except IOError:
-                self.stdout.write(add_timestamp(f"device: {device.name} - failed to open config file"))
+            device_config = RelayPeriodicDeviceConfig(device)
+            if not device_config.state_available:
+                self.stdout.write(add_timestamp(f"device: {device.name} - config error"))
                 continue
-            data = json.load(config_file)
-            pin_number = data["pinNumber"]
 
             periods = RelayPeriodicPeriod.objects.filter(device=device)
             days = RelayPeriodicDay.objects.filter(device=device)
@@ -47,10 +45,10 @@ class Command(BaseCommand):
             try:
                 if active_time:
                     self.stdout.write(add_timestamp(activation_log))
-                    gpio.set(pin_number, gpio.State.LOW)
+                    device_config.setstate(device_config.active_state)
                 else:
                     self.stdout.write(add_timestamp(f"device: {device.name} - no active period"))
-                    gpio.set(pin_number, gpio.State.HIGH)
+                    device_config.setstate(device_config.inactive_state)
             except Exception as e:
                 self.stdout.write(add_timestamp(f"Pin change error: {str(e)}"))
                 continue

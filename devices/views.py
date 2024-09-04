@@ -62,12 +62,12 @@ def location_update(request, location_id):
 
 def relay_update(request, device_id):
     next = request.POST.get('next', '/')
-    new_state = gpio.State.LOW if request.POST.get('state', 'off') == 'on' else gpio.State.HIGH
     try:
         device = Device.objects.get(pk=device_id)
     except Device.DoesNotExist:
         # todo: log error
         return HttpResponseRedirect(next)
     device_config = RelayDeviceConfig(device)
+    new_state = device_config.active_state if request.POST.get('state', 'off') == 'on' else device_config.inactive_state
     device_config.setstate(new_state)
     return HttpResponseRedirect(next)
