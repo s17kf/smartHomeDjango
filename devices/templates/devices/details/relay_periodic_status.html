@@ -1,6 +1,13 @@
 {% if device_config.state_available %}
     {% if device_config.is_active %}
         Relay is <span style="color: green;">ON</span>
+        {% if device_config.is_active_day %}
+            <br>
+            Active day: {{ device_config.current_day_display }}
+        {% elif device_config.current_period %}
+            <br>
+            Active period: {{ device_config.get_current_period_display }}
+        {% endif %}
     {% else %}
         Relay is <span style="color: red;">OFF</span>
     {% endif %}
