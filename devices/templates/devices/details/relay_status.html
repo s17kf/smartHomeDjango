@@ -19,9 +19,7 @@
           id="form_update_relay{{ device.id }}">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ request.path }}">
-
     </form>
-
 {% else %}
     <span style="color: gray;">Relay state not available</span>
 {% endif %}

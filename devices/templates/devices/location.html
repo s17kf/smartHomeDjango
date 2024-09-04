@@ -10,12 +10,9 @@
         <fieldset>
             <table>
                 {% for device_config in device_config_list %}
-                    <tr>
+                    <tr style="outline: thin solid darkgrey">
                         <td>
                             <a href="{% url 'devices:device' device_config.device.id %}">{{ device_config.device.name }}</a>
-                        </td>
-                        <td>
-                            --->
                         </td>
                         <td>
                             {% include device_config.get_status_template with device=device_config.device %}
