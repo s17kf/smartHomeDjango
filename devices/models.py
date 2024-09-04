@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from json import loads as json_loads
 
 
 # Create your models here.
@@ -48,6 +47,7 @@ class RelayPeriodicPeriod(models.Model):
 
     def get_end_display(self):
         return self.end.strftime('%H:%M')
+
     def __str__(self):
         return (f"{self.device.name}: "
                 f"begin={self.begin}, "
@@ -70,3 +70,12 @@ class RelayPeriodicDay(models.Model):
     def __str__(self):
         return (f"{self.device.name}: "
                 f"day={self.day}")
+
+
+class RelayPeriodicManualActivation(models.Model):
+    device = models.OneToOneField(Device, on_delete=models.CASCADE)
+    end_time = models.DateTimeField()
+
+    def __str__(self):
+        return (f"{self.device.name}: "
+                f"end_time={self.end_time}")
