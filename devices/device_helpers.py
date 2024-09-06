@@ -1,6 +1,6 @@
 import json
 
-from .models import Device, RelayPeriodicPeriod, RelayPeriodicDay
+from .models import Device, RelayPeriodicPeriod, RelayPeriodicDay, RelayPeriodicManualActivation
 import gpiocontrol as gpio
 from datetime import datetime
 
@@ -75,6 +75,7 @@ class RelayPeriodicDeviceConfig(RelayDeviceCommonConfig):
         super().__init__(device)
         self.now = datetime.now()
         self.current_period = self.__get_current_period()
+        self.manual_activation_period = self.__get_manual_activation()
 
     def is_active_day(self):
         return RelayPeriodicDay.objects.filter(device=self.device, day=self.now.weekday()).exists()
@@ -95,6 +96,19 @@ class RelayPeriodicDeviceConfig(RelayDeviceCommonConfig):
         if self.current_period is None:
             return "None"
         return f"{self.current_period.begin.strftime('%H:%M')} - {self.current_period.end.strftime('%H:%M')}"
+
+    def __get_manual_activation(self):
+        return RelayPeriodicManualActivation.objects.filter(device=self.device).first()
+
+    def is_manual_activated(self):
+        if self.manual_activation_period is None:
+            return False
+        return self.now < self.manual_activation_period.end_time
+
+    def get_manual_activation_end_display(self):
+        if self.manual_activation_period is None:
+            return "None"
+        return self.manual_activation_period.end_time.strftime('%Y-%m-%d %H:%M:%S')
 
     def get_active_days(self):
         return RelayPeriodicDay.objects.filter(device=self.device)
