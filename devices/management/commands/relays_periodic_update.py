@@ -54,11 +54,13 @@ class Command(BaseCommand):
 
             try:
                 if active_time:
-                    self.stdout.write(add_timestamp(activation_log))
-                    device_config.setstate(device_config.active_state)
+                    if not device_config.is_active():
+                        self.stdout.write(add_timestamp(activation_log))
+                        device_config.setstate(device_config.active_state)
                 else:
-                    self.stdout.write(add_timestamp(f"device: {device.name} - no active period"))
-                    device_config.setstate(device_config.inactive_state)
+                    if device_config.is_active():
+                        self.stdout.write(add_timestamp(f"device: {device.name} - no active period: Desactivating"))
+                        device_config.setstate(device_config.inactive_state)
             except Exception as e:
                 self.stdout.write(add_timestamp(f"Pin change error: {str(e)}"))
                 continue
