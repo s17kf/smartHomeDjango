@@ -74,17 +74,19 @@ class RelayPeriodicDeviceConfig(RelayDeviceCommonConfig):
         assert device.type == Device.DeviceType.RELAY_PERIODIC
         super().__init__(device)
         self.now = datetime.now()
+        self.active_days = RelayPeriodicDay.objects.filter(device=self.device)
+        self.active_periods = RelayPeriodicPeriod.objects.filter(device=self.device)
         self.current_period = self.__get_current_period()
         self.manual_activation_period = self.__get_manual_activation()
 
     def is_active_day(self):
-        return RelayPeriodicDay.objects.filter(device=self.device, day=self.now.weekday()).exists()
+        return self.active_days.filter(day=self.now.weekday()).exists()
 
     def current_day_display(self):
         return self.now.strftime('%A')
 
     def __get_current_period(self):
-        for period in RelayPeriodicPeriod.objects.filter(device=self.device):
+        for period in self.active_periods:
             if period.begin < period.end:
                 if period.begin <= self.now.time() <= period.end:
                     return period
@@ -110,8 +112,15 @@ class RelayPeriodicDeviceConfig(RelayDeviceCommonConfig):
             return "None"
         return self.manual_activation_period.end_time.strftime('%Y-%m-%d %H:%M')
 
+    def get_inactive_days(self):
+        inactive_days = []
+        for day in RelayPeriodicDay.DaysChoices.choices:
+            if not self.active_days.filter(day=day[0]).exists():
+                inactive_days.append(day)
+        return inactive_days
+
     def get_active_days(self):
-        return RelayPeriodicDay.objects.filter(device=self.device)
+        return self.active_days.order_by('day')
 
     def get_active_periods(self):
         return RelayPeriodicPeriod.objects.filter(device=self.device)

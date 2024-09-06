@@ -114,3 +114,46 @@ def periodic_relay_manual_deactivate(request, device_id):
     device_config = RelayPeriodicDeviceConfig(device)
     device_config.setstate(device_config.inactive_state)
     return HttpResponseRedirect(next)
+
+
+def periodic_relay_add_active_day(request, device_id):
+    next = request.POST.get('next', '/')
+    try:
+        device = Device.objects.get(pk=device_id)
+    except Device.DoesNotExist:
+        # todo: log error
+        return HttpResponseRedirect(next)
+    try:
+        day = int(request.POST.get('day', '-1'))
+    except ValueError:
+        return HttpResponseRedirect(next)
+    if day < 0 or day > 6:
+        return HttpResponseRedirect(next)
+    if device.relayperiodicday_set.filter(day=day).exists():
+        return HttpResponseRedirect(next)
+    device.relayperiodicday_set.create(day=day)
+    if day == datetime.now().weekday():
+        device_config = RelayPeriodicDeviceConfig(device)
+        device_config.setstate(device_config.active_state)
+    return HttpResponseRedirect(next)
+
+
+def periodic_relay_remove_active_day(request, device_id):
+    next = request.POST.get('next', '/')
+    try:
+        device = Device.objects.get(pk=device_id)
+    except Device.DoesNotExist:
+        # todo: log error
+        return HttpResponseRedirect(next)
+    try:
+        day = int(request.POST.get('day', '-1'))
+    except ValueError:
+        return HttpResponseRedirect(next)
+    if day < 0 or day > 6:
+        return HttpResponseRedirect(next)
+    device.relayperiodicday_set.filter(day=day).delete()
+    if day == datetime.now().weekday():
+        device_config = RelayPeriodicDeviceConfig(device)
+        if not device_config.is_manual_activated() and device_config.current_period is None:
+            device_config.setstate(device_config.inactive_state)
+    return HttpResponseRedirect(next)

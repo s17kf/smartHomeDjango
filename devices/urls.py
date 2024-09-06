@@ -13,4 +13,8 @@ urlpatterns = [
          name='periodic_relay_manual_activate'),
     path('periodic_relay_manual_deactivate/<int:device_id>', views.periodic_relay_manual_deactivate,
          name='periodic_relay_manual_deactivate'),
+    path('periodic_relay_add_active_day/<int:device_id>', views.periodic_relay_add_active_day,
+         name='periodic_relay_add_active_day'),
+    path('periodic_relay_remove_active_day/<int:device_id>', views.periodic_relay_remove_active_day,
+         name='periodic_relay_remove_active_day'),
 ]
