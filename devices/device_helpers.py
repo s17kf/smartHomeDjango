@@ -108,7 +108,7 @@ class RelayPeriodicDeviceConfig(RelayDeviceCommonConfig):
     def get_manual_activation_end_display(self):
         if self.manual_activation_period is None:
             return "None"
-        return self.manual_activation_period.end_time.strftime('%Y-%m-%d %H:%M:%S')
+        return self.manual_activation_period.end_time.strftime('%Y-%m-%d %H:%M')
 
     def get_active_days(self):
         return RelayPeriodicDay.objects.filter(device=self.device)

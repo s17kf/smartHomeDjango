@@ -9,4 +9,8 @@ urlpatterns = [
     path('device/<int:pk>/', views.DeviceView.as_view(), name='device'),
     path('location_update/<int:location_id>', views.location_update, name='location_update'),
     path('relay_update/<int:device_id>', views.relay_update, name='relay_update'),
+    path('periodic_relay_manual_activate/<int:device_id>', views.periodic_relay_manual_activate,
+         name='periodic_relay_manual_activate'),
+    path('periodic_relay_manual_deactivate/<int:device_id>', views.periodic_relay_manual_deactivate,
+         name='periodic_relay_manual_deactivate'),
 ]

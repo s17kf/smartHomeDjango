@@ -1,7 +1,17 @@
 {% if device_config.state_available %}
     {% if device_config.is_active %}
         Relay is <span style="color: green;">ON</span>
-        {% if device_config.is_active_day %}
+        {% if device_config.is_manual_activated %}
+            <br>
+            Activation till {{ device_config.get_manual_activation_end_display }}
+            <input type="button" form="form_manual_deactivate_relay{{ device.id }}" value="deactivate"
+                   onclick="this.form.submit()">
+            <form action="{% url 'devices:periodic_relay_manual_deactivate' device.id %}" method="post"
+                  id="form_manual_deactivate_relay{{ device.id }}">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="{{ request.path }}">
+            </form>
+        {% elif device_config.is_active_day %}
             <br>
             Active day: {{ device_config.current_day_display }}
         {% elif device_config.current_period %}
@@ -10,6 +20,16 @@
         {% endif %}
     {% else %}
         Relay is <span style="color: red;">OFF</span>
+        <br>
+        <label for="minutes_input_field">Minutes:</label>
+        <input type="number" id="minutes_input_field" name="minutes" form="form_manual_activate_relay{{ device.id }}">
+        <input type="button" form="form_manual_activate_relay{{ device.id }}" value="activate"
+               onclick="this.form.submit()">
+        <form action="{% url 'devices:periodic_relay_manual_activate' device.id %}" method="post"
+              id="form_manual_activate_relay{{ device.id }}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.path }}">
+        </form>
     {% endif %}
 {% else %}
     <span style="color: gray;">Relay state not available</span>

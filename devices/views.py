@@ -1,11 +1,12 @@
+from datetime import datetime, timedelta
+
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, get_object_or_404, get_list_or_404
+from django.shortcuts import get_object_or_404, get_list_or_404
 from django.urls import reverse
 from django.views import generic
 
-from .models import Location, Device
-from .device_helpers import DeviceConfig, RelayDeviceConfig
-import gpiocontrol as gpio
+from .device_helpers import DeviceConfig, RelayDeviceConfig, RelayPeriodicDeviceConfig
+from .models import Location, Device, RelayPeriodicManualActivation
 
 
 class IndexView(generic.ListView):
@@ -70,4 +71,46 @@ def relay_update(request, device_id):
     device_config = RelayDeviceConfig(device)
     new_state = device_config.active_state if request.POST.get('state', 'off') == 'on' else device_config.inactive_state
     device_config.setstate(new_state)
+    return HttpResponseRedirect(next)
+
+
+def periodic_relay_manual_activate(request, device_id):
+    next = request.POST.get('next', '/')
+    try:
+        device = Device.objects.get(pk=device_id)
+    except Device.DoesNotExist:
+        # todo: log error
+        return HttpResponseRedirect(next)
+    manual_activation = RelayPeriodicManualActivation.objects.filter(device=device).first()
+    if manual_activation:
+        manual_activation.delete()
+    manual_activation = RelayPeriodicManualActivation(device=device)
+    try:
+        minutes = int(request.POST.get('minutes', '0'))
+    except ValueError:
+        minutes = 0
+    if minutes <= 0:
+        return HttpResponseRedirect(next)
+    end_time = datetime.now().replace(second=0) + timedelta(minutes=minutes)
+    manual_activation.end_time = end_time
+    manual_activation.save()
+    device_config = RelayPeriodicDeviceConfig(device)
+    device_config.setstate(device_config.active_state)
+    return HttpResponseRedirect(next)
+
+
+def periodic_relay_manual_deactivate(request, device_id):
+    next = request.POST.get('next', '/')
+    try:
+        device = Device.objects.get(pk=device_id)
+    except Device.DoesNotExist:
+        # todo: log error
+        return HttpResponseRedirect(next)
+    manual_activation = RelayPeriodicManualActivation.objects.filter(device=device).first()
+    if manual_activation is None:
+        print(f"no manual activation to deactivate (dev: {device.name})")
+        return HttpResponseRedirect(next)
+    manual_activation.delete()
+    device_config = RelayPeriodicDeviceConfig(device)
+    device_config.setstate(device_config.inactive_state)
     return HttpResponseRedirect(next)
