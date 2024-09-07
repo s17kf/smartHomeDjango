@@ -132,8 +132,8 @@ def periodic_relay_add_active_day(request, device_id):
     if device.relayperiodicday_set.filter(day=day).exists():
         return HttpResponseRedirect(next)
     device.relayperiodicday_set.create(day=day)
-    if day == datetime.now().weekday():
-        device_config = RelayPeriodicDeviceConfig(device)
+    device_config = RelayPeriodicDeviceConfig(device)
+    if not device_config.is_active() and day == datetime.now().weekday():
         device_config.setstate(device_config.active_state)
     return HttpResponseRedirect(next)
 
@@ -156,4 +156,49 @@ def periodic_relay_remove_active_day(request, device_id):
         device_config = RelayPeriodicDeviceConfig(device)
         if not device_config.is_manual_activated() and device_config.current_period is None:
             device_config.setstate(device_config.inactive_state)
+    return HttpResponseRedirect(next)
+
+
+def periodic_relay_add_active_period(request, device_id):
+    next = request.POST.get('next', '/')
+    try:
+        device = Device.objects.get(pk=device_id)
+    except Device.DoesNotExist:
+        # todo: log error
+        return HttpResponseRedirect(next)
+    try:
+        begin = request.POST.get('begin', '00:00')
+        end = request.POST.get('end', '00:00')
+        begin_time = datetime.strptime(begin, '%H:%M').time()
+        end_time = datetime.strptime(end, '%H:%M').time()
+    except ValueError:
+        return HttpResponseRedirect(next)
+    if begin_time == end_time:
+        return HttpResponseRedirect(next)
+    if device.relayperiodicperiod_set.filter(begin=begin_time, end=end_time).exists():
+        return HttpResponseRedirect(next)
+    device.relayperiodicperiod_set.create(begin=begin_time, end=end_time)
+    device_config = RelayPeriodicDeviceConfig(device)
+    if not device_config.is_active() and device_config.current_period is not None:
+        device_config.setstate(device_config.active_state)
+    return HttpResponseRedirect(next)
+
+
+def periodic_relay_remove_active_period(request, device_id):
+    next = request.POST.get('next', '/')
+    try:
+        device = Device.objects.get(pk=device_id)
+    except Device.DoesNotExist:
+        # todo: log error
+        return HttpResponseRedirect(next)
+    try:
+        period_id = int(request.POST.get('period_id', '-1'))
+    except ValueError:
+        return HttpResponseRedirect(next)
+    device.relayperiodicperiod_set.filter(pk=period_id).delete()
+    device_config = RelayPeriodicDeviceConfig(device)
+    if (device_config.is_active() and device_config.current_period is None
+            and not device_config.is_manual_activated()
+            and not device_config.is_active_day()):
+        device_config.setstate(device_config.inactive_state)
     return HttpResponseRedirect(next)

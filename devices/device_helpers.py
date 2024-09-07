@@ -123,7 +123,7 @@ class RelayPeriodicDeviceConfig(RelayDeviceCommonConfig):
         return self.active_days.order_by('day')
 
     def get_active_periods(self):
-        return RelayPeriodicPeriod.objects.filter(device=self.device)
+        return RelayPeriodicPeriod.objects.filter(device=self.device).order_by('begin', 'end')
 
     def get_details_template(self):
         return "devices/details/relay_periodic_details.html"
