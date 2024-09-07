@@ -3,9 +3,9 @@ Active days:
     {% for day in device_config.get_active_days %}
         <li>
             {{ day.get_day_display }}
-            <input type="submit" value="Remove" form="form_remove_active_day{{ device.id }}">
+            <input type="submit" value="Remove" form="form_remove_active_day{{ device.id }}{{ day.day }}">
             <form action="{% url 'devices:periodic_relay_remove_active_day' device.id %}" method="post"
-                  id="form_remove_active_day{{ device.id }}">
+                  id="form_remove_active_day{{ device.id }}{{ day.day }}">
                 {% csrf_token %}
                 <input type="hidden" name="day" value="{{ day.day }}">
                 <input type="hidden" name="next" value="{{ request.path }}">
