@@ -22,7 +22,8 @@
         Relay is <span style="color: red;">OFF</span>
         <br>
         <label for="minutes_input_field">Minutes:</label>
-        <input type="number" id="minutes_input_field" name="minutes" form="form_manual_activate_relay{{ device.id }}">
+        <input type="number" class="minutes" id="minutes_input_field" name="minutes"
+               form="form_manual_activate_relay{{ device.id }}">
         <input type="button" form="form_manual_activate_relay{{ device.id }}" value="activate"
                onclick="this.form.submit()">
         <form action="{% url 'devices:periodic_relay_manual_activate' device.id %}" method="post"
