@@ -112,7 +112,8 @@ def periodic_relay_manual_deactivate(request, device_id):
         return HttpResponseRedirect(next)
     manual_activation.delete()
     device_config = RelayPeriodicDeviceConfig(device)
-    device_config.setstate(device_config.inactive_state)
+    if not device_config.is_active_day() and device_config.current_period is None:
+        device_config.setstate(device_config.inactive_state)
     return HttpResponseRedirect(next)
 
 
