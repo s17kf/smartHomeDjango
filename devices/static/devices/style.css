@@ -43,6 +43,10 @@ html, body {
   width: 4em;
 }
 
+.rp_edit_buttons {
+  display: none;
+}
+
 @media (max-width: 600px) {
   input[type="time"] {
     width: 5em;
