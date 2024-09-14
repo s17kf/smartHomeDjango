@@ -4,7 +4,6 @@ RUN apt update -y
 RUN apt -y install sudo git vim cron
 RUN apt -y install python3 python3-pip
 
-
 ENV USER=ubuntu
 RUN echo "$USER ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/$USER
 
@@ -20,12 +19,10 @@ COPY assets/entrypoint.sh entrypoint.sh
 COPY assets/run_server.sh run_server.sh
 
 COPY assets/tmp tmp
-
 COPY assets/pinctrl_dummy.py pinctrl_dummy.py
-COPY assets/devices devices
 
-#todo: replace this with populating db based on some data file
-COPY db.sqlite3 tmp/db.sqlite3
+COPY assets/devices devices
+COPY assets/db_fixtures db_fixtures
 
 RUN ./install.sh
 
