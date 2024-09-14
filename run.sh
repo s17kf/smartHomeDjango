@@ -1,8 +1,10 @@
 #!/usr/bin/bash
 
-if [ "$EUID" -ne 0 ]
-  then echo "$0 has to be run as root!"
+set -e
+
+if [ "$EUID" -eq 0 ]
+  then echo "$0 Can't be run as root!"
   exit 1
 fi
 
-docker run -it -p 8000:8000 smarthome
+sudo docker run -it -p 8000:8000 smarthome

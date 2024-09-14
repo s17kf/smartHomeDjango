@@ -21,6 +21,8 @@ git clone --depth=1 https://github.com/s17kf/smartHomeWebApp.git
 
 cd smartHomeWebApp || exit 1
 
+git apply --allow-empty ../tmp/patch.diff
+
 echo "Installing dependencies from requirements.txt"
 # Use flag --break-system-packages to be possible to install packages without virtualenv,
 # there is no need to use virtualenv inside docker container
