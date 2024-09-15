@@ -1,11 +1,13 @@
 {% extends 'devices/base.html' %}
 
+{% load i18n %}
+
 {% block page_title %}
     {{ device.name }} ({{ device.location.name }})
 {% endblock %}
 
 {% block content %}
-    <a href="{% url 'devices:location' device.location_id %}">Back to location</a>
+    <a href="{% url 'devices:location' device.location_id %}">{% trans "Back to location" %}</a>
 
     <p>
         {% include device_config.get_status_template %}

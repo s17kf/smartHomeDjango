@@ -3,6 +3,7 @@ FROM ubuntu
 RUN apt update -y
 RUN apt -y install sudo git vim cron tree
 RUN apt -y install python3 python3-pip
+RUN apt -y install gettext
 
 ENV USER=ubuntu
 RUN echo "$USER ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/$USER

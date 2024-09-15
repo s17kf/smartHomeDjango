@@ -30,6 +30,7 @@ pip3 install --break-system-packages -r requirements.txt
 
 echo "Migrating database and loading fixtures"
 python3 manage.py migrate
+python3 manage.py compilemessages
 for fixture in ../db_fixtures/*.json; do
   echo "Loading fixture: $fixture"
   python3 manage.py loaddata "$fixture"

@@ -1,11 +1,13 @@
 {% extends 'devices/base.html' %}
 
+{% load i18n %}
+
 {% block page_title %}
     {{ location_name }}
 {% endblock %}
 
 {% block content %}
-    <a href="{% url 'devices:index' %}">Back to locations</a>
+    <a href="{% url 'devices:index' %}">{% trans "Back to locations" %}</a>
     {% if device_config_list %}
         <fieldset>
             <table>

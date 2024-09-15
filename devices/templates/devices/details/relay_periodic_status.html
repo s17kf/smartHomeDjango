@@ -1,14 +1,15 @@
+{% load i18n %}
 {% if device_config.state_available %}
     {% if device_config.is_active %}
-        Relay is <span style="color: green;">ON</span>
+        {% trans "Relay is " %} <span style="color: green;">{% trans "ON" %}</span>
         {% if not device_config.is_manual_activated %}
-            <input type="button" value="manual on" id="manual_activation_button_{{ device.id }}"
+            <input type="button" value="{% trans "manual on" %}" id="manual_activation_button_{{ device.id }}"
                    onclick="show_manual_activation({{ device.id }})">
         {% endif %}
         {% if device_config.is_manual_activated %}
             <br>
-            Activation till {{ device_config.get_manual_activation_end_display }}
-            <input type="submit" form="form_manual_deactivate_relay{{ device.id }}" value="cancel">
+            {% trans "Active till " %} {{ device_config.get_manual_activation_end_display }}
+            <input type="submit" form="form_manual_deactivate_relay{{ device.id }}" value="{% trans "cancel" %}">
             <form action="{% url 'devices:periodic_relay_manual_deactivate' device.id %}" method="post"
                   id="form_manual_deactivate_relay{{ device.id }}">
                 {% csrf_token %}
@@ -16,23 +17,23 @@
             </form>
         {% elif device_config.is_active_day %}
             <br>
-            Active day: {{ device_config.current_day_display }}
+            {% trans "Active day: " %} {{ device_config.current_day_display }}
         {% elif device_config.current_period %}
             <br>
-            Active period: {{ device_config.get_current_period_display }}
+            {% trans "Active period: " %} {{ device_config.get_current_period_display }}
         {% endif %}
     {% else %}
-        Relay is <span style="color: red;">OFF</span>
-        <input type="button" value="manual on" id="manual_activation_button_{{ device.id }}"
+        {% trans "Relay is " %} <span style="color: red;">{% trans "OFF" %}</span>
+        <input type="button" value="{% trans "manual on" %}" id="manual_activation_button_{{ device.id }}"
                onclick="show_manual_activation({{ device.id }})">
     {% endif %}
     {% if not device_config.is_manual_activated %}
         <div class="hidden" id="manual_activation_{{ device.id }}">
-            <label for="minutes_input_field">Minutes:</label>
+            <label for="minutes_input_field">{% trans "Minutes:" %}</label>
             <input type="number" class="minutes" id="minutes_input_field" name="minutes"
                    value="30" min="1" form="form_manual_activate_relay{{ device.id }}">
-            <input type="submit" form="form_manual_activate_relay{{ device.id }}" value="set">
-            <input type="button" value="cancel" onclick="hide_manual_activation({{ device.id }})">
+            <input type="submit" form="form_manual_activate_relay{{ device.id }}" value="{% trans "set" %}">
+            <input type="button" value="{% trans "cancel" %}" onclick="hide_manual_activation({{ device.id }})">
             <form action="{% url 'devices:periodic_relay_manual_activate' device.id %}" method="post"
                   id="form_manual_activate_relay{{ device.id }}">
                 {% csrf_token %}
@@ -41,7 +42,7 @@
         </div>
     {% endif %}
 {% else %}
-    <span style="color: gray;">Relay state not available</span>
+    <span style="color: gray;">{% trans "Relay state not available" %}</span>
 {% endif %}
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"

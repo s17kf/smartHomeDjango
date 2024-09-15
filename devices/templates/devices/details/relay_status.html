@@ -1,3 +1,4 @@
+{% load i18n %}
 {% if device_config.state_available %}
     <label for="radio_{{ device.id }}_0">0</label>
     <input type="radio" id="radio_{{ device.id }}_0" name="state" value="off"
@@ -19,5 +20,5 @@
         <input type="hidden" name="next" value="{{ request.path }}">
     </form>
 {% else %}
-    <span style="color: gray;">Relay state not available</span>
+    <span style="color: gray;">{% trans "Relay state not available" %}</span>
 {% endif %}

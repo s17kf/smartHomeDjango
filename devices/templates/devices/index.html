@@ -1,7 +1,9 @@
 {% extends 'devices/base.html' %}
 
+{% load i18n %}
+
 {% block page_title %}
-	Locations
+    {% trans "Locations" %}
 {% endblock %}
 
 {% block content %}
@@ -13,7 +15,7 @@
             {% endfor %}
         </ul>
     {% else %}
-        <p>No locations available.</p>
+        <p>{% trans "No locations available." %}</p>
     {% endif %}
 
 {% endblock %}

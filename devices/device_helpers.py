@@ -83,7 +83,7 @@ class RelayPeriodicDeviceConfig(RelayDeviceCommonConfig):
         return self.active_days.filter(day=self.now.weekday()).exists()
 
     def current_day_display(self):
-        return self.now.strftime('%A')
+        return RelayPeriodicDay.DaysChoices(self.now.weekday()).label
 
     def __get_current_period(self):
         for period in self.active_periods:
