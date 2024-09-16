@@ -68,6 +68,9 @@ class RelayDeviceConfig(RelayDeviceCommonConfig):
     def get_status_template(self):
         return "devices/details/relay_status.html"
 
+    def get_details_template(self):
+        return "devices/details/empty.html"
+
 
 class RelayPeriodicDeviceConfig(RelayDeviceCommonConfig):
     def __init__(self, device: Device):
