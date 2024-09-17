@@ -16,8 +16,8 @@ for i in $(seq 1 27); do
 done
 sudo ln -s /home/ubuntu/pinctrl_dummy.py /usr/bin/pinctrl
 
-echo "Cloning smartHomeWebApp repository"
-git clone --depth=1 https://github.com/s17kf/smartHomeWebApp.git
+echo "Cloning smartHomeDjango repository"
+git clone --depth=1 https://github.com/s17kf/smartHomeDjango.git
 
 cd smartHomeWebApp || exit 1
 
