@@ -19,7 +19,7 @@ sudo ln -s /home/ubuntu/pinctrl_dummy.py /usr/bin/pinctrl
 echo "Cloning smartHomeDjango repository"
 git clone --depth=1 https://github.com/s17kf/smartHomeDjango.git
 
-cd smartHomeWebApp || exit 1
+cd smartHomeDjango || exit 1
 
 git apply --allow-empty ../tmp/patch.diff
 

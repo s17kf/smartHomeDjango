@@ -37,11 +37,11 @@ To run on other devices, it is recommended to use Docker. See the [Docker](#dock
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/s17kf/SmartHomeDjango.git
+    git clone https://github.com/s17kf/smartHomeDjango.git
     ```
 2. Navigate into the project directory:
     ```bash
-    cd SmartHomeDjango
+    cd smartHomeDjango
     ```
 3. Install dependencies:
     ```bash
@@ -79,7 +79,7 @@ The Docker image is based on ubuntu and includes all dependencies required to ru
 
 1. Navigate into the project directory:
    ```bash
-   cd SmartHomeDjango
+   cd smartHomeDjango
    ```
 2. Build the Docker image:
    ```bash

@@ -14,7 +14,7 @@ function usage() {
   cat <<EOF
 ${BOLD}Usage${NC}: $0 [OPTIONS]
 
-Prepare and build docker image for smartHomeWebApp.
+Prepare and build docker image for SmartHomeDjango app.
 
 ${YELLOW_B}WARNING${NC}: Any files staged for commit will be included in patch and UNSTAGED!
 
