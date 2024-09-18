@@ -10,6 +10,35 @@ __error_trapper() {
 }
 trap '__error_trapper "${LINENO}/${BASH_LINENO}" "$?" "$BASH_COMMAND"' ERR
 
+BLUE='\033[0;34m'
+GREEN='\033[0;32m'
+IT_BLUE='\033[3;34m'
+NC='\033[0m'
+
+function welcome_print() {
+  local border=$GREEN
+  cat <<EOF
+${border}
+*********************************************
+*                                           *
+*   ${BLUE}Welcome to SmartHomeDjango container!${border}   *
+*                                           *
+*********************************************
+
+${BLUE}Starting Django server...
+${NC}
+EOF
+}
+
+function server_stopped_print() {
+  cat <<EOF
+
+${BLUE}Django server has been stopped.
+You still are in the container!
+To exit type: ${IT_BLUE}exit$
+${NC}
+EOF
+}
 
 # Not sure if there is need cron tab job to be run
 # without this cron jobs won't work (crontab file is set by install.sh)
@@ -17,10 +46,10 @@ trap '__error_trapper "${LINENO}/${BASH_LINENO}" "$?" "$BASH_COMMAND"' ERR
 
 python3 /home/ubuntu/smartHomeDjango/manage.py relays_periodic_update >> /home/ubuntu/logs/relays_periodic_update_crontab.log 2>&1
 
-echo "*********************************************"
-echo "*                                           *"
-echo "*   Welcome to SmartHomeDjango container!   *"
-echo "*                                           *"
-echo "*********************************************"
+echo -e "$(welcome_print)"
+
+./run_server.sh
+
+echo -e "$(server_stopped_print)"
 
 bash
