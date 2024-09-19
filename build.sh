@@ -23,6 +23,7 @@ ${BOLD}Options${NC}:
                       Add file(s)/dir(s) to be included in patch applied to docker image's repo
                       To add multiple entries use comma as separator.
   -c, --cache         Do not use --no-cache flag when building docker image
+  --reference REF     Use REF as reference for git diff (default: HEAD)
   -h, --help          Display this help and exit
 EOF
 }
@@ -36,7 +37,7 @@ fi
 # Check if sudo is available and ask password if needed
 sudo ls > /dev/null
 
-VALID_ARGS=$(getopt -o a:ch --long add-file:,cache,help -- "$@")
+VALID_ARGS=$(getopt -o a:ch --long add-file:,cache,reference:,help -- "$@")
 if [[ $? -ne 0 ]]; then
   echo -e "$(usage)"
   exit 1;
@@ -46,6 +47,7 @@ set -e
 
 eval set -- "$VALID_ARGS"
 cache="--no-cache"
+git_reference="HEAD"
 # shellcheck disable=SC2078
 while [ : ]; do
   case "$1" in
@@ -67,6 +69,10 @@ while [ : ]; do
       echo -e "${INFO} --no-cache flag will NOT be used"
       cache=""
       shift
+      ;;
+    --reference)
+      git_reference="$2"
+      shift 2
       ;;
     -h | --help)
       echo -e "$(usage)"
@@ -92,9 +98,10 @@ for file in "${files_to_git_add[@]}"; do
   echo -e "${INFO} git add ${file}"
   git add "$file"
 done
+echo -e "${INFO} Prepare patch against ${git_reference}"
 echo -e "${INFO} Files included in patch:"
-git diff --staged HEAD --name-only | xargs -i echo -e "\t{}"
-git diff --staged HEAD > _tmp/patch.diff
+git diff --staged ${git_reference} --name-only | xargs -i echo -e "\t{}"
+git diff --staged ${git_reference} > _tmp/patch.diff
 echo -e "${INFO} Run: ${ITALIC}git reset HEAD${NC}"
 git reset HEAD > /dev/null
 
