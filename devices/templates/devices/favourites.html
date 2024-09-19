@@ -1,0 +1,27 @@
+{% extends 'devices/base.html' %}
+
+{% load i18n %}
+
+{% block page_title %}
+    {% trans "Favourites" %}
+{% endblock %}
+
+{% block content %}
+
+    {% if favourites_devices %}
+        <table>
+            {% for device_config in favourites_devices %}
+                <tr style="outline: thin solid darkgrey">
+                    <td>
+                        <a href="{% url 'devices:device' device_config.device.id %}">{{ device_config.device.name }}</a>
+                    </td>
+                    <td>
+                        {% include device_config.get_status_template with device=device_config.device %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+    <p>{% trans "Add favourite devices." %}</p>
+
+{% endblock %}

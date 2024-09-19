@@ -9,12 +9,20 @@ from .device_helpers import DeviceConfig, RelayDeviceConfig, RelayPeriodicDevice
 from .models import Location, Device, RelayPeriodicManualActivation
 
 
-class IndexView(generic.ListView):
-    template_name = 'devices/index.html'
+class LocationListView(generic.ListView):
+    template_name = 'devices/location_list.html'
     context_object_name = 'locations'
 
     def get_queryset(self):
         return Location.objects.all()
+
+
+class FavouritesView(generic.ListView):
+    template_name = 'devices/favourites.html'
+    context_object_name = 'favourites_devices'
+
+    def get_queryset(self):
+        return
 
 
 class DeviceView(generic.DetailView):

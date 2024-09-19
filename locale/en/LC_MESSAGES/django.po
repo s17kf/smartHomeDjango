@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-15 23:26+0200\n"
+"POT-Creation-Date: 2024-09-19 11:46+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -97,7 +97,7 @@ msgid "edit"
 msgstr ""
 
 #: devices/templates/devices/details/relay_periodic_details.html:61
-msgid "cancel edit"
+msgid "hide edit"
 msgstr ""
 
 #: devices/templates/devices/details/relay_periodic_status.html:4
@@ -152,22 +152,30 @@ msgstr ""
 msgid "Back to location"
 msgstr ""
 
-#: devices/templates/devices/index.html:6
-msgid "Locations"
+#: devices/templates/devices/favourites.html:6
+msgid "Favourites"
 msgstr ""
 
-#: devices/templates/devices/index.html:18
-msgid "No locations available."
+#: devices/templates/devices/favourites.html:25
+msgid "Add favourite devices."
 msgstr ""
 
 #: devices/templates/devices/location.html:10
 msgid "Back to locations"
 msgstr ""
 
-#: smartHomeSite/settings.py:117
-msgid "English"
+#: devices/templates/devices/location_list.html:6
+msgid "Locations"
+msgstr ""
+
+#: devices/templates/devices/location_list.html:18
+msgid "No locations available."
 msgstr ""
 
 #: smartHomeSite/settings.py:118
+msgid "English"
+msgstr ""
+
+#: smartHomeSite/settings.py:119
 msgid "Polish"
 msgstr ""

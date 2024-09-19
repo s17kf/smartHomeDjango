@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-15 23:26+0200\n"
+"POT-Creation-Date: 2024-09-19 11:46+0200\n"
 "PO-Revision-Date: 2024-09-15 11:47+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -154,22 +154,30 @@ msgstr "Stan przekaźnika niedostępny"
 msgid "Back to location"
 msgstr "Powrót do lokalizacji"
 
-#: devices/templates/devices/index.html:6
-msgid "Locations"
-msgstr "Miejsca"
+#: devices/templates/devices/favourites.html:6
+msgid "Favourites"
+msgstr "Ulubione"
 
-#: devices/templates/devices/index.html:18
-msgid "No locations available."
-msgstr "Brak miejsc do wyświetlenia."
+#: devices/templates/devices/favourites.html:25
+msgid "Add favourite devices."
+msgstr "Dodaj do ulubionych."
 
 #: devices/templates/devices/location.html:10
 msgid "Back to locations"
 msgstr "Powrót do listy lokalizacji"
 
-#: smartHomeSite/settings.py:117
+#: devices/templates/devices/location_list.html:6
+msgid "Locations"
+msgstr "Miejsca"
+
+#: devices/templates/devices/location_list.html:18
+msgid "No locations available."
+msgstr "Brak miejsc do wyświetlenia."
+
+#: smartHomeSite/settings.py:118
 msgid "English"
 msgstr "angielski"
 
-#: smartHomeSite/settings.py:118
+#: smartHomeSite/settings.py:119
 msgid "Polish"
 msgstr "polski"
