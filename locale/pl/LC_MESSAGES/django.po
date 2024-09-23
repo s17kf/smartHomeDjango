@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-19 11:46+0200\n"
+"POT-Creation-Date: 2024-09-22 23:29+0200\n"
 "PO-Revision-Date: 2024-09-15 11:47+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -19,6 +19,14 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 "
 "|| n%100>14) ? 1 : 2);\n"
 "X-Generator: Poedit 3.5\n"
+
+#: devices/menus.py:5 devices/templates/devices/location_list.html:6
+msgid "Locations"
+msgstr "Miejsca"
+
+#: devices/menus.py:8 devices/templates/devices/favourites.html:6
+msgid "Favourites"
+msgstr "Ulubione"
 
 #: devices/models.py:16
 msgid "Relay"
@@ -55,6 +63,10 @@ msgstr "Sobota"
 #: devices/models.py:65
 msgid "Sunday"
 msgstr "Niedziela"
+
+#: devices/templates/devices/base.html:36
+msgid "Smart home"
+msgstr ""
 
 #: devices/templates/devices/details/relay_periodic_details.html:4
 msgid "Active days:"
@@ -154,10 +166,6 @@ msgstr "Stan przekaźnika niedostępny"
 msgid "Back to location"
 msgstr "Powrót do lokalizacji"
 
-#: devices/templates/devices/favourites.html:6
-msgid "Favourites"
-msgstr "Ulubione"
-
 #: devices/templates/devices/favourites.html:25
 msgid "Add favourite devices."
 msgstr "Dodaj do ulubionych."
@@ -165,10 +173,6 @@ msgstr "Dodaj do ulubionych."
 #: devices/templates/devices/location.html:10
 msgid "Back to locations"
 msgstr "Powrót do listy lokalizacji"
-
-#: devices/templates/devices/location_list.html:6
-msgid "Locations"
-msgstr "Miejsca"
 
 #: devices/templates/devices/location_list.html:18
 msgid "No locations available."
