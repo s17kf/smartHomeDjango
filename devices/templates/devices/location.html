@@ -8,18 +8,22 @@
 
 {% block content %}
     <a href="{% url 'devices:main' %}"
-       class="btn btn-outline-secondary " role="button"
+       class="btn btn-outline-secondary btn-lg" role="button"
     >
         {% trans "Back to locations" %}
     </a>
     {% if device_config_list %}
         <div class="table-responsive">
-            <table class="table table-dark table-striped table-hover">
+            <table class="table table-dark table-striped table-hover align-middle">
                 <tbody>
                 {% for device_config in device_config_list %}
                     <tr>
                         <td class="col table-fit">
-                            <a href="{% url 'devices:device' device_config.device.id %}">{{ device_config.device.name }}</a>
+                            <a href="{% url 'devices:device' device_config.device.id %}"
+                               class="btn btn-outline-primary btn-sm" role="button"
+                            >
+                                {{ device_config.device.name }}
+                            </a>
                         </td>
                         <td class="col text-nowrap">
                             {% include device_config.get_status_template with device=device_config.device %}
