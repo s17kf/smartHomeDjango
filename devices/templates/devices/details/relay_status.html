@@ -1,13 +1,5 @@
 {% load i18n %}
 {% if device_config.state_available %}
-    <input type="radio" id="radio_{{ device.id }}_0" name="state" value="off"
-           form="form_update_relay{{ device.id }}"
-           class="btn-check" autocomplete="off"
-            {% if not device_config.is_active %}
-           checked
-            {% endif %}
-           onchange="this.form.submit()">
-    <label class="btn btn-outline-danger btn-sm" for="radio_{{ device.id }}_0">0</label>
     <input type="radio" id="radio_{{ device.id }}_1" name="state" value="on"
            form="form_update_relay{{ device.id }}"
            class="btn-check" autocomplete="off"
@@ -15,7 +7,15 @@
            checked
             {% endif %}
            onchange="this.form.submit()">
-    <label class="btn btn-outline-success btn-sm" for="radio_{{ device.id }}_1">1</label>
+    <label class="btn btn-outline-success btn-sm" for="radio_{{ device.id }}_1">ON</label>
+    <input type="radio" id="radio_{{ device.id }}_0" name="state" value="off"
+           form="form_update_relay{{ device.id }}"
+           class="btn-check" autocomplete="off"
+            {% if not device_config.is_active %}
+           checked
+            {% endif %}
+           onchange="this.form.submit()">
+    <label class="btn btn-outline-danger btn-sm" for="radio_{{ device.id }}_0">OFF</label>
     <form action="{% url 'devices:relay_update' device.id %}" method="post"
           id="form_update_relay{{ device.id }}">
         {% csrf_token %}

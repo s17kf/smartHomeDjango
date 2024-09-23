@@ -60,10 +60,7 @@
 <input type="button" value="{% trans "edit" %}" class="show_rp_edit_buttons" onclick="show_edit_buttons_clicked()">
 <input type="button" value="{% trans "hide edit" %}" class="rp_edit_buttons" onclick="hide_edit_buttons()">
 
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"
-        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
-        crossorigin="anonymous"></script>
-<script src="{% static 'devices/js/relay_periodic_edit.js' %}"></script>
+
 <script>
     $(document).ready(function () {
         show_edit_buttons_if_needed();

@@ -1,15 +1,14 @@
 {% load i18n %}
 {% if device_config.state_available %}
     {% if device_config.is_active %}
-        {% trans "Relay is " %} <span style="color: green;">{% trans "ON" %}</span>
-        {% if not device_config.is_manual_activated %}
-            <input type="button" value="{% trans "manual on" %}" id="manual_activation_button_{{ device.id }}"
-                   onclick="show_manual_activation({{ device.id }})">
-        {% endif %}
+        <span style="color: green;">
+            {% trans "ON" %}
+        </span>
         {% if device_config.is_manual_activated %}
             <br>
-            {% trans "Active till " %} {{ device_config.get_manual_activation_end_display }}
-            <input type="submit" form="form_manual_deactivate_relay{{ device.id }}" value="{% trans "cancel" %}">
+            {% trans "till " %} {{ device_config.get_manual_activation_end_display }}
+            <input type="submit" class="btn btn-outline-danger btn-sm"
+                   form="form_manual_deactivate_relay{{ device.id }}" value="{% trans "cancel" %}">
             <form action="{% url 'devices:periodic_relay_manual_deactivate' device.id %}" method="post"
                   id="form_manual_deactivate_relay{{ device.id }}">
                 {% csrf_token %}
@@ -17,23 +16,44 @@
             </form>
         {% elif device_config.is_active_day %}
             <br>
-            {% trans "Active day: " %} {{ device_config.current_day_display }}
+            {{ device_config.current_day_display }}
         {% elif device_config.current_period %}
             <br>
-            {% trans "Active period: " %} {{ device_config.get_current_period_display }}
+            {{ device_config.get_current_period_display }}
         {% endif %}
     {% else %}
-        {% trans "Relay is " %} <span style="color: red;">{% trans "OFF" %}</span>
-        <input type="button" value="{% trans "manual on" %}" id="manual_activation_button_{{ device.id }}"
-               onclick="show_manual_activation({{ device.id }})">
+        <span style="color: red;">{% trans "OFF" %}</span>
+        <button class="btn btn-outline-secondary btn-sm"
+                type="button" data-bs-toggle="collapse"
+                data-bs-target="#manual_activation_{{ device.id }}"
+                aria-expanded="false" aria-controls="manual_activation_{{ device.id }}"
+        >
+            {% trans "one-time ON" %}
+        </button>
     {% endif %}
     {% if not device_config.is_manual_activated %}
-        <div class="hidden" id="manual_activation_{{ device.id }}">
-            <label for="minutes_input_field">{% trans "Minutes:" %}</label>
-            <input type="number" class="minutes" id="minutes_input_field" name="minutes"
-                   value="30" min="1" form="form_manual_activate_relay{{ device.id }}">
-            <input type="submit" form="form_manual_activate_relay{{ device.id }}" value="{% trans "set" %}">
-            <input type="button" value="{% trans "cancel" %}" onclick="hide_manual_activation({{ device.id }})">
+        <div class="collapse" id="manual_activation_{{ device.id }}">
+            <table>
+                <tr>
+                    <td class="col">
+                            <label for="minutes_input_field_{{ device.id }}">
+                                {% trans "Minutes:" %}
+                            </label>
+                            <input type="number" class="minutes form-control text-bg-dark border-0"
+                                   id="minutes_input_field_{{ device.id }}" name="minutes"
+                                   value="30" min="1" form="form_manual_activate_relay{{ device.id }}">
+                    </td>
+                    <td class="col">
+                        <input type="submit" class="btn btn-outline-success btn-sm"
+                               form="form_manual_activate_relay{{ device.id }}" value="{% trans "set" %}">
+                        <input type="button" class="btn btn-outline-danger btn-sm"
+                               data-bs-toggle="collapse"
+                               data-bs-target="#manual_activation_{{ device.id }}"
+                               aria-expanded="false" aria-controls="manual_activation_{{ device.id }}"
+                               value="{% trans "cancel" %}">
+                    </td>
+                </tr>
+            </table>
             <form action="{% url 'devices:periodic_relay_manual_activate' device.id %}" method="post"
                   id="form_manual_activate_relay{{ device.id }}">
                 {% csrf_token %}
@@ -45,9 +65,6 @@
     <span style="color: gray;">{% trans "Relay state not available" %}</span>
 {% endif %}
 
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"
-        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
-        crossorigin="anonymous"></script>
 <script>
     function show_manual_activation(dev_id) {
         $('#manual_activation_' + dev_id).show();

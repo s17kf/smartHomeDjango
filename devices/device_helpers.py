@@ -25,6 +25,9 @@ class DeviceConfig:
     def get_status_template(self):
         return "devices/details/not_implemented_status.html"
 
+    def has_additional_info(self):
+        return False
+
 
 class RelayDeviceCommonConfig(DeviceConfig):
     def __init__(self, device: Device):
@@ -133,6 +136,9 @@ class RelayPeriodicDeviceConfig(RelayDeviceCommonConfig):
 
     def get_status_template(self):
         return "devices/details/relay_periodic_status.html"
+
+    def has_additional_info(self):
+        return True
 
 
 class MissingConfigFileDeviceConfig(DeviceConfig):
