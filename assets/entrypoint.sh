@@ -50,6 +50,6 @@ echo -e "$(welcome_print)"
 
 ./run_server.sh
 
-echo -e "$(server_stopped_print)"
-
-bash
+# Uncomment below lines if you want to keep container running after server stops
+#echo -e "$(server_stopped_print)"
+#bash
