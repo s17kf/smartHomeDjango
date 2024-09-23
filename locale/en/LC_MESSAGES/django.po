@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-09-22 23:29+0200\n"
+"POT-Creation-Date: 2024-09-23 21:16+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -112,51 +112,37 @@ msgstr ""
 msgid "hide edit"
 msgstr ""
 
-#: devices/templates/devices/details/relay_periodic_status.html:4
-#: devices/templates/devices/details/relay_periodic_status.html:26
-msgid "Relay is "
-msgstr ""
-
-#: devices/templates/devices/details/relay_periodic_status.html:4
+#: devices/templates/devices/details/relay_periodic_status.html:5
 msgid "ON"
 msgstr ""
 
-#: devices/templates/devices/details/relay_periodic_status.html:6
-#: devices/templates/devices/details/relay_periodic_status.html:27
-msgid "manual on"
+#: devices/templates/devices/details/relay_periodic_status.html:9
+msgid "till "
 msgstr ""
 
 #: devices/templates/devices/details/relay_periodic_status.html:11
-msgid "Active till "
-msgstr ""
-
-#: devices/templates/devices/details/relay_periodic_status.html:12
-#: devices/templates/devices/details/relay_periodic_status.html:36
+#: devices/templates/devices/details/relay_periodic_status.html:53
 msgid "cancel"
 msgstr ""
 
-#: devices/templates/devices/details/relay_periodic_status.html:20
-msgid "Active day: "
-msgstr ""
-
-#: devices/templates/devices/details/relay_periodic_status.html:23
-msgid "Active period: "
-msgstr ""
-
-#: devices/templates/devices/details/relay_periodic_status.html:26
+#: devices/templates/devices/details/relay_periodic_status.html:25
 msgid "OFF"
 msgstr ""
 
-#: devices/templates/devices/details/relay_periodic_status.html:32
+#: devices/templates/devices/details/relay_periodic_status.html:31
+msgid "one-time ON"
+msgstr ""
+
+#: devices/templates/devices/details/relay_periodic_status.html:40
 msgid "Minutes:"
 msgstr ""
 
-#: devices/templates/devices/details/relay_periodic_status.html:35
+#: devices/templates/devices/details/relay_periodic_status.html:48
 msgid "set"
 msgstr ""
 
-#: devices/templates/devices/details/relay_periodic_status.html:45
-#: devices/templates/devices/details/relay_status.html:23
+#: devices/templates/devices/details/relay_periodic_status.html:65
+#: devices/templates/devices/details/relay_status.html:25
 msgid "Relay state not available"
 msgstr ""
 
@@ -168,11 +154,11 @@ msgstr ""
 msgid "Add favourite devices."
 msgstr ""
 
-#: devices/templates/devices/location.html:10
+#: devices/templates/devices/location.html:64
 msgid "Back to locations"
 msgstr ""
 
-#: devices/templates/devices/location_list.html:18
+#: devices/templates/devices/location_list.html:22
 msgid "No locations available."
 msgstr ""
 

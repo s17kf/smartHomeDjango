@@ -64,16 +64,3 @@
 {% else %}
     <span style="color: gray;">{% trans "Relay state not available" %}</span>
 {% endif %}
-
-<script>
-    function show_manual_activation(dev_id) {
-        $('#manual_activation_' + dev_id).show();
-        $('#manual_activation_button_' + dev_id).hide();
-    }
-</script>
-<script>
-    function hide_manual_activation(dev_id) {
-        $('#manual_activation_' + dev_id).hide();
-        $('#manual_activation_button_' + dev_id).show();
-    }
-</script>
