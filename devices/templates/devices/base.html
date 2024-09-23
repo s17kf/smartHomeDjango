@@ -30,12 +30,12 @@
         <header>
             {% block header %}{% endblock %}
         </header>
-        <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
+        <nav class="navbar sticky-top navbar-expand-md navbar-dark bg-dark">
             <div class="container-fluid">
                 <a class="navbar-brand" href="{% url 'devices:main' %}">
                     {% trans "Smart home" %}
                 </a>
-                <div class="d-lg-none">
+                <div class="d-md-none">
                     <a class="navbar-text" href="#">
                         {% block page_title %}{% endblock %}
                     </a>

@@ -9,11 +9,15 @@
 {% block content %}
 
     {% if locations %}
-        <ul>
+        <div class="d-grid gap-2 d-md-block">
             {% for location in locations %}
-                <li><a href="{% url 'devices:location' location.id %}">{{ location }}</a></li>
+                <a href="{% url 'devices:location' location.id %}"
+                   class="btn btn-outline-light btn-sm" role="button"
+                >
+                    {{ location }}
+                </a>
             {% endfor %}
-        </ul>
+        </div>
     {% else %}
         <p>{% trans "No locations available." %}</p>
     {% endif %}
