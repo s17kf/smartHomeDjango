@@ -18,8 +18,8 @@ header h1 {
 #content {
   background: #293124;
   color: #a1afc0;
-  padding: 1vw 1vw 1vw 1vw;
-  margin: 0 1vw 0 0;
+  padding: 1vw 2vw 1vw 2vw;
+  margin: 0 0 0 0;
 }
 
 a {
@@ -28,6 +28,10 @@ a {
 
 fieldset {
   border-color: #a1afc0;
+}
+
+.table-fit {
+  width: 1px;
 }
 
 html, body {

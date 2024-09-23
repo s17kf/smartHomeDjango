@@ -30,7 +30,7 @@
         <header>
             {% block header %}{% endblock %}
         </header>
-        <nav class="navbar sticky-top navbar-expand-md navbar-dark bg-dark">
+        <nav class="navbar sticky-top navbar-expand-md navbar-dark bg-black">
             <div class="container-fluid">
                 <a class="navbar-brand" href="{% url 'devices:main' %}">
                     {% trans "Smart home" %}
@@ -52,7 +52,7 @@
                 </div>
             </div>
         </nav>
-        <div id="content">
+        <div id="content" class="bg-dark">
             {% block content %}{% endblock %}
         </div>
     {% endblock %}
