@@ -23,6 +23,7 @@ COPY assets/pinctrl_dummy.py pinctrl_dummy.py
 
 COPY assets/devices devices
 COPY assets/db_fixtures db_fixtures
+COPY assets/patches patches
 
 COPY _tmp/* tmp/
 
