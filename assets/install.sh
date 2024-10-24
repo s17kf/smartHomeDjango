@@ -19,6 +19,8 @@ sudo ln -s /home/ubuntu/pinctrl_dummy.py /usr/bin/pinctrl
 echo "Cloning smartHomeDjango repository"
 git clone --depth=1 https://github.com/s17kf/smartHomeDjango.git
 
+ln -s smartHomeDjango/manage.py .
+
 cd smartHomeDjango || exit 1
 
 git apply --allow-empty ../tmp/patch.diff
@@ -37,7 +39,7 @@ echo "Migrating database and loading fixtures"
 python3 manage.py migrate
 python3 manage.py compilemessages
 if [ -d ../db_fixtures ]; then
-  find ../db_fixtures -name '*.json' -exec echo "Loading fixture: {}" \; -exec python3 manage.py loaddata {} \;
+  find ../db_fixtures -name '*.json' | sort | xargs -I{} sh -c 'echo "Loading fixture: {}" && python3 manage.py loaddata {}'
 fi
 
 echo "Adding host's IP to ALLOWED_HOSTS in settings.py"
