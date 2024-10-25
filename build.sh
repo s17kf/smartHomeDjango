@@ -22,7 +22,7 @@ ${BOLD}Options${NC}:
   -a, --add-file FILE[,FILE]
                       Add file(s)/dir(s) to be included in patch applied to docker image's repo
                       To add multiple entries use comma as separator.
-  -c, --cache         Do not use --no-cache flag when building docker image
+  -c, --no-cache      Use the --no-cache flag when building docker image
   --reference REF     Use REF as reference for git diff (default: HEAD)
   -h, --help          Display this help and exit
 EOF
@@ -37,7 +37,7 @@ fi
 # Check if sudo is available and ask password if needed
 sudo ls > /dev/null
 
-VALID_ARGS=$(getopt -o a:ch --long add-file:,cache,reference:,help -- "$@")
+VALID_ARGS=$(getopt -o a:ch --long add-file:,no-cache,reference:,help -- "$@")
 if [[ $? -ne 0 ]]; then
   echo -e "$(usage)"
   exit 1;
@@ -46,7 +46,7 @@ fi
 set -e
 
 eval set -- "$VALID_ARGS"
-cache="--no-cache"
+cache=""
 git_reference="HEAD"
 # shellcheck disable=SC2078
 while [ : ]; do
@@ -65,9 +65,9 @@ while [ : ]; do
       done
       shift 2
       ;;
-    -c | --cache)
-      echo -e "${INFO} --no-cache flag will NOT be used"
-      cache=""
+    -c | --no-cache)
+      echo -e "${INFO} --no-cache flag will be used for docker build"
+      cache="--no-cache"
       shift
       ;;
     --reference)
