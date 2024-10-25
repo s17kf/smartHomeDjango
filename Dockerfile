@@ -13,6 +13,11 @@ WORKDIR /home/${USER}
 
 ARG HOST_IP
 ENV HOST_IP=${HOST_IP}
+ARG USE_LOCAL
+ENV USE_LOCAL=${USE_LOCAL}
+
+# Use wildcard to prevent failure if no files are found
+COPY *tmp_local_repo smartHomeDjango
 
 COPY assets/install.sh install.sh
 COPY assets/entrypoint.sh entrypoint.sh

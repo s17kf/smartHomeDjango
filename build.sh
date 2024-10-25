@@ -9,6 +9,7 @@ NC='\033[0m'
 ERROR="${RED_B}ERROR${NC}:"
 WARNING="${YELLOW_B}WARNING${NC}:"
 INFO="${BOLD}INFO${NC}:"
+INFO_LISTED_ENTRY=" ----"
 
 function usage() {
   cat <<EOF
@@ -24,8 +25,22 @@ ${BOLD}Options${NC}:
                       To add multiple entries use comma as separator.
   -c, --no-cache      Use the --no-cache flag when building docker image
   --reference REF     Use REF as reference for git diff (default: HEAD)
+  -l, --local         Use local repository for docker build
+  --clean             Clean up temporary files and exit
   -h, --help          Display this help and exit
 EOF
+}
+
+function do_cleanup() {
+  echo -e "${INFO} Cleaning up"
+  if [[ -d _tmp ]]; then
+    echo -e "${INFO_LISTED_ENTRY} Removing _tmp directory"
+    rm -rf _tmp
+  fi
+  if [[ -L tmp_local_repo ]]; then
+    echo -e "${INFO_LISTED_ENTRY} Removing tmp_local_repo symlink"
+    rm tmp_local_repo
+  fi
 }
 
 # run git commands as root will cause problems with permissions afterwards
@@ -37,7 +52,7 @@ fi
 # Check if sudo is available and ask password if needed
 sudo ls > /dev/null
 
-VALID_ARGS=$(getopt -o a:ch --long add-file:,no-cache,reference:,help -- "$@")
+VALID_ARGS=$(getopt -o a:clh --long add-file:,no-cache,reference:,local,clean,help -- "$@")
 if [[ $? -ne 0 ]]; then
   echo -e "$(usage)"
   exit 1;
@@ -48,6 +63,7 @@ set -e
 eval set -- "$VALID_ARGS"
 cache=""
 git_reference="HEAD"
+use_local=false
 # shellcheck disable=SC2078
 while [ : ]; do
   case "$1" in
@@ -74,6 +90,15 @@ while [ : ]; do
       git_reference="$2"
       shift 2
       ;;
+    -l | --local)
+      echo -e "${INFO} Using local repository for docker build"
+      use_local=true
+      shift
+      ;;
+    --clean)
+      do_cleanup
+      exit 0
+      ;;
     -h | --help)
       echo -e "$(usage)"
       exit 0
@@ -94,23 +119,27 @@ fi
 cd "$(dirname "$0")"
 
 mkdir -p _tmp
-for file in "${files_to_git_add[@]}"; do
-  echo -e "${INFO} git add ${file}"
-  git add "$file"
-done
-echo -e "${INFO} Prepare patch against ${git_reference}"
-echo -e "${INFO} Files included in patch:"
-git diff --staged ${git_reference} --name-only | xargs -i echo -e "\t{}"
-git diff --staged ${git_reference} > _tmp/patch.diff
-echo -e "${INFO} Run: ${ITALIC}git reset HEAD${NC}"
-git reset HEAD > /dev/null
+
+if $use_local; then
+  ln -s . tmp_local_repo
+else
+  for file in "${files_to_git_add[@]}"; do
+    echo -e "${INFO} git add ${file}"
+    git add "$file"
+  done
+  echo -e "${INFO} Prepare patch against ${git_reference}"
+  echo -e "${INFO} Files included in patch:"
+  git diff --staged ${git_reference} --name-only | xargs -i echo -e "\t{}"
+  git diff --staged ${git_reference} > _tmp/patch.diff
+  echo -e "${INFO} Run: ${ITALIC}git reset HEAD${NC}"
+  git reset HEAD > /dev/null
+fi
 
 
 HOST_IP=$(ifconfig wlp0s20f3 | grep -Po "inet (?:[0-9]{1,3}\.){3}[0-9]{1,3}" | sed 's/inet //')
 echo -e "${INFO} host's IP: ${HOST_IP}"
 
-echo -e "${INFO} Run: ${ITALIC}sudo docker build -t smarthome . $cache --build-arg HOST_IP=\"${HOST_IP}\"${NC}"
-sudo docker build -t smarthome . $cache --build-arg HOST_IP="${HOST_IP}"
+echo -e "${INFO} Run: ${ITALIC}sudo docker build -t smarthome . $cache --build-arg HOST_IP=\"${HOST_IP}\"${NC}--build-arg USE_LOCAL=\"${use_local}\""
+sudo docker build -t smarthome . $cache --build-arg HOST_IP="${HOST_IP}" --build-arg USE_LOCAL="${use_local}"
 
-echo -e "${INFO} Cleaning up"
-rm -rf _tmp
+do_cleanup

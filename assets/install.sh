@@ -16,14 +16,28 @@ for i in $(seq 1 27); do
 done
 sudo ln -s /home/ubuntu/pinctrl_dummy.py /usr/bin/pinctrl
 
-echo "Cloning smartHomeDjango repository"
-git clone --depth=1 https://github.com/s17kf/smartHomeDjango.git
+if $USE_LOCAL; then
+  echo "Using local smartHomeDjango repository no need to clone"
+  sudo chown -R "$USER":"$USER" smartHomeDjango
+  cd smartHomeDjango || exit 1
+    if [ -f db.sqlite3 ]; then
+      echo "Removing old database"
+      rm db.sqlite3
+    fi
+  cd ..
+else
+  echo "Cloning smartHomeDjango repository"
+  git clone --depth=1 https://github.com/s17kf/smartHomeDjango.git
+
+  cd smartHomeDjango || exit 1
+  git apply --allow-empty ../tmp/patch.diff
+
+  cd ..
+fi
 
 ln -s smartHomeDjango/manage.py .
 
 cd smartHomeDjango || exit 1
-
-git apply --allow-empty ../tmp/patch.diff
 
 echo "Installing dependencies from requirements.txt"
 # Use flag --break-system-packages to be possible to install packages without virtualenv,
