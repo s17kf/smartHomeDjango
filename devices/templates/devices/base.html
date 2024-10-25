@@ -22,6 +22,7 @@
         >
 
         <link rel="stylesheet" href="{% static 'devices/style.css' %}">
+        {% block additional_stylesheets %}{% endblock %}
     {% endblock %}
 </head>
 <body>
@@ -62,5 +63,6 @@
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
 <script src="{% static 'devices/js/relay_periodic_edit.js' %}"></script>
+{% block scripts %}{% endblock %}
 </body>
 </html>

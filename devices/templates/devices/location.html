@@ -1,6 +1,11 @@
 {% extends 'devices/base.html' %}
 
 {% load i18n %}
+{% load static %}
+
+{% block additional_stylesheets %}
+    <link rel="stylesheet" href="{% static 'devices/graphics.css' %}">
+{% endblock %}
 
 {% block page_title %}
     {{ location_name }}
@@ -8,8 +13,8 @@
 
 {% block content %}
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"
-        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
-        crossorigin="anonymous"></script>
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+            crossorigin="anonymous"></script>
     {% if device_config_list %}
         <div class="table-responsive">
             <table class="table table-dark table-hover align-middle">
@@ -64,4 +69,12 @@
         {% trans "Back to locations" %}
     </a>
 
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        const RELAY_UPDATE_URL = "{% url 'devices:relay_update' 0 %}";
+        const CSRF_TOKEN = '{{ csrf_token }}';
+    </script>
+    <script src="{% static 'devices/js/device_status_update.js' %}"></script>
 {% endblock %}

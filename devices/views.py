@@ -1,6 +1,9 @@
 from datetime import datetime, timedelta
+from random import random
+from time import sleep
 
 from django.http import HttpResponseRedirect
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, get_list_or_404
 from django.urls import reverse
 from django.views import generic
@@ -70,16 +73,23 @@ def location_update(request, location_id):
 
 
 def relay_update(request, device_id):
-    next = request.POST.get('next', '/')
-    try:
-        device = Device.objects.get(pk=device_id)
-    except Device.DoesNotExist:
-        # todo: log error
-        return HttpResponseRedirect(next)
-    device_config = RelayDeviceConfig(device)
-    new_state = device_config.active_state if request.POST.get('state', 'off') == 'on' else device_config.inactive_state
-    device_config.setstate(new_state)
-    return HttpResponseRedirect(next)
+    if request.method == 'POST':
+        # simulate delay - todo: remove this
+        sleep(0.7)
+        if random() < 0.15:
+            return JsonResponse({'status': 'error', 'message': 'Random error xD'})
+        try:
+            device = Device.objects.get(pk=device_id)
+            device_config = RelayDeviceConfig(device)
+            new_state = device_config.active_state \
+                if request.POST.get('state', 'off') == 'on' else device_config.inactive_state
+            device_config.setstate(new_state)
+            return JsonResponse({'status': 'success', 'message': 'Device state updated'})
+        except Device.DoesNotExist:
+            return JsonResponse({'status': 'error', 'message': 'Device not found'})
+        except Exception as e:
+            return JsonResponse({'status': 'error', 'message': str(e)})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
 
 
 def periodic_relay_manual_activate(request, device_id):

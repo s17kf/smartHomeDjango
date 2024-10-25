@@ -1,26 +1,29 @@
 {% load i18n %}
+
 {% if device_config.state_available %}
-    <input type="radio" id="radio_{{ device.id }}_1" name="state" value="on"
-           form="form_update_relay{{ device.id }}"
-           class="btn-check" autocomplete="off"
-            {% if device_config.is_active %}
-           checked
-            {% endif %}
-           onchange="this.form.submit()">
-    <label class="btn btn-outline-success btn-sm" for="radio_{{ device.id }}_1">ON</label>
-    <input type="radio" id="radio_{{ device.id }}_0" name="state" value="off"
-           form="form_update_relay{{ device.id }}"
-           class="btn-check" autocomplete="off"
-            {% if not device_config.is_active %}
-           checked
-            {% endif %}
-           onchange="this.form.submit()">
-    <label class="btn btn-outline-danger btn-sm" for="radio_{{ device.id }}_0">OFF</label>
-    <form action="{% url 'devices:relay_update' device.id %}" method="post"
-          id="form_update_relay{{ device.id }}">
-        {% csrf_token %}
-        <input type="hidden" name="next" value="{{ request.path }}">
-    </form>
+    <div id="device_status_show_{{ device.id }}">
+        <input type="radio" id="radio_{{ device.id }}_on" name="state" value="on"
+               form="form_update_relay{{ device.id }}"
+               class="btn-check" autocomplete="off"
+                {% if device_config.is_active %}
+               checked
+                {% endif %}
+               onchange="updateDevice({{ device.id }}, 'on')"
+        >
+        <label class="btn btn-outline-success btn-sm" for="radio_{{ device.id }}_on">ON</label>
+        <input type="radio" id="radio_{{ device.id }}_off" name="state" value="off"
+               form="form_update_relay{{ device.id }}"
+               class="btn-check" autocomplete="off"
+                {% if not device_config.is_active %}
+               checked
+                {% endif %}
+               onchange="updateDevice({{ device.id }}, 'off')"
+        >
+        <label class="btn btn-outline-danger btn-sm" for="radio_{{ device.id }}_off">OFF</label>
+    </div>
+    <div id="device_status_loading_{{ device.id }}" style="display: none">
+        <div class="loader"></div>
+    </div>
 {% else %}
     <span style="color: gray;">{% trans "Relay state not available" %}</span>
 {% endif %}
