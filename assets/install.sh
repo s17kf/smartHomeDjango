@@ -36,10 +36,10 @@ if [ -d ../patches ]; then
 fi
 
 echo "Migrating database and loading fixtures"
-python3 manage.py migrate
-python3 manage.py compilemessages
+./manage.py migrate
+./manage.py compilemessages
 if [ -d ../db_fixtures ]; then
-  find ../db_fixtures -name '*.json' | sort | xargs -I{} sh -c 'echo "Loading fixture: {}" && python3 manage.py loaddata {}'
+  find ../db_fixtures -name '*.json' | sort | xargs -I{} sh -c 'echo "Loading fixture: {}" && ./manage.py loaddata {}'
 fi
 
 echo "Adding host's IP to ALLOWED_HOSTS in settings.py"

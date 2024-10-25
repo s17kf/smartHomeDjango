@@ -108,7 +108,7 @@ Run ./build.sh script or docker build command will apply DB fixtures stored in
 To generate fixtures you can use command:
 
    ```
-   python3 manage.py dumpdata [app_name[.model_name]]
+   ./manage.py dumpdata [app_name[.model_name]]
    ```
 
 ## Usage
