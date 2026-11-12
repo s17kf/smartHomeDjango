@@ -3,6 +3,9 @@
 A Python-based smart home management system with device tracking and site management functionality.
 Intended to run on a Raspberry Pi.
 
+Repository rules (architecture, directory layout, conventions, git workflow) are
+described in [CONTRIBUTING.md](CONTRIBUTING.md) (in Polish).
+
 ## Table of Contents
 
 - [Features](#features)
