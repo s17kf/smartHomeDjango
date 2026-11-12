@@ -34,3 +34,5 @@ function show_edit_buttons() {
     $(".rp_edit_buttons").show();
     $(".show_rp_edit_buttons").hide();
 }
+
+$(document).ready(show_edit_buttons_if_needed);

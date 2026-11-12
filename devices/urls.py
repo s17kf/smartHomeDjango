@@ -10,7 +10,6 @@ urlpatterns = [
     path('location/<int:location_id>/', views.LocationView.as_view(), name='location'),
     path('favourites/', views.FavouritesView.as_view(), name='favourites'),
     path('device/<int:pk>/', views.DeviceView.as_view(), name='device'),
-    path('location_update/<int:location_id>', views.location_update, name='location_update'),
     path('relay_update/<int:device_id>', views.relay_update, name='relay_update'),
     path('periodic_relay_manual_activate/<int:device_id>', views.periodic_relay_manual_activate,
          name='periodic_relay_manual_activate'),

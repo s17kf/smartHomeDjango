@@ -1,11 +1,8 @@
 from datetime import datetime, timedelta
-from random import random
-from time import sleep
 
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, get_list_or_404
-from django.urls import reverse
+from django.shortcuts import get_object_or_404
 from django.views import generic
 
 from .device_helpers import DeviceConfig, RelayDeviceConfig, RelayPeriodicDeviceConfig
@@ -58,26 +55,8 @@ class LocationView(generic.ListView):
         return context
 
 
-def location_update(request, location_id):
-    selected_location = get_object_or_404(Location, pk=location_id)
-    devices = get_list_or_404(Device, location=location_id)
-    for device in devices:
-        try:
-            value = request.POST[f'device_{device.id}']
-        except KeyError:
-            continue
-        else:
-            device.value = value
-            device.save()
-    return HttpResponseRedirect(reverse('devices:location', args=(location_id,)))
-
-
 def relay_update(request, device_id):
     if request.method == 'POST':
-        # simulate delay - todo: remove this
-        sleep(0.7)
-        if random() < 0.15:
-            return JsonResponse({'status': 'error', 'message': 'Random error xD'})
         try:
             device = Device.objects.get(pk=device_id)
             device_config = RelayDeviceConfig(device)

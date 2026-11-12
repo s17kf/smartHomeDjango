@@ -35,27 +35,27 @@ class DeviceHelper:
         return response.context['device']
 
 
-class IndexViewTests(TestCase):
+class LocationListViewTests(TestCase):
 
-    def get_index_response(self):
-        return self.client.get(reverse('devices:index'))
+    def get_location_list_response(self):
+        return self.client.get(reverse('devices:location_list'))
 
     def test_no_locations(self):
-        response = self.get_index_response()
+        response = self.get_location_list_response()
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'No locations available.')
         self.assertQuerySetEqual(LocationHelper.get_context_locations(response), [])
 
     def test_one_location(self):
         location = LocationHelper.create_location('some location')
-        response = self.get_index_response()
+        response = self.get_location_list_response()
         self.assertNotContains(response, 'No locations available.')
         self.assertQuerySetEqual(LocationHelper.get_context_locations(response), [location])
 
     def test_two_locations(self):
         location1 = LocationHelper.create_location("location 1")
         location2 = LocationHelper.create_location("second location")
-        response = self.get_index_response()
+        response = self.get_location_list_response()
         self.assertQuerySetEqual(LocationHelper.get_context_locations(response),
                                  [location1, location2],
                                  ordered=False)
@@ -72,11 +72,11 @@ class LocationViewTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
 
-class DeviceView(TestCase):
+class DeviceViewTests(TestCase):
     def get_device_response(self, device_id):
         return self.client.get(reverse('devices:device', args=(device_id,)))
 
-    def setUp(self, dev_type=Device.DeviceType.RELAY):
+    def setUp(self):
         self.location = LocationHelper.create_location('room')
         self.device = DeviceHelper.create_device(self.location, 'device')
 
@@ -84,3 +84,23 @@ class DeviceView(TestCase):
         invalid_id = self.device.id + 1
         response = self.get_device_response(invalid_id)
         self.assertEqual(response.status_code, 404)
+
+    def test_device_page_loads_status_scripts(self):
+        response = self.get_device_response(self.device.id)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'jquery-3.7.1.min.js')
+        self.assertContains(response, 'const RELAY_UPDATE_URL')
+        self.assertContains(response, 'devices/js/device_status_update.js')
+
+
+class RelayUpdateTests(TestCase):
+    def get_relay_update_url(self, device_id):
+        return reverse('devices:relay_update', args=(device_id,))
+
+    def test_device_not_exist(self):
+        response = self.client.post(self.get_relay_update_url(1), {'state': 'on'})
+        self.assertEqual(response.json(), {'status': 'error', 'message': 'Device not found'})
+
+    def test_get_not_allowed(self):
+        response = self.client.get(self.get_relay_update_url(1))
+        self.assertEqual(response.json(), {'status': 'error', 'message': 'Invalid request method'})

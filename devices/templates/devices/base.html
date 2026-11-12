@@ -22,6 +22,7 @@
         >
 
         <link rel="stylesheet" href="{% static 'devices/style.css' %}">
+        <link rel="stylesheet" href="{% static 'devices/graphics.css' %}">
         {% block additional_stylesheets %}{% endblock %}
     {% endblock %}
 </head>
@@ -62,7 +63,15 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo="
+        crossorigin="anonymous"></script>
+<script>
+    const RELAY_UPDATE_URL = "{% url 'devices:relay_update' 0 %}";
+    const CSRF_TOKEN = '{{ csrf_token }}';
+</script>
 <script src="{% static 'devices/js/relay_periodic_edit.js' %}"></script>
+<script src="{% static 'devices/js/device_status_update.js' %}"></script>
 {% block scripts %}{% endblock %}
 </body>
 </html>

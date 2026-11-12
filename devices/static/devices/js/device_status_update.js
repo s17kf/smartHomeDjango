@@ -1,7 +1,7 @@
 function updateDevice(deviceId, newState) {
     $('#device_status_show_' + deviceId).hide();
     $('#device_status_loading_' + deviceId).show();
-    oldState = newState === 'on' ? 'off' : 'on';
+    const oldState = newState === 'on' ? 'off' : 'on';
     $.ajax({
         // RELAY_UPDATE_URL variable has to be defined in the template
         url: RELAY_UPDATE_URL.replace('0', deviceId),
@@ -25,6 +25,7 @@ function updateDevice(deviceId, newState) {
         error: function (xhr, status, error) {
             $('#device_status_show_' + deviceId).show();
             $('#device_status_loading_' + deviceId).hide();
+            $('#radio_' + deviceId + '_' + oldState).prop('checked', true);
             alert('AJAX request failed: ' + error);
         }
     });
