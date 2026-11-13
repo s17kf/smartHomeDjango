@@ -55,7 +55,3 @@ echo "Migrating database and loading fixtures"
 if [ -d ../db_fixtures ]; then
   find ../db_fixtures -name '*.json' | sort | xargs -I{} sh -c 'echo "Loading fixture: {}" && ./manage.py loaddata {}'
 fi
-
-echo "Adding host's IP to ALLOWED_HOSTS in settings.py"
-# Host's IP is needed here to allow access to the server from other devices in LAN
-sed -i -E "s/(ALLOWED_HOSTS = \[)/\1'${HOST_IP}', 'localhost', /g" smartHomeSite/settings.py

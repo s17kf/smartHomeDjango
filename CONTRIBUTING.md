@@ -37,8 +37,10 @@ projektu – trzymamy tu kod aplikacji i ustalenia o niej samej.
   urządzenia.
 - JSON API tylko tam, gdzie jest potrzebne (np. komendy głosowe), jako
   zwykłe widoki w tym projekcie. DRF dopiero, gdy API urośnie.
-- Konfiguracja ze zmiennych środowiskowych (`SECRET_KEY`, `DEBUG`,
-  `ALLOWED_HOSTS`, baza). Sekretów ani adresów hostów nie wpisujemy do kodu.
+- Konfiguracja ze zmiennych środowiskowych (`DJANGO_SECRET_KEY`,
+  `DJANGO_DEBUG`, `DJANGO_ALLOWED_HOSTS`, `DATABASE_URL`) – lista i wartości
+  domyślne w README (sekcja Configuration), nowe zmienne dopisujemy tam.
+  Sekretów ani adresów hostów nie wpisujemy do kodu.
 - Docelowy sprzęt: Raspberry Pi 4 (arm64). Obraz ma wariant amd64 i arm64,
   pilnujemy zużycia RAM (liczba procesów i workerów, ciężkie zależności).
 
@@ -54,8 +56,7 @@ rozwijamy jej – poprawiamy tylko wtedy, gdy blokuje bieżącą pracę:
   reguł automatyzacji,
 - obraz deweloperski: `Dockerfile` (ubuntu, cron), `build.sh`, `run.sh`,
   `assets/` – do zastąpienia obrazem `python:*-slim` z gunicornem,
-- ustawienia na sztywno w `smartHomeSite/settings.py`, SQLite (docelowo
-  PostgreSQL), `USE_TZ = False`,
+- SQLite (docelowo PostgreSQL), `USE_TZ = False`,
 - jQuery, Bootstrap i ikony ładowane z CDN.
 
 ## Struktura katalogów
@@ -115,7 +116,8 @@ rozwijamy jej – poprawiamy tylko wtedy, gdy blokuje bieżącą pracę:
   `python manage.py makemessages -l en -l pl` i uzupełnienie
   `locale/pl/LC_MESSAGES/django.po` w tym samym commicie.
 - Zmiana modeli razem z migracją (`makemigrations`) w tym samym commicie.
-- Testy: `python manage.py test`. Nowe widoki i logika reguł / harmonogramów
+- Testy: `DJANGO_DEBUG=true python manage.py test` (bez `DJANGO_SECRET_KEY`
+  ustawienia wymagają trybu debug). Nowe widoki i logika reguł / harmonogramów
   – z testami.
 - Zależności przypięte do wersji (`==`) w `requirements.txt`. Przed dodaniem
   nowej sprawdzamy, czy działa na arm64 i ile kosztuje w RAM.

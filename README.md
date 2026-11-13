@@ -11,6 +11,7 @@ described in [CONTRIBUTING.md](CONTRIBUTING.md) (in Polish).
 - [Features](#features)
 - [Technologies Used](#technologies-used)
 - [Installation](#installation)
+- [Configuration](#configuration)
 - [Docker](#docker)
 - [Usage](#usage)
 - [License](#license)
@@ -26,7 +27,7 @@ described in [CONTRIBUTING.md](CONTRIBUTING.md) (in Polish).
 - **Backend:** Python
 - **Frontend:** HTML, CSS, JavaScript
 - **Web Framework:** Django
-- **Database:** SQLite (can be replaced with other compatible databases)
+- **Database:** SQLite by default, configurable with `DATABASE_URL` (see [Configuration](#configuration))
 
 ## Installation
 
@@ -35,7 +36,7 @@ To run on other devices, it is recommended to use Docker. See the [Docker](#dock
 
 ### Prerequisites
 
-- Python 3.11+
+- Python 3.12+
 - Pip (Python package installer)
 
 1. Clone the repository:
@@ -49,6 +50,11 @@ To run on other devices, it is recommended to use Docker. See the [Docker](#dock
 3. Install dependencies:
     ```bash
     pip install -r requirements.txt
+    ```
+4. Set environment variables (see [Configuration](#configuration)). For local
+   development enabling debug mode is enough:
+    ```bash
+    export DJANGO_DEBUG=true
     ```
 
 ### Database Setup
@@ -68,6 +74,36 @@ python manage.py runserver
 
 Access the app at http://127.0.0.1:8000/.
 
+## Configuration
+
+Environment-specific settings are read from environment variables. Nothing
+secret or host-specific is stored in the code.
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `DJANGO_SECRET_KEY` | yes, unless debug is on | fixed insecure key (debug only) | Long random value, keep it secret. Changing it logs out all users. |
+| `DJANGO_DEBUG` | no | `false` | Debug mode: `true`/`false` (also `1`/`0`, `yes`/`no`, `on`/`off`). Never enable it in production. |
+| `DJANGO_ALLOWED_HOSTS` | yes, in production | empty | Comma-separated host names / IP addresses the app is served under, e.g. `smarthome.lan,192.168.1.10`. |
+| `DATABASE_URL` | no | `sqlite:///<project dir>/db.sqlite3` | Database URL in the [dj-database-url](https://github.com/jazzband/dj-database-url) format, e.g. `postgres://user:password@host:5432/name`. |
+
+Notes:
+
+- **Production** (debug off) needs at least `DJANGO_SECRET_KEY` and
+  `DJANGO_ALLOWED_HOSTS`; without the secret key the app refuses to start.
+  Generate the key with:
+  ```bash
+  python3 -c "import secrets; print(secrets.token_urlsafe(50))"
+  ```
+  The result contains only URL-safe characters (no `$`), so it can be put into
+  `.env` files without quoting.
+- **Debug mode** without `DJANGO_SECRET_KEY` uses a fixed development key, and
+  with an empty `DJANGO_ALLOWED_HOSTS` Django accepts `localhost`, `127.0.0.1`
+  and `[::1]`.
+- **`DATABASE_URL`**: special characters in the user name or password must be
+  URL-encoded (e.g. `@` → `%40`). PostgreSQL also needs the `psycopg` driver,
+  which is not in `requirements.txt` yet.
+- Check a production configuration with `python manage.py check --deploy`.
+
 ## Docker
 
 The app can be run in a Docker container.
@@ -78,6 +114,11 @@ The Docker image is based on ubuntu and includes all dependencies required to ru
 - Docker
 - Repository cloned (see [Installation](#installation))
 - Create a build.env file in the project root directory (use `build.env.example` as a template)
+
+The image is meant for development: it sets `DJANGO_DEBUG=true` and
+`DJANGO_ALLOWED_HOSTS` to the host's IP address (detected on the `INTERFACE`
+from `build.env`) and `localhost`, so the app is reachable from other devices
+in the LAN.
 
 ### Build the Docker image
 

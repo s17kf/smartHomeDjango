@@ -11,8 +11,10 @@ RUN echo "$USER ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/$USER
 USER $USER
 WORKDIR /home/${USER}
 
+# Obraz deweloperski: runserver z DEBUG; IP hosta w LAN dopuszczone w ALLOWED_HOSTS
 ARG HOST_IP
-ENV HOST_IP=${HOST_IP}
+ENV DJANGO_DEBUG=true
+ENV DJANGO_ALLOWED_HOSTS=${HOST_IP},localhost
 ARG USE_LOCAL
 ENV USE_LOCAL=${USE_LOCAL}
 
