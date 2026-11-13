@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import tempfile
 from datetime import datetime, time, timezone as dt_timezone
 from io import StringIO
@@ -7,7 +8,9 @@ from unittest import mock
 
 import gpiocontrol as gpio
 from django.contrib.auth import get_user_model
+from django.contrib.staticfiles import finders
 from django.core.management import call_command
+from django.templatetags.static import static
 from django.test import TestCase
 from django.urls import reverse
 
@@ -126,7 +129,7 @@ class DeviceViewTests(LoggedInTestCase):
     def test_device_page_loads_status_scripts(self):
         response = self.get_device_response(self.device.id)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'jquery-3.7.1.min.js')
+        self.assertContains(response, 'devices/vendor/jquery/jquery.min.js')
         self.assertContains(response, 'const RELAY_UPDATE_URL')
         self.assertContains(response, 'devices/js/device_status_update.js')
 
@@ -352,3 +355,24 @@ class LogoutTests(LoggedInTestCase):
         response = self.client.get(reverse('logout'))
         self.assertEqual(response.status_code, 405)
         self.assertIn('_auth_user_id', self.client.session)
+
+
+class LocalStaticFilesTests(LoggedInTestCase):
+    """CSS i JS stron z repo (`{% static %}`), nie z CDN – UI działa bez internetu."""
+
+    ASSET_URL = re.compile(r'<(?:link|script)\b[^>]*\b(?:href|src)="([^"]+)"')
+
+    def assert_assets_local(self, response):
+        urls = self.ASSET_URL.findall(response.content.decode())
+        self.assertIn(static('devices/vendor/bootstrap/css/bootstrap.min.css'), urls)
+        for url in urls:
+            with self.subTest(url=url):
+                self.assertTrue(url.startswith(static('')))
+                self.assertIsNotNone(finders.find(url.removeprefix(static(''))))
+
+    def test_devices_page(self):
+        self.assert_assets_local(self.client.get(reverse('devices:location_list')))
+
+    def test_login_page(self):
+        self.client.logout()
+        self.assert_assets_local(self.client.get(reverse('login')))

@@ -27,7 +27,10 @@ described in [CONTRIBUTING.md](CONTRIBUTING.md) (in Polish).
 ## Technologies Used
 
 - **Backend:** Python
-- **Frontend:** HTML, CSS, JavaScript
+- **Frontend:** HTML, CSS, JavaScript; Bootstrap, Bootstrap Icons and jQuery
+  are bundled in the repository (no CDN, the UI works without internet access)
+- **Static files:** [WhiteNoise](https://whitenoise.readthedocs.io/), see
+  [Static files](#static-files)
 - **Web Framework:** Django
 - **Database:** PostgreSQL (address in `DATABASE_URL`, see [Configuration](#configuration))
 
@@ -112,6 +115,25 @@ Notes:
 - **Tests** create and drop a separate `test_<name>` database, so the
   PostgreSQL user needs the `CREATEDB` privilege.
 - Check a production configuration with `python manage.py check --deploy`.
+
+### Static files
+
+CSS, JavaScript, fonts and front-end libraries live in the `static/`
+directories of the apps (libraries in `devices/static/devices/vendor/`) and
+are served by the app itself through WhiteNoise.
+
+- **Production** (debug off): run
+  ```bash
+  python manage.py collectstatic --noinput
+  ```
+  after every code update, before starting the app. It copies the files to
+  `static_root/` with a content hash in their names and adds gzip versions.
+  Browsers cache hashed files without revalidation (10 years); a changed file
+  gets a new name. Without `collectstatic` pages fail with
+  `Missing staticfiles manifest entry`. The command needs the same
+  environment variables as the app, but does not connect to the database.
+- **Debug mode and tests** serve the files directly from the app
+  directories, `collectstatic` is not needed.
 
 ## Docker
 

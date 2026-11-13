@@ -25,7 +25,8 @@ projektu – trzymamy tu kod aplikacji i ustalenia o niej samej.
   HTMX, Alpine.js tylko tam, gdzie HTMX nie wystarczy. Bez budowania
   frontendu (Node).
 - Zasoby statyczne (CSS, JS, ikony) w repo i serwowane lokalnie, nie z CDN –
-  UI działa bez internetu.
+  UI działa bez internetu. Serwuje je sama aplikacja (whitenoise),
+  w produkcji po `collectstatic` (opis w README, sekcja Static files).
 - Wszystkie widoki UI wymagają zalogowania (sesje Django). Bez otwartej
   rejestracji – konta zakłada admin.
   Wymusza to `LoginRequiredMiddleware`, więc nowe widoki są chronione bez
@@ -64,7 +65,7 @@ rozwijamy jej – poprawiamy tylko wtedy, gdy blokuje bieżącą pracę:
   `assets/` – do zastąpienia obrazem `python:*-slim` z gunicornem; jako
   jedyny działa na SQLite (`DATABASE_URL` w `Dockerfile` i
   `assets/tmp/crontab`),
-- jQuery, Bootstrap i ikony ładowane z CDN.
+- jQuery (`devices/static/devices/js/`) – interaktywność przechodzi na HTMX.
 
 ## Struktura katalogów
 
@@ -95,8 +96,9 @@ rozwijamy jej – poprawiamy tylko wtedy, gdy blokuje bieżącą pracę:
 - Szablony w `templates/devices/`. Status i szczegóły urządzenia mają osobne
   szablony per typ w `templates/devices/details/`
   (`<typ>_status.html`, `<typ>_details.html`).
-- Statyki w `static/devices/`, komendy zarządzania w
-  `management/commands/`, testy w `tests.py`.
+- Statyki w `static/devices/`, biblioteki zewnętrzne w
+  `static/devices/vendor/` ([Biblioteki frontendowe](#biblioteki-frontendowe)),
+  komendy zarządzania w `management/commands/`, testy w `tests.py`.
 
 ### `templates/`
 
@@ -138,6 +140,30 @@ rozwijamy jej – poprawiamy tylko wtedy, gdy blokuje bieżącą pracę:
   przekierowanie na logowanie dla wszystkich adresów `devices`.
 - Zależności przypięte do wersji (`==`) w `requirements.txt`. Przed dodaniem
   nowej sprawdzamy, czy działa na arm64 i ile kosztuje w RAM.
+
+## Biblioteki frontendowe
+
+Biblioteki CSS/JS leżą w `devices/static/devices/vendor/<pakiet>/`: gotowe
+pliki z pakietu npm danej wersji, bez zmian, razem z jego `LICENSE`.
+Szablony ładują je przez `{% static %}` – test `LocalStaticFilesTests`
+sprawdza, że strony nie ładują CSS ani JS z zewnątrz.
+
+| Pakiet npm | Wersja | Pliki z pakietu |
+|---|---|---|
+| `bootstrap` | 5.3.3 | `dist/css/bootstrap.min.css`, `dist/js/bootstrap.bundle.min.js` (z `.map`) |
+| `bootstrap-icons` | 1.11.3 | `font/bootstrap-icons.min.css`, `font/fonts/bootstrap-icons.woff2`, `.woff` |
+| `jquery` | 3.7.1 | `dist/jquery.min.js` |
+
+Dodanie lub aktualizacja biblioteki:
+
+- Tarball z `https://registry.npmjs.org/<pakiet>/-/<pakiet>-<wersja>.tgz`,
+  suma sprawdzona z polem `dist.integrity` w
+  `https://registry.npmjs.org/<pakiet>/<wersja>`.
+- Kopiujemy pliki używane w szablonach i to, do czego same się odwołują
+  (fonty w `url()`, mapy źródeł z `sourceMappingURL`), z zachowaniem
+  względnych ścieżek (np. `fonts/` obok CSS ikon). `collectstatic`
+  w produkcji przerywa, gdy odwołanie prowadzi do brakującego pliku.
+- Tabela, ścieżki w szablonach i pliki – w jednym commicie.
 
 ## Git
 

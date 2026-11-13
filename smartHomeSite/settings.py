@@ -66,12 +66,16 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    # runserver oddaje statyki whitenoise (jak w produkcji) – musi być przed staticfiles
+    'whitenoise.runserver_nostatic',
     'django.contrib.staticfiles',
     'simple_menu',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    # Statyki obsłużone przed sesją i logowaniem – strona logowania też ich potrzebuje
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -176,8 +180,26 @@ LOCALE_PATHS = [
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.1/howto/static-files/
+# https://whitenoise.readthedocs.io/en/stable/django.html
+# Biblioteki (Bootstrap, ikony, jQuery) są w repo, nie w CDN. Statyki serwuje
+# whitenoise: w produkcji z STATIC_ROOT po `collectstatic` – nazwy z hashem
+# treści (przeglądarka trzyma je bez odpytywania) i wersje .gz. Manifest
+# z hashami powstaje dopiero w `collectstatic`, więc przy DEBUG (runserver,
+# testy) zwykły magazyn i pliki prosto z katalogów static/ aplikacji.
 
 STATIC_URL = 'static/'
+
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': (
+            'django.contrib.staticfiles.storage.StaticFilesStorage' if DEBUG
+            else 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+        ),
+    },
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/6.1/ref/settings/#default-auto-field
