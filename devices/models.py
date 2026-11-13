@@ -42,6 +42,16 @@ class RelayPeriodicPeriod(models.Model):
     begin = models.TimeField()
     end = models.TimeField()
 
+    def contains(self, moment):
+        """Czy godzina `moment` (czas lokalny) mieści się w okresie.
+
+        Okres obejmuje początek, a koniec już nie: [begin, end). Okres z końcem
+        przed początkiem trwa przez północ.
+        """
+        if self.begin < self.end:
+            return self.begin <= moment < self.end
+        return moment >= self.begin or moment < self.end
+
     def get_begin_display(self):
         return self.begin.strftime('%H:%M')
 

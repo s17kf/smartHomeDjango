@@ -4,7 +4,9 @@ from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.utils import timezone
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views import generic
+from django.views.decorators.http import require_POST
 
 from .device_helpers import DeviceConfig, RelayDeviceConfig, RelayPeriodicDeviceConfig
 from .models import Location, Device, RelayPeriodicManualActivation
@@ -72,35 +74,42 @@ def relay_update(request, device_id):
     return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
 
 
+def get_next_url(request):
+    """Adres powrotu z formularza (`next`) – tylko w obrębie tej strony, inaczej `/`."""
+    next_url = request.POST.get('next', '/')
+    if url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()},
+                                       require_https=request.is_secure()):
+        return next_url
+    return '/'
+
+
+@require_POST
 def periodic_relay_manual_activate(request, device_id):
-    next = request.POST.get('next', '/')
+    next = get_next_url(request)
     try:
         device = Device.objects.get(pk=device_id)
     except Device.DoesNotExist:
         # todo: log error
         return HttpResponseRedirect(next)
-    manual_activation = RelayPeriodicManualActivation.objects.filter(device=device).first()
-    if manual_activation:
-        manual_activation.delete()
-    manual_activation = RelayPeriodicManualActivation(device=device)
     try:
         minutes = int(request.POST.get('minutes', '0'))
     except ValueError:
         minutes = 0
+    # Nieprawidłowa liczba minut niczego nie zmienia, także trwającego włączenia.
     if minutes <= 0:
         return HttpResponseRedirect(next)
     # Czas trwania liczony od chwili w UTC – przy zmianie czasu włączenie
     # nadal trwa podaną liczbę minut.
     end_time = timezone.now().replace(second=0, microsecond=0) + timedelta(minutes=minutes)
-    manual_activation.end_time = end_time
-    manual_activation.save()
+    RelayPeriodicManualActivation.objects.update_or_create(device=device, defaults={'end_time': end_time})
     device_config = RelayPeriodicDeviceConfig(device)
     device_config.setstate(device_config.active_state)
     return HttpResponseRedirect(next)
 
 
+@require_POST
 def periodic_relay_manual_deactivate(request, device_id):
-    next = request.POST.get('next', '/')
+    next = get_next_url(request)
     try:
         device = Device.objects.get(pk=device_id)
     except Device.DoesNotExist:
@@ -117,8 +126,9 @@ def periodic_relay_manual_deactivate(request, device_id):
     return HttpResponseRedirect(next)
 
 
+@require_POST
 def periodic_relay_add_active_day(request, device_id):
-    next = request.POST.get('next', '/')
+    next = get_next_url(request)
     try:
         device = Device.objects.get(pk=device_id)
     except Device.DoesNotExist:
@@ -139,8 +149,9 @@ def periodic_relay_add_active_day(request, device_id):
     return HttpResponseRedirect(next)
 
 
+@require_POST
 def periodic_relay_remove_active_day(request, device_id):
-    next = request.POST.get('next', '/')
+    next = get_next_url(request)
     try:
         device = Device.objects.get(pk=device_id)
     except Device.DoesNotExist:
@@ -160,8 +171,9 @@ def periodic_relay_remove_active_day(request, device_id):
     return HttpResponseRedirect(next)
 
 
+@require_POST
 def periodic_relay_add_active_period(request, device_id):
-    next = request.POST.get('next', '/')
+    next = get_next_url(request)
     try:
         device = Device.objects.get(pk=device_id)
     except Device.DoesNotExist:
@@ -185,8 +197,9 @@ def periodic_relay_add_active_period(request, device_id):
     return HttpResponseRedirect(next)
 
 
+@require_POST
 def periodic_relay_remove_active_period(request, device_id):
-    next = request.POST.get('next', '/')
+    next = get_next_url(request)
     try:
         device = Device.objects.get(pk=device_id)
     except Device.DoesNotExist:

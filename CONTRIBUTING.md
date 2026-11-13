@@ -33,6 +33,9 @@ projektu – trzymamy tu kod aplikacji i ustalenia o niej samej.
   dodatkowego kodu. Wyjątek tylko przez `@login_not_required` z komentarzem,
   dlaczego (np. endpoint z własnym uwierzytelnianiem). Panel admina ma własne
   logowanie i wymaga `is_staff`.
+- Widoki, które zmieniają stan, przyjmują tylko POST (`@require_POST`, żeby
+  działała ochrona CSRF). Adres powrotu z formularza (`next`) bierzemy przez
+  `get_next_url`, która nie przepuszcza adresów spoza strony.
 - Panel admina Django służy do zarządzania urządzeniami i lokalizacjami.
 - Sterowanie urządzeniami: komendy na `home/<id>/set`, stan z `…/state`,
   `…/telemetry` i `…/availability`. Nie dopisujemy kodu, który komunikuje się
@@ -140,7 +143,12 @@ rozwijamy jej – poprawiamy tylko wtedy, gdy blokuje bieżącą pracę:
   i usuwa osobną bazę `test_<nazwa>`). Nowe widoki i logika reguł / harmonogramów
   – z testami. Testy widoków dziedziczą po `LoggedInTestCase` (klient
   zalogowany jako zwykły użytkownik); test `LoginRequiredTests` sprawdza
-  przekierowanie na logowanie dla wszystkich adresów `devices`.
+  przekierowanie na logowanie dla wszystkich adresów `devices`. Przekaźniki
+  z zamockowanym GPIO daje `RelayDeviceTestCase`.
+- Zachowanie harmonogramu opisuje tabela `SCHEDULE_CASES` w `devices/tests.py`:
+  okresy `[begin, end)`, także przez północ, dni tygodnia i ręczne włączenie.
+  Tabelę sprawdzamy dla strony urządzenia i komendy workera. Zmianę
+  zachowania zaczynamy od zmiany tabeli.
 - Zależności przypięte do wersji (`==`) w `requirements.txt`. Przed dodaniem
   nowej sprawdzamy, czy działa na arm64 i ile kosztuje w RAM.
 

@@ -94,10 +94,7 @@ class RelayPeriodicDeviceConfig(RelayDeviceCommonConfig):
 
     def __get_current_period(self):
         for period in self.active_periods:
-            if period.begin < period.end:
-                if period.begin <= self.now.time() <= period.end:
-                    return period
-            elif period.begin < self.now.time() or self.now.time() < period.end:
+            if period.contains(self.now.time()):
                 return period
         return None
 

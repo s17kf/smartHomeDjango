@@ -42,12 +42,7 @@ class Command(BaseCommand):
                     activation_log = f"device: {device.name} active day: {now.strftime('%A')}"
                 else:
                     for period in periods:
-                        if period.begin < period.end:
-                            if period.begin <= now.time() <= period.end:
-                                active_time = True
-                                activation_log = f"device: {device.name} active period: {period.begin} - {period.end}"
-                                break
-                        elif period.begin < now.time() or now.time() < period.end:
+                        if period.contains(now.time()):
                             active_time = True
                             activation_log = f"device: {device.name} active period: {period.begin} - {period.end}"
                             break
