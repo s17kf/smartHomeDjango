@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from django.http import HttpResponseRedirect
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 from django.views import generic
 
 from .device_helpers import DeviceConfig, RelayDeviceConfig, RelayPeriodicDeviceConfig
@@ -88,7 +89,9 @@ def periodic_relay_manual_activate(request, device_id):
         minutes = 0
     if minutes <= 0:
         return HttpResponseRedirect(next)
-    end_time = datetime.now().replace(second=0) + timedelta(minutes=minutes)
+    # Czas trwania liczony od chwili w UTC – przy zmianie czasu włączenie
+    # nadal trwa podaną liczbę minut.
+    end_time = timezone.now().replace(second=0, microsecond=0) + timedelta(minutes=minutes)
     manual_activation.end_time = end_time
     manual_activation.save()
     device_config = RelayPeriodicDeviceConfig(device)
@@ -131,7 +134,7 @@ def periodic_relay_add_active_day(request, device_id):
         return HttpResponseRedirect(next)
     device.relayperiodicday_set.create(day=day)
     device_config = RelayPeriodicDeviceConfig(device)
-    if not device_config.is_active() and day == datetime.now().weekday():
+    if not device_config.is_active() and day == timezone.localtime().weekday():
         device_config.setstate(device_config.active_state)
     return HttpResponseRedirect(next)
 
@@ -150,7 +153,7 @@ def periodic_relay_remove_active_day(request, device_id):
     if day < 0 or day > 6:
         return HttpResponseRedirect(next)
     device.relayperiodicday_set.filter(day=day).delete()
-    if day == datetime.now().weekday():
+    if day == timezone.localtime().weekday():
         device_config = RelayPeriodicDeviceConfig(device)
         if not device_config.is_manual_activated() and device_config.current_period is None:
             device_config.setstate(device_config.inactive_state)

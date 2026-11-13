@@ -149,7 +149,10 @@ TIME_ZONE = 'Europe/Warsaw'
 
 USE_I18N = True
 
-USE_TZ = False
+# Daty w bazie w UTC (timestamptz w PostgreSQL), w kodzie świadome strefy.
+# Znaczniki czasu i czas trwania: timezone.now(); godziny i dni harmonogramów
+# w czasie lokalnym (TIME_ZONE): timezone.localtime(). Nie datetime.now().
+USE_TZ = True
 
 LANGUAGES = (
     ('en', _('English')),

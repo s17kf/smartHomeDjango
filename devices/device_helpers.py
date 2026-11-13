@@ -2,7 +2,7 @@ import json
 
 from .models import Device, RelayPeriodicPeriod, RelayPeriodicDay, RelayPeriodicManualActivation
 import gpiocontrol as gpio
-from datetime import datetime
+from django.utils import timezone
 
 
 class DeviceConfig:
@@ -79,7 +79,8 @@ class RelayPeriodicDeviceConfig(RelayDeviceCommonConfig):
     def __init__(self, device: Device):
         assert device.type == Device.DeviceType.RELAY_PERIODIC
         super().__init__(device)
-        self.now = datetime.now()
+        # Harmonogram (dzień tygodnia, godziny okresów) w czasie lokalnym.
+        self.now = timezone.localtime()
         self.active_days = RelayPeriodicDay.objects.filter(device=self.device)
         self.active_periods = RelayPeriodicPeriod.objects.filter(device=self.device)
         self.current_period = self.__get_current_period()
@@ -116,7 +117,7 @@ class RelayPeriodicDeviceConfig(RelayDeviceCommonConfig):
     def get_manual_activation_end_display(self):
         if self.manual_activation_period is None:
             return "None"
-        return self.manual_activation_period.end_time.strftime('%Y-%m-%d %H:%M')
+        return timezone.localtime(self.manual_activation_period.end_time).strftime('%Y-%m-%d %H:%M')
 
     def get_inactive_days(self):
         inactive_days = []

@@ -60,7 +60,6 @@ rozwijamy jej – poprawiamy tylko wtedy, gdy blokuje bieżącą pracę:
   `assets/` – do zastąpienia obrazem `python:*-slim` z gunicornem; jako
   jedyny działa na SQLite (`DATABASE_URL` w `Dockerfile` i
   `assets/tmp/crontab`),
-- `USE_TZ = False`,
 - jQuery, Bootstrap i ikony ładowane z CDN.
 
 ## Struktura katalogów
@@ -119,6 +118,10 @@ rozwijamy jej – poprawiamy tylko wtedy, gdy blokuje bieżącą pracę:
   szablonach. Po zmianie tekstów:
   `python manage.py makemessages -l en -l pl` i uzupełnienie
   `locale/pl/LC_MESSAGES/django.po` w tym samym commicie.
+- Czas: `USE_TZ = True`, `TIME_ZONE = 'Europe/Warsaw'`. Znaczniki czasu
+  i czas trwania przez `timezone.now()` (UTC), godziny i dni harmonogramów
+  przez `timezone.localtime()`. Nie używamy `datetime.now()` ani naiwnych
+  dat zapisywanych do bazy.
 - Zmiana modeli razem z migracją (`makemigrations`) w tym samym commicie.
 - Testy: `DJANGO_DEBUG=true DATABASE_URL=postgres://… python manage.py test`
   (bez `DJANGO_SECRET_KEY` ustawienia wymagają trybu debug; Django zakłada

@@ -1,7 +1,26 @@
+import json
+import os
+import tempfile
+from datetime import datetime, time, timezone as dt_timezone
+from io import StringIO
+from unittest import mock
+
+import gpiocontrol as gpio
+from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
 
-from .models import Device, Location
+from .device_helpers import RelayPeriodicDeviceConfig
+from .models import Device, Location, RelayPeriodicDay, RelayPeriodicManualActivation, RelayPeriodicPeriod
+
+
+def utc(*args):
+    """Chwila w UTC – testy ustawiają `timezone.now()` niezależnie od strefy hosta."""
+    return datetime(*args, tzinfo=dt_timezone.utc)
+
+
+def frozen_now(now):
+    return mock.patch('django.utils.timezone.now', return_value=now)
 
 
 # Create your tests here.
@@ -104,3 +123,113 @@ class RelayUpdateTests(TestCase):
     def test_get_not_allowed(self):
         response = self.client.get(self.get_relay_update_url(1))
         self.assertEqual(response.json(), {'status': 'error', 'message': 'Invalid request method'})
+
+
+class PeriodicDeviceTestCase(TestCase):
+    """Urządzenie `relay-periodic` z plikiem konfiguracyjnym i zamockowanym GPIO (stan: wyłączone)."""
+
+    PIN = 17
+
+    def setUp(self):
+        with tempfile.NamedTemporaryFile('w', suffix='.json', delete=False) as config_file:
+            json.dump({'pinNumber': self.PIN, 'activeState': gpio.State.HIGH.value}, config_file)
+        self.addCleanup(os.unlink, config_file.name)
+        for name, kwargs in (('get', {'return_value': gpio.State.LOW}), ('set', {})):
+            patcher = mock.patch(f'gpiocontrol.{name}', **kwargs)
+            setattr(self, f'gpio_{name}', patcher.start())
+            self.addCleanup(patcher.stop)
+        location = LocationHelper.create_location('room')
+        self.device = Device.objects.create(location=location, name='periodic', config_file=config_file.name,
+                                            type=Device.DeviceType.RELAY_PERIODIC)
+
+    def config_at(self, now):
+        with frozen_now(now):
+            return RelayPeriodicDeviceConfig(self.device)
+
+
+class RelayPeriodicLocalTimeTests(PeriodicDeviceTestCase):
+    """Dni i okresy harmonogramu liczone w czasie lokalnym (Europe/Warsaw), nie w UTC."""
+
+    def setUp(self):
+        super().setUp()
+        self.period = RelayPeriodicPeriod.objects.create(device=self.device, begin=time(0, 0), end=time(1, 0))
+
+    def test_period_in_local_time_winter(self):
+        # niedziela 23:30 UTC = poniedziałek 00:30 CET
+        self.assertEqual(self.config_at(utc(2026, 11, 15, 23, 30)).current_period, self.period)
+
+    def test_period_in_local_time_summer(self):
+        # 22:30 UTC = 00:30 CEST
+        self.assertEqual(self.config_at(utc(2026, 7, 1, 22, 30)).current_period, self.period)
+
+    def test_period_not_in_utc(self):
+        # 00:30 UTC = 01:30 CET – poza okresem 00:00–01:00, choć w UTC by się w nim mieścił
+        self.assertIsNone(self.config_at(utc(2026, 11, 16, 0, 30)).current_period)
+
+    def test_active_day_in_local_date(self):
+        RelayPeriodicDay.objects.create(device=self.device, day=RelayPeriodicDay.DaysChoices.MONDAY)
+        # w UTC jeszcze niedziela, lokalnie już poniedziałek
+        config = self.config_at(utc(2026, 11, 15, 23, 30))
+        self.assertTrue(config.is_active_day())
+        self.assertEqual(config.current_day_display(), 'Monday')
+
+
+class ManualActivationTimeTests(PeriodicDeviceTestCase):
+    """Ręczne włączenie: koniec zapisany w UTC, wyświetlany w czasie lokalnym."""
+
+    def activate(self, now, minutes):
+        with frozen_now(now):
+            self.client.post(reverse('devices:periodic_relay_manual_activate', args=(self.device.id,)),
+                             {'minutes': minutes, 'next': '/'})
+        return RelayPeriodicManualActivation.objects.get(device=self.device)
+
+    def test_end_time_stored_in_utc(self):
+        activation = self.activate(utc(2026, 11, 15, 23, 30, 45), 30)
+        self.assertEqual(activation.end_time, utc(2026, 11, 16, 0, 0))
+        config = self.config_at(utc(2026, 11, 15, 23, 45))
+        self.assertTrue(config.is_manual_activated())
+        self.assertEqual(config.get_manual_activation_end_display(), '2026-11-16 01:00')
+        self.gpio_set.assert_called_once_with(self.PIN, gpio.State.HIGH)
+
+    def test_expired(self):
+        self.activate(utc(2026, 11, 15, 23, 30), 30)
+        self.assertFalse(self.config_at(utc(2026, 11, 16, 0, 0, 1)).is_manual_activated())
+
+    def test_duration_across_dst_change(self):
+        # 25.10.2026 o 01:00 UTC zegary cofają się z 03:00 CEST na 02:00 CET:
+        # włączenie o 02:30 CEST na 60 minut kończy się o 02:30 CET
+        activation = self.activate(utc(2026, 10, 25, 0, 30), 60)
+        self.assertEqual(activation.end_time, utc(2026, 10, 25, 1, 30))
+        config = self.config_at(utc(2026, 10, 25, 1, 0))
+        self.assertTrue(config.is_manual_activated())
+        self.assertEqual(config.get_manual_activation_end_display(), '2026-10-25 02:30')
+
+
+class RelaysPeriodicUpdateCommandTests(PeriodicDeviceTestCase):
+    """Komenda workera `relays_periodic_update` w czasie lokalnym."""
+
+    def run_at(self, now):
+        with frozen_now(now):
+            call_command('relays_periodic_update', stdout=StringIO())
+
+    def test_activates_in_local_period(self):
+        RelayPeriodicPeriod.objects.create(device=self.device, begin=time(0, 0), end=time(1, 0))
+        self.run_at(utc(2026, 11, 15, 23, 30))
+        self.gpio_set.assert_called_once_with(self.PIN, gpio.State.HIGH)
+
+    def test_no_activation_outside_local_period(self):
+        RelayPeriodicPeriod.objects.create(device=self.device, begin=time(0, 0), end=time(1, 0))
+        self.run_at(utc(2026, 11, 16, 0, 30))
+        self.gpio_set.assert_not_called()
+
+    def test_keeps_active_manual_activation(self):
+        RelayPeriodicManualActivation.objects.create(device=self.device, end_time=utc(2026, 11, 15, 23, 45))
+        self.run_at(utc(2026, 11, 15, 23, 30))
+        self.gpio_set.assert_called_once_with(self.PIN, gpio.State.HIGH)
+        self.assertTrue(RelayPeriodicManualActivation.objects.filter(device=self.device).exists())
+
+    def test_removes_expired_manual_activation(self):
+        RelayPeriodicManualActivation.objects.create(device=self.device, end_time=utc(2026, 11, 15, 23, 0))
+        self.run_at(utc(2026, 11, 15, 23, 30))
+        self.gpio_set.assert_not_called()
+        self.assertFalse(RelayPeriodicManualActivation.objects.filter(device=self.device).exists())

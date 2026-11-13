@@ -1,6 +1,5 @@
-from datetime import datetime
-
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 
 from devices.device_helpers import RelayPeriodicDeviceConfig
 from devices.models import Device, RelayPeriodicPeriod, RelayPeriodicDay, RelayPeriodicManualActivation
@@ -9,7 +8,7 @@ PIN_CONTROL_COMMAND = "/usr/bin/pinctrl"
 
 
 def add_timestamp(msg):
-    return f"{datetime.now().strftime('%Y.%m.%d-%H:%M:%S.%f')} {msg}"
+    return f"{timezone.localtime().strftime('%Y.%m.%d-%H:%M:%S.%f')} {msg}"
 
 
 class Command(BaseCommand):
@@ -17,7 +16,8 @@ class Command(BaseCommand):
             'It is intended to be run by a cron job or other periodic scheduler')
 
     def handle(self, *args, **options):
-        now = datetime.now()
+        # Harmonogram (dzień tygodnia, godziny okresów) w czasie lokalnym.
+        now = timezone.localtime()
         for device in Device.objects.filter(type=Device.DeviceType.RELAY_PERIODIC):
             device_config = RelayPeriodicDeviceConfig(device)
             if not device_config.state_available:
@@ -29,7 +29,7 @@ class Command(BaseCommand):
             active_time = False
             manual_activation = RelayPeriodicManualActivation.objects.filter(device=device).first()
             if manual_activation:
-                manual_activation_end = manual_activation.end_time.replace(tzinfo=None)
+                manual_activation_end = timezone.localtime(manual_activation.end_time)
                 if now < manual_activation_end:
                     active_time = True
                     activation_log = f"device: {device.name} active manual till: {manual_activation_end}"
