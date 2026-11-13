@@ -28,6 +28,10 @@ projektu – trzymamy tu kod aplikacji i ustalenia o niej samej.
   UI działa bez internetu.
 - Wszystkie widoki UI wymagają zalogowania (sesje Django). Bez otwartej
   rejestracji – konta zakłada admin.
+  Wymusza to `LoginRequiredMiddleware`, więc nowe widoki są chronione bez
+  dodatkowego kodu. Wyjątek tylko przez `@login_not_required` z komentarzem,
+  dlaczego (np. endpoint z własnym uwierzytelnianiem). Panel admina ma własne
+  logowanie i wymaga `is_staff`.
 - Panel admina Django służy do zarządzania urządzeniami i lokalizacjami.
 - Sterowanie urządzeniami: komendy na `home/<id>/set`, stan z `…/state`,
   `…/telemetry` i `…/availability`. Nie dopisujemy kodu, który komunikuje się
@@ -68,7 +72,7 @@ rozwijamy jej – poprawiamy tylko wtedy, gdy blokuje bieżącą pracę:
 .
 ├── smartHomeSite/   # projekt Django: ustawienia, główne urls, wsgi/asgi
 ├── devices/         # aplikacja: modele, widoki, szablony, statyki, komendy
-├── templates/       # nadpisania szablonów spoza aplikacji (panel admina)
+├── templates/       # szablony widoków spoza aplikacji (panel admina, logowanie)
 ├── locale/          # tłumaczenia en/pl
 ├── assets/          # obraz deweloperski: instalacja, fikstury, konfiguracje urządzeń
 ├── Dockerfile, build.sh, run.sh   # obraz deweloperski (do zastąpienia)
@@ -81,7 +85,8 @@ rozwijamy jej – poprawiamy tylko wtedy, gdy blokuje bieżącą pracę:
 ### `smartHomeSite/`
 
 - Ustawienia projektu i główny `urls.py` – adresy z prefiksem języka
-  (`i18n_patterns`).
+  (`i18n_patterns`), w tym logowanie i wylogowanie (widoki
+  `django.contrib.auth`).
 - Bez logiki aplikacji – ta trafia do aplikacji (`devices/` lub kolejnej).
 
 ### `devices/`
@@ -95,8 +100,10 @@ rozwijamy jej – poprawiamy tylko wtedy, gdy blokuje bieżącą pracę:
 
 ### `templates/`
 
-- Tylko szablony nadpisujące szablony spoza projektu (np.
-  `admin/base_site.html`). Szablony aplikacji trzymamy w aplikacji.
+- Tylko szablony widoków spoza projektu: nadpisania (np.
+  `admin/base_site.html`) i szablony, których szukają widoki
+  `django.contrib.auth` (`registration/login.html`). Szablony aplikacji
+  trzymamy w aplikacji.
 
 ### `locale/`
 
@@ -126,7 +133,9 @@ rozwijamy jej – poprawiamy tylko wtedy, gdy blokuje bieżącą pracę:
 - Testy: `DJANGO_DEBUG=true DATABASE_URL=postgres://… python manage.py test`
   (bez `DJANGO_SECRET_KEY` ustawienia wymagają trybu debug; Django zakłada
   i usuwa osobną bazę `test_<nazwa>`). Nowe widoki i logika reguł / harmonogramów
-  – z testami.
+  – z testami. Testy widoków dziedziczą po `LoggedInTestCase` (klient
+  zalogowany jako zwykły użytkownik); test `LoginRequiredTests` sprawdza
+  przekierowanie na logowanie dla wszystkich adresów `devices`.
 - Zależności przypięte do wersji (`==`) w `requirements.txt`. Przed dodaniem
   nowej sprawdzamy, czy działa na arm64 i ile kosztuje w RAM.
 

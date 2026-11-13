@@ -41,17 +41,32 @@
                     <a class="navbar-text" href="#">
                         {% block page_title %}{% endblock %}
                     </a>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                            data-bs-target="#navbarCollapsed" aria-controls="navbarCollapsed"
-                            aria-expanded="false"
-                            aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
+                    {% if user.is_authenticated %}
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#navbarCollapsed" aria-controls="navbarCollapsed"
+                                aria-expanded="false"
+                                aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                    {% endif %}
                 </div>
-                <div class="collapse navbar-collapse" id="navbarCollapsed">
-                    {% generate_menu %}
-                    {% include 'devices/menu.html' with menu=menus.main navbar_class="ms-auto" %}
-                </div>
+                {% if user.is_authenticated %}
+                    <div class="collapse navbar-collapse" id="navbarCollapsed">
+                        {% generate_menu %}
+                        {% include 'devices/menu.html' with menu=menus.main navbar_class="ms-auto" %}
+                        {# Wylogowanie tylko przez POST (LogoutView) – formularz z tokenem CSRF #}
+                        <form method="post" action="{% url 'logout' %}"
+                              class="d-flex align-items-center gap-2 mb-2 mb-md-0">
+                            {% csrf_token %}
+                            <span class="navbar-text">
+                                <i class="bi bi-person"></i> {{ user.get_username }}
+                            </span>
+                            <button type="submit" class="btn btn-sm btn-outline-light">
+                                <i class="bi bi-box-arrow-right"></i> {% trans "Log out" %}
+                            </button>
+                        </form>
+                    </div>
+                {% endif %}
             </div>
         </nav>
         <div id="content" class="bg-dark">

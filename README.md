@@ -20,7 +20,9 @@ described in [CONTRIBUTING.md](CONTRIBUTING.md) (in Polish).
 
 - Manage smart home devices (relay, more types soon).
 - Responsive web interface for manage device's state.
-- Admin panel to manage devices.
+- Login required for every page (Django sessions). No sign-up – accounts are
+  created by an administrator.
+- Admin panel to manage devices and user accounts.
 
 ## Technologies Used
 
@@ -191,8 +193,17 @@ contains password hashes – delete it afterwards.
 ## Usage
 
 1. Build and run the app (locally or using docker) using the instructions above.
-2. Access the app at http://localhost:8000
-3. Log into the admin panel at http://localhost:8000/admin/ to manage devices.
+2. Access the app at http://localhost:8000 and log in. Every page requires
+   login; the first account is created with `python manage.py createsuperuser`.
+3. Log into the admin panel at http://localhost:8000/admin/ to manage devices
+   and user accounts (Authentication and Authorization → Users). Regular
+   users need no special permissions to use the app; the admin panel requires
+   the *staff status* flag.
+
+Sessions are stored in the database and last two weeks (Django default
+`SESSION_COOKIE_AGE`). The *Log out* button is in the navigation bar.
+Expired sessions stay in the database until `python manage.py clearsessions`
+removes them.
 
 ## License
 

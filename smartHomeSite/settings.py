@@ -77,6 +77,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.LoginRequiredMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -139,6 +140,16 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+# Logowanie
+# https://docs.djangoproject.com/en/6.1/topics/auth/default/#the-loginrequiredmiddleware-middleware
+# Wszystkie widoki wymagają zalogowania (LoginRequiredMiddleware), także nowe –
+# wyjątki tylko przez dekorator @login_not_required. Bez rejestracji: konta
+# zakłada admin. Sesje w bazie, ważne 2 tygodnie (domyślne SESSION_COOKIE_AGE).
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'devices:main'
+LOGOUT_REDIRECT_URL = 'login'
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.1/topics/i18n/

@@ -6,12 +6,16 @@ from io import StringIO
 from unittest import mock
 
 import gpiocontrol as gpio
+from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.test import TestCase
 from django.urls import reverse
 
+from . import urls as devices_urls
 from .device_helpers import RelayPeriodicDeviceConfig
 from .models import Device, Location, RelayPeriodicDay, RelayPeriodicManualActivation, RelayPeriodicPeriod
+
+User = get_user_model()
 
 
 def utc(*args):
@@ -23,7 +27,21 @@ def frozen_now(now):
     return mock.patch('django.utils.timezone.now', return_value=now)
 
 
-# Create your tests here.
+def login_url(next_url):
+    """Adres, na który LoginRequiredMiddleware przekierowuje niezalogowanego użytkownika."""
+    return f"{reverse('login')}?next={next_url}"
+
+
+class LoggedInTestCase(TestCase):
+    """Klient zalogowany jako zwykły użytkownik (bez uprawnień admina) – widoki UI wymagają zalogowania."""
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user('user')
+
+    def setUp(self):
+        self.client.force_login(self.user)
+
 
 class DeviceModelTests(TestCase):
     pass
@@ -54,7 +72,7 @@ class DeviceHelper:
         return response.context['device']
 
 
-class LocationListViewTests(TestCase):
+class LocationListViewTests(LoggedInTestCase):
 
     def get_location_list_response(self):
         return self.client.get(reverse('devices:location_list'))
@@ -80,7 +98,7 @@ class LocationListViewTests(TestCase):
                                  ordered=False)
 
 
-class LocationViewTests(TestCase):
+class LocationViewTests(LoggedInTestCase):
     def get_location_response(self, location_id):
         return self.client.get(reverse('devices:location', args=(location_id,)))
 
@@ -91,11 +109,12 @@ class LocationViewTests(TestCase):
         self.assertEqual(response.status_code, 404)
 
 
-class DeviceViewTests(TestCase):
+class DeviceViewTests(LoggedInTestCase):
     def get_device_response(self, device_id):
         return self.client.get(reverse('devices:device', args=(device_id,)))
 
     def setUp(self):
+        super().setUp()
         self.location = LocationHelper.create_location('room')
         self.device = DeviceHelper.create_device(self.location, 'device')
 
@@ -112,7 +131,7 @@ class DeviceViewTests(TestCase):
         self.assertContains(response, 'devices/js/device_status_update.js')
 
 
-class RelayUpdateTests(TestCase):
+class RelayUpdateTests(LoggedInTestCase):
     def get_relay_update_url(self, device_id):
         return reverse('devices:relay_update', args=(device_id,))
 
@@ -125,12 +144,13 @@ class RelayUpdateTests(TestCase):
         self.assertEqual(response.json(), {'status': 'error', 'message': 'Invalid request method'})
 
 
-class PeriodicDeviceTestCase(TestCase):
+class PeriodicDeviceTestCase(LoggedInTestCase):
     """Urządzenie `relay-periodic` z plikiem konfiguracyjnym i zamockowanym GPIO (stan: wyłączone)."""
 
     PIN = 17
 
     def setUp(self):
+        super().setUp()
         with tempfile.NamedTemporaryFile('w', suffix='.json', delete=False) as config_file:
             json.dump({'pinNumber': self.PIN, 'activeState': gpio.State.HIGH.value}, config_file)
         self.addCleanup(os.unlink, config_file.name)
@@ -233,3 +253,102 @@ class RelaysPeriodicUpdateCommandTests(PeriodicDeviceTestCase):
         self.run_at(utc(2026, 11, 15, 23, 30))
         self.gpio_set.assert_not_called()
         self.assertFalse(RelayPeriodicManualActivation.objects.filter(device=self.device).exists())
+
+
+class LoginRequiredTests(TestCase):
+    """Bez zalogowania widoki przekierowują na stronę logowania i niczego nie zmieniają."""
+
+    def test_devices_views_redirect_to_login(self):
+        # wszystkie adresy aplikacji devices, także dodane w przyszłości
+        for pattern in devices_urls.urlpatterns:
+            args = [1] * len(pattern.pattern.converters)
+            url = reverse(f'devices:{pattern.name}', args=args)
+            with self.subTest(url=url):
+                response = self.client.get(url)
+                self.assertRedirects(response, login_url(url), fetch_redirect_response=False)
+
+    def test_root_redirects_to_login(self):
+        response = self.client.get('/en/')
+        self.assertRedirects(response, login_url('/en/'), fetch_redirect_response=False)
+
+    def test_admin_redirects_to_admin_login(self):
+        # panel admina ma własne logowanie (wymaga is_staff), poza LoginRequiredMiddleware
+        url = reverse('admin:index')
+        response = self.client.get(url)
+        self.assertRedirects(response, f"{reverse('admin:login')}?next={url}", fetch_redirect_response=False)
+
+    def test_post_has_no_effect(self):
+        location = LocationHelper.create_location('room')
+        device = DeviceHelper.create_device(location, 'device')
+        url = reverse('devices:periodic_relay_add_active_day', args=(device.id,))
+        response = self.client.post(url, {'day': 0, 'next': '/'})
+        self.assertRedirects(response, login_url(url), fetch_redirect_response=False)
+        self.assertFalse(RelayPeriodicDay.objects.exists())
+
+
+class LoginViewTests(TestCase):
+    PASSWORD = 'correct-horse-battery-staple'
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create_user('user', password=cls.PASSWORD)
+
+    def log_in(self, password=PASSWORD, **extra):
+        return self.client.post(reverse('login'), {'username': 'user', 'password': password, **extra})
+
+    def test_login_page_without_menu(self):
+        response = self.client.get(reverse('login'))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'name="password"')
+        self.assertNotContains(response, reverse('devices:location_list'))
+        self.assertNotContains(response, reverse('logout'))
+
+    def test_login_redirects_to_devices(self):
+        response = self.log_in()
+        self.assertRedirects(response, reverse('devices:main'), fetch_redirect_response=False)
+        self.assertEqual(int(self.client.session['_auth_user_id']), self.user.pk)
+
+    def test_login_redirects_to_next(self):
+        next_url = reverse('devices:location_list')
+        response = self.log_in(next=next_url)
+        self.assertRedirects(response, next_url)
+
+    def test_login_ignores_external_next(self):
+        response = self.log_in(next='https://example.com/')
+        self.assertRedirects(response, reverse('devices:main'), fetch_redirect_response=False)
+
+    def test_wrong_password(self):
+        response = self.log_in(password='wrong')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'alert-danger')
+        self.assertNotIn('_auth_user_id', self.client.session)
+
+    def test_inactive_user_cannot_log_in(self):
+        self.user.is_active = False
+        self.user.save()
+        response = self.log_in()
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn('_auth_user_id', self.client.session)
+
+    def test_logged_in_user_redirected_from_login_page(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse('login'))
+        self.assertRedirects(response, reverse('devices:main'), fetch_redirect_response=False)
+
+
+class LogoutTests(LoggedInTestCase):
+    def test_navbar_shows_user_and_logout(self):
+        response = self.client.get(reverse('devices:location_list'))
+        self.assertContains(response, self.user.get_username())
+        self.assertContains(response, f'action="{reverse("logout")}"')
+
+    def test_logout(self):
+        response = self.client.post(reverse('logout'))
+        self.assertRedirects(response, reverse('login'))
+        url = reverse('devices:location_list')
+        self.assertRedirects(self.client.get(url), login_url(url), fetch_redirect_response=False)
+
+    def test_logout_requires_post(self):
+        response = self.client.get(reverse('logout'))
+        self.assertEqual(response.status_code, 405)
+        self.assertIn('_auth_user_id', self.client.session)

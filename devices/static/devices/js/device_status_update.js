@@ -12,6 +12,12 @@ function updateDevice(deviceId, newState) {
             'csrfmiddlewaretoken': CSRF_TOKEN
         },
         success: function (response) {
+            // Bez ważnej sesji widok przekierowuje na stronę logowania – zamiast
+            // JSON przychodzi HTML. Przeładowanie strony prowadzi do logowania.
+            if (typeof response !== 'object') {
+                window.location.reload();
+                return;
+            }
             if (response.status === 'success') {
                 $('#device_status_show_' + deviceId).show();
                 $('#device_status_loading_' + deviceId).hide();

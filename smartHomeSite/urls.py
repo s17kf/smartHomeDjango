@@ -16,12 +16,17 @@ Including another URLconf
 """
 from django.conf.urls.i18n import i18n_patterns
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
 from django.urls import path, include
 
 from .views import redirect_view
 
 urlpatterns = i18n_patterns(
     path('', redirect_view, {'target': 'devices/'}),
+    # Logowanie i wylogowanie (tylko POST) z django.contrib.auth – bez rejestracji
+    # i resetu hasła. Szablon: templates/registration/login.html.
+    path('login/', auth_views.LoginView.as_view(redirect_authenticated_user=True), name='login'),
+    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('devices/', include('devices.urls')),
     path('admin/', admin.site.urls),
 )
