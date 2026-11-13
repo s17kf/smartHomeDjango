@@ -48,8 +48,12 @@ projektu – trzymamy tu kod aplikacji i ustalenia o niej samej.
 - Baza: PostgreSQL. Bez kodu zależnego od silnika bazy (surowy SQL, funkcje
   tylko jednego silnika), dopóki nie będzie naprawdę potrzebny.
 - Konfiguracja ze zmiennych środowiskowych (`DJANGO_SECRET_KEY`,
-  `DJANGO_DEBUG`, `DJANGO_ALLOWED_HOSTS`, `DATABASE_URL`) – lista i wartości
-  domyślne w README (sekcja Configuration), nowe zmienne dopisujemy tam.
+  `DJANGO_DEBUG`, `DJANGO_ALLOWED_HOSTS`, `DATABASE_URL`, `DJANGO_HTTPS`) –
+  lista i wartości domyślne w README (sekcja Configuration), nowe zmienne
+  dopisujemy tam.
+- HTTPS kończy reverse proxy (Caddy), aplikacja mówi zwykłym HTTP.
+  `DJANGO_HTTPS` włącza zaufanie do `X-Forwarded-Proto` i ciasteczka
+  `Secure`. Przekierowanie na HTTPS i HSTS należą do proxy, nie do Django.
   Sekretów ani adresów hostów nie wpisujemy do kodu.
 - Docelowy sprzęt: Raspberry Pi 4 (arm64). Obraz ma wariant amd64 i arm64,
   pilnujemy zużycia RAM (liczba procesów i workerów, ciężkie zależności).

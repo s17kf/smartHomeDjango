@@ -100,6 +100,7 @@ secret or host-specific is stored in the code.
 | `DJANGO_DEBUG` | no | `false` | Debug mode: `true`/`false` (also `1`/`0`, `yes`/`no`, `on`/`off`). Never enable it in production. |
 | `DJANGO_ALLOWED_HOSTS` | yes, in production | empty | Comma-separated host names / IP addresses the app is served under, e.g. `smarthome.lan,192.168.1.10`. |
 | `DATABASE_URL` | yes | – | Database URL in the [dj-database-url](https://github.com/jazzband/dj-database-url) format, e.g. `postgres://user:password@host:5432/name`. |
+| `DJANGO_HTTPS` | no | `false` | `true` when the app is served over HTTPS by a reverse proxy (e.g. Caddy) that terminates TLS – see [HTTPS behind a reverse proxy](#https-behind-a-reverse-proxy). |
 
 Notes:
 
@@ -127,6 +128,35 @@ Notes:
   including server errors (500) with a traceback. Client errors (4xx) are
   only in the web server's request log.
 - Check a production configuration with `python manage.py check --deploy`.
+  See [HTTPS behind a reverse proxy](#https-behind-a-reverse-proxy) for the
+  warnings that are expected.
+
+### HTTPS behind a reverse proxy
+
+The app itself speaks plain HTTP. HTTPS is terminated by a reverse proxy in
+front of it, which forwards requests with the original `Host` header and
+sets `X-Forwarded-Proto` (Caddy does both by default).
+
+`DJANGO_HTTPS=true` makes the app trust `X-Forwarded-Proto: https` and marks
+the session and CSRF cookies `Secure`. Without it a request coming through
+the HTTPS proxy looks like plain HTTP to Django, so the CSRF check rejects
+every form sent by a browser (`Origin checking failed`), including the login
+form.
+
+- Enable it only when the app is reachable **exclusively through the proxy**
+  and the proxy overwrites `X-Forwarded-Proto` sent by clients (Caddy
+  ignores it from untrusted clients). Otherwise a client could claim HTTPS by
+  sending the header itself.
+- Keep it off when the site is served over plain HTTP (e.g. in a local
+  network): browsers do not send `Secure` cookies over HTTP, so logging in
+  would fail.
+- The app does not redirect HTTP to HTTPS and does not send HSTS – that is
+  the proxy's job. Requests made directly to the app over HTTP (e.g. a health
+  check inside the container) get a normal response.
+
+Expected `check --deploy` warnings: with `DJANGO_HTTPS=true` –
+`security.W004` (HSTS) and `security.W008` (HTTPS redirect); with it off
+also `security.W012` and `security.W016` (cookies without `Secure`).
 
 ### Static files
 

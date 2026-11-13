@@ -54,6 +54,17 @@ if not SECRET_KEY:
 # Przy DEBUG i pustej liście Django sam dopuszcza localhost, 127.0.0.1 i [::1].
 ALLOWED_HOSTS = env_list('DJANGO_ALLOWED_HOSTS')
 
+# HTTPS kończone na reverse proxy (Caddy), do aplikacji idzie zwykłe HTTP.
+# Proxy ustawia X-Forwarded-Proto i nadpisuje wartość od klienta, więc
+# nagłówkowi ufamy tylko z DJANGO_HTTPS – gdy aplikacja jest osiągalna
+# wyłącznie przez proxy. Bez tego Django uważa żądanie za HTTP, a kontrola
+# CSRF odrzuca formularze z `Origin: https://…`.
+# Przekierowanie HTTP → HTTPS robi proxy, nie Django (SECURE_SSL_REDIRECT
+# przekierowałby też healthcheck łączący się bezpośrednio po HTTP).
+HTTPS = env_bool('DJANGO_HTTPS')
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') if HTTPS else None
+SESSION_COOKIE_SECURE = CSRF_COOKIE_SECURE = HTTPS
+
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_root')
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media_root')
 
