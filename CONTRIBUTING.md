@@ -37,6 +37,8 @@ projektu – trzymamy tu kod aplikacji i ustalenia o niej samej.
   urządzenia.
 - JSON API tylko tam, gdzie jest potrzebne (np. komendy głosowe), jako
   zwykłe widoki w tym projekcie. DRF dopiero, gdy API urośnie.
+- Baza: PostgreSQL. Bez kodu zależnego od silnika bazy (surowy SQL, funkcje
+  tylko jednego silnika), dopóki nie będzie naprawdę potrzebny.
 - Konfiguracja ze zmiennych środowiskowych (`DJANGO_SECRET_KEY`,
   `DJANGO_DEBUG`, `DJANGO_ALLOWED_HOSTS`, `DATABASE_URL`) – lista i wartości
   domyślne w README (sekcja Configuration), nowe zmienne dopisujemy tam.
@@ -55,8 +57,10 @@ rozwijamy jej – poprawiamy tylko wtedy, gdy blokuje bieżącą pracę:
 - typ `relay-periodic` i modele `RelayPeriodic*` – harmonogram przechodzi do
   reguł automatyzacji,
 - obraz deweloperski: `Dockerfile` (ubuntu, cron), `build.sh`, `run.sh`,
-  `assets/` – do zastąpienia obrazem `python:*-slim` z gunicornem,
-- SQLite (docelowo PostgreSQL), `USE_TZ = False`,
+  `assets/` – do zastąpienia obrazem `python:*-slim` z gunicornem; jako
+  jedyny działa na SQLite (`DATABASE_URL` w `Dockerfile` i
+  `assets/tmp/crontab`),
+- `USE_TZ = False`,
 - jQuery, Bootstrap i ikony ładowane z CDN.
 
 ## Struktura katalogów
@@ -116,8 +120,9 @@ rozwijamy jej – poprawiamy tylko wtedy, gdy blokuje bieżącą pracę:
   `python manage.py makemessages -l en -l pl` i uzupełnienie
   `locale/pl/LC_MESSAGES/django.po` w tym samym commicie.
 - Zmiana modeli razem z migracją (`makemigrations`) w tym samym commicie.
-- Testy: `DJANGO_DEBUG=true python manage.py test` (bez `DJANGO_SECRET_KEY`
-  ustawienia wymagają trybu debug). Nowe widoki i logika reguł / harmonogramów
+- Testy: `DJANGO_DEBUG=true DATABASE_URL=postgres://… python manage.py test`
+  (bez `DJANGO_SECRET_KEY` ustawienia wymagają trybu debug; Django zakłada
+  i usuwa osobną bazę `test_<nazwa>`). Nowe widoki i logika reguł / harmonogramów
   – z testami.
 - Zależności przypięte do wersji (`==`) w `requirements.txt`. Przed dodaniem
   nowej sprawdzamy, czy działa na arm64 i ile kosztuje w RAM.

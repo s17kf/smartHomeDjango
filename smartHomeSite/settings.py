@@ -103,11 +103,22 @@ WSGI_APPLICATION = 'smartHomeSite.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
-# Adres bazy w formacie dj-database-url; domyślnie SQLite w katalogu projektu.
+# Adres bazy w formacie dj-database-url, bez wartości domyślnej. Docelowa baza
+# to PostgreSQL; SQLite tylko po jawnym podaniu sqlite:///… (obraz deweloperski).
+
+DATABASE_URL = os.environ.get('DATABASE_URL', '')
+if not DATABASE_URL:
+    raise ImproperlyConfigured(
+        'DATABASE_URL must be set, e.g. postgres://user:password@localhost:5432/name'
+    )
 
 DATABASES = {
     'default': dj_database_url.parse(
-        os.environ.get('DATABASE_URL') or f'sqlite:///{BASE_DIR / "db.sqlite3"}'
+        DATABASE_URL,
+        # Połączenie zostaje otwarte między żądaniami (mniej nawiązywania połączeń
+        # na RPi) i jest sprawdzane przed ponownym użyciem, np. po restarcie bazy.
+        conn_max_age=60,
+        conn_health_checks=True,
     ),
 }
 

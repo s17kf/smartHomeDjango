@@ -15,6 +15,8 @@ WORKDIR /home/${USER}
 ARG HOST_IP
 ENV DJANGO_DEBUG=true
 ENV DJANGO_ALLOWED_HOSTS=${HOST_IP},localhost
+# Obraz deweloperski zostaje przy SQLite (plik w katalogu projektu)
+ENV DATABASE_URL=sqlite:////home/ubuntu/smartHomeDjango/db.sqlite3
 ARG USE_LOCAL
 ENV USE_LOCAL=${USE_LOCAL}
 
