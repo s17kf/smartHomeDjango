@@ -1,0 +1,12 @@
+.git
+.idea
+.venv
+**/__pycache__
+db.sqlite3
+static_root
+media_root
+# .mo kompiluje etap tłumaczeń w Dockerfile
+**/*.mo
+*.md
+Dockerfile
+.dockerignore

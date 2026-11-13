@@ -13,6 +13,7 @@ described in [CONTRIBUTING.md](CONTRIBUTING.md) (in Polish).
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Docker](#docker)
+- [Moving data from SQLite to PostgreSQL](#moving-data-from-sqlite-to-postgresql)
 - [Usage](#usage)
 - [License](#license)
 
@@ -36,13 +37,14 @@ described in [CONTRIBUTING.md](CONTRIBUTING.md) (in Polish).
 
 ## Installation
 
-The app is designed to run on a Raspberry Pi device.
-To run on other devices, it is recommended to use Docker. See the [Docker](#docker) section for more details.
+The app is designed to run on a Raspberry Pi (arm64) in Docker, see the
+[Docker](#docker) section. The steps below set up local development.
 
 ### Prerequisites
 
 - Python 3.12+
 - Pip (Python package installer)
+- GNU gettext (`msgfmt`) to compile translations
 - PostgreSQL server (e.g. `docker run -d -p 127.0.0.1:5432:5432 -e POSTGRES_PASSWORD=… postgres:17-alpine`)
 
 1. Clone the repository:
@@ -71,6 +73,12 @@ Run the following commands to set up the database:
 ```bash
 python manage.py migrate
 python manage.py createsuperuser
+```
+
+Compile the translations (`.mo` files are not in the repository):
+
+```bash
+python manage.py compilemessages
 ```
 
 ### Start the development server
@@ -110,10 +118,14 @@ Notes:
 - **`DATABASE_URL`**: special characters in the user name or password must be
   URL-encoded (e.g. `@` → `%40`). The supported database is PostgreSQL
   (driver `psycopg` in `requirements.txt`). `sqlite:///<absolute path>` still
-  works and is used only by the development Docker image. Database
-  connections are kept open for 60 s between requests.
+  works, but is not supported (the Docker build uses an in-memory SQLite URL
+  only for `collectstatic`). Database connections are kept open for 60 s
+  between requests.
 - **Tests** create and drop a separate `test_<name>` database, so the
   PostgreSQL user needs the `CREATEDB` privilege.
+- **Logs** go to stderr, also with debug off: Django warnings and errors,
+  including server errors (500) with a traceback. Client errors (4xx) are
+  only in the web server's request log.
 - Check a production configuration with `python manage.py check --deploy`.
 
 ### Static files
@@ -126,7 +138,8 @@ are served by the app itself through WhiteNoise.
   ```bash
   python manage.py collectstatic --noinput
   ```
-  after every code update, before starting the app. It copies the files to
+  after every code update, before starting the app (the Docker image does it
+  at build time). It copies the files to
   `static_root/` with a content hash in their names and adds gzip versions.
   Browsers cache hashed files without revalidation (10 years); a changed file
   gets a new name. Without `collectstatic` pages fail with
@@ -137,63 +150,33 @@ are served by the app itself through WhiteNoise.
 
 ## Docker
 
-The app can be run in a Docker container.
-The Docker image is based on ubuntu and includes all dependencies required to run the app.
+The `Dockerfile` builds the production image (amd64 and arm64):
+`python:3.14-slim`, [gunicorn](https://gunicorn.org/) on port 8000, a
+non-root user. Translations are compiled and static files collected at build
+time.
 
-### Prerequisites
+```bash
+docker build -t smart-home-django .
+docker run --rm -p 8000:8000 \
+    -e DJANGO_SECRET_KEY=… -e DJANGO_ALLOWED_HOSTS=localhost \
+    -e DATABASE_URL=postgres://user:password@host:5432/name \
+    smart-home-django
+```
 
-- Docker
-- Repository cloned (see [Installation](#installation))
-- Create a build.env file in the project root directory (use `build.env.example` as a template)
+- The default command (`gunicorn`) applies database migrations first. Any
+  other command runs without migrations, so only one container migrates the
+  database, e.g. a worker:
+  `docker run … smart-home-django python manage.py relays_periodic_update`.
+- gunicorn settings are in `gunicorn.conf.py`: 2 worker processes, request
+  log on stdout. Change them without rebuilding with `WEB_CONCURRENCY`
+  (number of processes) or `GUNICORN_CMD_ARGS` (any gunicorn option, e.g.
+  `--log-level debug`).
+- Run the tests in the image:
+  `docker run --rm -e DJANGO_DEBUG=true -e DATABASE_URL=… smart-home-django python manage.py test`.
+- Relays controlled through GPIO (`pinctrl`) do not work in the image –
+  device control moves to MQTT.
 
-The image is meant for development: it uses SQLite
-(`DATABASE_URL=sqlite:////home/ubuntu/smartHomeDjango/db.sqlite3`), sets
-`DJANGO_DEBUG=true` and
-`DJANGO_ALLOWED_HOSTS` to the host's IP address (detected on the `INTERFACE`
-from `build.env`) and `localhost`, so the app is reachable from other devices
-in the LAN.
-
-### Build the Docker image
-
-1. Navigate into the project directory:
-   ```bash
-   cd smartHomeDjango
-   ```
-2. Build the Docker image:
-   ```bash
-   ./build.sh [OPTIONS]
-   ```
-   Use -h option for help.
-
-### Run the Docker container
-
-1. Start the Docker container:
-   ```bash
-   ./run.sh
-   ```
-2. Start server:
-
-   Run from the container shell (from home directory):
-   ```bash
-   ./run_server.sh
-   ```
-3. Access the app at http://localhost:8000
-
-### Database Setup
-
-Run ./build.sh script or docker build command will apply DB fixtures stored in
-.json files in assets/db_fixtures directory.
-To generate fixtures you can use command:
-
-   ```
-   ./manage.py dumpdata [app_name[.model_name]]
-
-   ## Example:
-   ./manage.py dumpdata auth.user
-   ./manage.py dumpdata devices
-   ```
-
-### Moving data from SQLite to PostgreSQL
+## Moving data from SQLite to PostgreSQL
 
 Dump the data with the old SQLite database, then load it into an empty,
 migrated PostgreSQL database:

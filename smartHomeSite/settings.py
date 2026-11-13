@@ -109,7 +109,8 @@ WSGI_APPLICATION = 'smartHomeSite.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.1/ref/settings/#databases
 # Adres bazy w formacie dj-database-url, bez wartości domyślnej. Docelowa baza
-# to PostgreSQL; SQLite tylko po jawnym podaniu sqlite:///… (obraz deweloperski).
+# to PostgreSQL; SQLite tylko po jawnym podaniu sqlite://… (np. collectstatic
+# przy budowie obrazu, które bazy nie używa).
 
 DATABASE_URL = os.environ.get('DATABASE_URL', '')
 if not DATABASE_URL:
@@ -198,6 +199,34 @@ STORAGES = {
             'django.contrib.staticfiles.storage.StaticFilesStorage' if DEBUG
             else 'whitenoise.storage.CompressedManifestStaticFilesStorage'
         ),
+    },
+}
+
+# Whitenoise domyślnie czyta DEBUG przy starcie, a test runner wyłącza DEBUG –
+# bez tego testy ostrzegają o braku STATIC_ROOT (nie było collectstatic).
+WHITENOISE_AUTOREFRESH = DEBUG
+
+# Logi
+# https://docs.djangoproject.com/en/6.1/topics/logging/
+# Wszystko na stderr (w kontenerze: `docker compose logs`). Domyślne handlery
+# Django wypisują na konsolę tylko przy DEBUG, a błędy 500 bez DEBUG wysyłają
+# wyłącznie e-mailem do ADMINS – tu zastąpione jednym handlerem w root.
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'plain': {'format': '[{levelname}] {name}: {message}', 'style': '{'},
+    },
+    'handlers': {
+        'console': {'class': 'logging.StreamHandler', 'formatter': 'plain'},
+    },
+    'root': {'handlers': ['console'], 'level': 'INFO'},
+    'loggers': {
+        # Bez własnych handlerów – komunikaty Django trafiają do root
+        'django': {'handlers': [], 'level': 'INFO'},
+        # Kody 4xx są w logu żądań gunicorna; tu tylko błędy 500 z tracebackiem
+        'django.request': {'level': 'ERROR'},
     },
 }
 

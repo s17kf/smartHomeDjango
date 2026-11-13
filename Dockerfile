@@ -1,46 +1,44 @@
-FROM ubuntu
+# Obraz aplikacji: gunicorn + whitenoise. python:*-slim ma warianty amd64
+# i arm64 (Raspberry Pi 4).
 
-RUN apt update -y
-RUN apt -y install sudo git vim cron tree
-RUN apt -y install python3 python3-pip
-RUN apt -y install gettext
+# Etap tłumaczeń: skompilowane .mo są poza gitem, a msgfmt (gettext) jest
+# potrzebny tylko tutaj – nie trafia do obrazu.
+FROM python:3.14-slim AS messages
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends gettext \
+    && rm -rf /var/lib/apt/lists/*
+COPY locale /locale
+# To samo co `manage.py compilemessages`; `{} +`, żeby błąd msgfmt przerwał budowę
+RUN find /locale -name '*.po' -exec sh -c \
+    'for po; do msgfmt --check-format -o "${po%.po}.mo" "$po" || exit 1; done' _ {} +
 
-ENV USER=ubuntu
-RUN echo "$USER ALL=(ALL:ALL) NOPASSWD: ALL" > /etc/sudoers.d/$USER
+FROM python:3.14-slim
 
-USER $USER
-WORKDIR /home/${USER}
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Obraz deweloperski: runserver z DEBUG; IP hosta w LAN dopuszczone w ALLOWED_HOSTS
-ARG HOST_IP
-ENV DJANGO_DEBUG=true
-ENV DJANGO_ALLOWED_HOSTS=${HOST_IP},localhost
-# Obraz deweloperski zostaje przy SQLite (plik w katalogu projektu)
-ENV DATABASE_URL=sqlite:////home/ubuntu/smartHomeDjango/db.sqlite3
-ARG USE_LOCAL
-ENV USE_LOCAL=${USE_LOCAL}
+WORKDIR /app
+COPY requirements.txt ./
+RUN pip install -r requirements.txt
 
-# Use wildcard to prevent failure if no files are found
-COPY *tmp_local_repo smartHomeDjango
+COPY . .
+COPY --from=messages /locale ./locale
 
-COPY assets/install.sh install.sh
-COPY assets/entrypoint.sh entrypoint.sh
-COPY assets/run_server.sh run_server.sh
+# Statyki z hashem w nazwach i manifest powstają tylko przy wyłączonym DEBUG.
+# Ustawienia wymagają wtedy klucza i adresu bazy – tu wartości tylko na czas
+# tej komendy (collectstatic nie łączy się z bazą), nie zostają w obrazie.
+RUN DJANGO_DEBUG=false \
+    DJANGO_SECRET_KEY=collectstatic-only \
+    DATABASE_URL=sqlite://:memory: \
+    python manage.py collectstatic --noinput
 
-COPY assets/tmp tmp
-COPY assets/pinctrl_dummy.py pinctrl_dummy.py
+# Kod i statyki należą do roota – aplikacja tylko je czyta.
+RUN useradd --system --uid 10001 --user-group --no-create-home --shell /usr/sbin/nologin django
+USER django
 
-COPY assets/devices devices
-COPY assets/db_fixtures db_fixtures
-COPY assets/patches patches
-
-COPY _tmp/* tmp/
-
-RUN ./install.sh
-
-RUN sudo rm -rf tmp
-
-ENV TERM=xterm-256color
 EXPOSE 8000
-
-CMD ["./entrypoint.sh"]
+# Ustawienia gunicorna w gunicorn.conf.py (wczytywany z katalogu roboczego).
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
+CMD ["gunicorn"]

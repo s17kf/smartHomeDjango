@@ -58,13 +58,9 @@ rozwijamy jej – poprawiamy tylko wtedy, gdy blokuje bieżącą pracę:
 
 - sterowanie przekaźnikiem przez GPIO (`gpiocontrol` w
   `devices/device_helpers.py`) i pliki konfiguracyjne urządzeń
-  (`Device.config_file`),
+  (`Device.config_file`) – w obrazie nie działa (brak `pinctrl`),
 - typ `relay-periodic` i modele `RelayPeriodic*` – harmonogram przechodzi do
   reguł automatyzacji,
-- obraz deweloperski: `Dockerfile` (ubuntu, cron), `build.sh`, `run.sh`,
-  `assets/` – do zastąpienia obrazem `python:*-slim` z gunicornem; jako
-  jedyny działa na SQLite (`DATABASE_URL` w `Dockerfile` i
-  `assets/tmp/crontab`),
 - jQuery (`devices/static/devices/js/`) – interaktywność przechodzi na HTMX.
 
 ## Struktura katalogów
@@ -75,8 +71,8 @@ rozwijamy jej – poprawiamy tylko wtedy, gdy blokuje bieżącą pracę:
 ├── devices/         # aplikacja: modele, widoki, szablony, statyki, komendy
 ├── templates/       # szablony widoków spoza aplikacji (panel admina, logowanie)
 ├── locale/          # tłumaczenia en/pl
-├── assets/          # obraz deweloperski: instalacja, fikstury, konfiguracje urządzeń
-├── Dockerfile, build.sh, run.sh   # obraz deweloperski (do zastąpienia)
+├── Dockerfile, .dockerignore, docker-entrypoint.sh   # obraz aplikacji
+├── gunicorn.conf.py # ustawienia gunicorna (obraz)
 ├── requirements.txt
 ├── manage.py
 ├── CONTRIBUTING.md
@@ -111,11 +107,18 @@ rozwijamy jej – poprawiamy tylko wtedy, gdy blokuje bieżącą pracę:
 
 - Pliki `.po` dla `en` i `pl`. Skompilowane `.mo` są poza gitem.
 
-### `assets/`
+### Obraz Dockera
 
-- Pliki obrazu deweloperskiego (zob. [Stan przejściowy](#stan-przejściowy)).
-- Fikstury z danymi (`db_fixtures/*.json`) i konfiguracje urządzeń
-  (`devices/*.json`, poza `example_device.json`) są poza gitem.
+- Jeden obraz – produkcyjny (`python:3.14-slim`, amd64 i arm64). Praca
+  lokalna: `runserver` na hoście (README, Installation).
+- Przy budowie: tłumaczenia (`msgfmt` w osobnym etapie, gettext nie trafia
+  do obrazu) i `collectstatic` z wyłączonym DEBUG.
+- Start: `migrate` tylko przed serwerem WWW (domyślna komenda `gunicorn`),
+  inne komendy z obrazu (worker, testy) bez migracji – bazę migruje jedna
+  usługa.
+- Użytkownik nie-root (`django`, uid 10001), kod i statyki należą do roota –
+  aplikacja nie zapisuje plików lokalnie, stan trzyma w bazie.
+- Pakiety systemowe w obrazie tylko gdy niezbędne (rozmiar, RAM na RPi).
 
 ## Konwencje
 

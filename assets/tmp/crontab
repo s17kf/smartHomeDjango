@@ -1,4 +1,0 @@
-# cron nie dziedziczy ENV z obrazu – ustawienia muszą być tutaj
-DJANGO_DEBUG=true
-DATABASE_URL=sqlite:////home/ubuntu/smartHomeDjango/db.sqlite3
-* * * * * python3 /home/ubuntu/smartHomeDjango/manage.py relays_periodic_update >> /home/ubuntu/logs/relays_periodic_update_crontab.log 2>&1
