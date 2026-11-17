@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 19:36+0100\n"
+"POT-Creation-Date: 2026-11-17 20:04+0100\n"
 "PO-Revision-Date: 2024-09-15 11:47+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -37,6 +37,19 @@ msgid ""
 msgstr ""
 "Urządzenie usunięte, ale jego tematy zostały w brokerze MQTT: %(error)s. "
 "Uruchom „manage.py mqtt_sync --prune”, gdy broker będzie dostępny."
+
+#: devices/control.py:31
+msgid "on: expected true or false"
+msgstr "on: oczekiwano true albo false"
+
+#: devices/control.py:38
+#, python-format
+msgid "%(field)s: expected an integer"
+msgstr "%(field)s: oczekiwano liczby całkowitej"
+
+#: devices/control.py:56
+msgid "color: expected #rrggbb"
+msgstr "color: oczekiwano #rrggbb"
 
 #: devices/kinds.py:29
 msgid "expected true or false"
@@ -111,15 +124,15 @@ msgstr "pola spoza rodzaju %(kind)s: %(fields)s"
 msgid "nothing to change – allowed fields: %(fields)s"
 msgstr "brak pól do zmiany – dozwolone: %(fields)s"
 
-#: devices/kinds.py:135
+#: devices/kinds.py:141
 msgid "Switch"
 msgstr "Przełącznik"
 
-#: devices/kinds.py:144
+#: devices/kinds.py:150
 msgid "RGBCCT light"
 msgstr "Światło RGBCCT"
 
-#: devices/kinds.py:159
+#: devices/kinds.py:165
 msgid "Sensor"
 msgstr "Czujnik"
 
@@ -206,37 +219,51 @@ msgstr ""
 msgid "Log out"
 msgstr "Wyloguj"
 
-#: devices/templates/devices/cards/base.html:10
+#: devices/templates/devices/cards/base.html:12
 msgid "online"
 msgstr "dostępne"
 
-#: devices/templates/devices/cards/base.html:12
+#: devices/templates/devices/cards/base.html:14
 msgid "unavailable"
 msgstr "niedostępne"
 
-#: devices/templates/devices/cards/light_rgbcct.html:8
-#: devices/templates/devices/cards/switch.html:7
-msgid "ON"
-msgstr "Włączone"
+#: devices/templates/devices/cards/base.html:23
+msgid "Sent – waiting for the device…"
+msgstr "Wysłano – czekam na urządzenie…"
 
 #: devices/templates/devices/cards/light_rgbcct.html:10
 #: devices/templates/devices/cards/switch.html:9
+msgid "ON"
+msgstr "Włączone"
+
+#: devices/templates/devices/cards/light_rgbcct.html:12
+#: devices/templates/devices/cards/switch.html:11
 msgid "OFF"
 msgstr "Wyłączone"
 
-#: devices/templates/devices/cards/light_rgbcct.html:15
-#: devices/templates/devices/cards/light_rgbcct.html:16
+#: devices/templates/devices/cards/light_rgbcct.html:17
+#: devices/templates/devices/cards/light_rgbcct.html:18
+#: devices/templates/devices/cards/light_rgbcct.html:40
 msgid "Colour"
 msgstr "Kolor"
 
-#: devices/templates/devices/cards/light_rgbcct.html:18
+#: devices/templates/devices/cards/light_rgbcct.html:20
+#: devices/templates/devices/cards/light_rgbcct.html:34
 msgid "White"
 msgstr "Biel"
 
-#: devices/templates/devices/cards/light_rgbcct.html:22
-#: devices/templates/devices/cards/switch.html:12
+#: devices/templates/devices/cards/light_rgbcct.html:23
+#: devices/templates/devices/cards/switch.html:14
 msgid "State unknown"
 msgstr "Stan nieznany"
+
+#: devices/templates/devices/cards/light_rgbcct.html:29
+msgid "Brightness"
+msgstr "Jasność"
+
+#: devices/templates/devices/cards/on_switch.html:6
+msgid "On / off"
+msgstr "Włącz / wyłącz"
 
 #: devices/templates/devices/cards/sensor.html:9
 msgid "No readings yet"
@@ -287,6 +314,20 @@ msgstr "Brak miejsc do wyświetlenia."
 #, python-format
 msgid "%(time)s ago"
 msgstr "%(time)s temu"
+
+#: devices/views.py:70
+msgid "No confirmation from the device – check that it is available."
+msgstr "Brak potwierdzenia od urządzenia – sprawdź, czy jest dostępne."
+
+#: devices/views.py:85
+#, python-format
+msgid "The device is unavailable (%(reason)s) – the command was not sent."
+msgstr "Urządzenie niedostępne (%(reason)s) – polecenie nie zostało wysłane."
+
+#: devices/views.py:91
+#, python-format
+msgid "The command was not sent: %(error)s"
+msgstr "Polecenie nie zostało wysłane: %(error)s"
 
 #: smartHomeSite/settings.py:214
 msgid "English"

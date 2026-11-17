@@ -36,3 +36,11 @@ def ago(moment):
     if not moment:
         return ''
     return _('%(time)s ago') % {'time': timesince(moment, depth=1)}
+
+
+@register.filter
+def rgb_hex(value):
+    """`[r, g, b]` → `#rrggbb` dla `<input type="color">`; inna wartość → biały."""
+    if rgb_css(value):
+        return '#{:02x}{:02x}{:02x}'.format(*value)
+    return '#ffffff'

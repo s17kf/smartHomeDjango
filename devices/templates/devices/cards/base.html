@@ -1,7 +1,9 @@
 {% load i18n devices_extras %}
 {# Karta urządzenia: nagłówek z dostępnością, treść per rodzaj (block body), pomiary, czas danych. #}
+{# Po wysłaniu polecenia (pending): karta co 1 s pobiera się od nowa, aż stan potwierdzi zmianę. #}
 <div class="card h-100 text-bg-dark border-secondary device-card" id="device-{{ status.device.slug }}"
-     data-available="{{ status.available|yesno:'true,false' }}">
+     data-available="{{ status.available|yesno:'true,false' }}"
+     {% if refresh_url %}hx-get="{{ refresh_url }}" hx-trigger="load delay:1s" hx-target="this" hx-swap="outerHTML"{% endif %}>
     <div class="card-header d-flex align-items-center gap-2">
         <i class="bi bi-{% block icon %}cpu{% endblock %} {% if status.available %}text-success{% else %}text-secondary{% endif %}"></i>
         <a href="{% url 'devices:device' status.device.slug %}"
@@ -15,6 +17,15 @@
     {# Niedostępne urządzenie: ostatnie znane wartości, przygaszone #}
     <div class="card-body{% if not status.available %} opacity-50{% endif %}">
         {% block body %}{% endblock %}
+        {% if pending %}
+            <div class="small text-info mt-2">
+                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                {% trans "Sent – waiting for the device…" %}
+            </div>
+        {% endif %}
+        {% if error %}
+            <div class="alert alert-danger py-1 px-2 small mt-2 mb-0" role="alert">{{ error }}</div>
+        {% endif %}
         {% block readings %}
             {% if status.card_readings %}
                 <dl class="row small mb-0 mt-2">

@@ -2,13 +2,16 @@
 {% load i18n %}
 {% block icon %}plug{% endblock %}
 {% block body %}
-    {% if status.state %}
-        {% if status.state.on %}
-            <span class="badge text-bg-success fs-6">{% trans "ON" %}</span>
+    <div class="d-flex align-items-center gap-3">
+        {% include 'devices/cards/on_switch.html' %}
+        {% if status.state %}
+            {% if status.state.on %}
+                <span class="badge text-bg-success fs-6">{% trans "ON" %}</span>
+            {% else %}
+                <span class="badge text-bg-secondary fs-6">{% trans "OFF" %}</span>
+            {% endif %}
         {% else %}
-            <span class="badge text-bg-secondary fs-6">{% trans "OFF" %}</span>
+            <span class="text-secondary">{% trans "State unknown" %}</span>
         {% endif %}
-    {% else %}
-        <span class="text-secondary">{% trans "State unknown" %}</span>
-    {% endif %}
+    </div>
 {% endblock %}

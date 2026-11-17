@@ -38,6 +38,11 @@ projektu – trzymamy tu kod aplikacji i ustalenia o niej samej.
   Żądania HTMX bez ważnej sesji dostają `HX-Redirect` na logowanie
   (`devices/middleware.py`), żeby formularz logowania nie trafił do
   fragmentu. Token CSRF wysyła HTMX w nagłówku (`hx-headers` na `<body>`).
+- Sterowanie z karty (`devices/control.py`, widok `device_set`): pola
+  kontrolek → polecenie `set`, sprawdzenie według rodzaju (`kinds.py`),
+  publikacja krótkim połączeniem tylko do dostępnego urządzenia. Karta
+  pokazuje „wysłano” i odpytuje co 1 s (najwyżej 5 razy), aż `state` w cache
+  potwierdzi polecenie – kanału błędów `set` w kontrakcie nie ma.
 - Widoki, które zmieniają stan, przyjmują tylko POST (`@require_POST`, żeby
   działała ochrona CSRF). Adres powrotu z formularza (`next`) bierzemy przez
   `get_next_url`, która nie przepuszcza adresów spoza strony.

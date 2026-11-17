@@ -2,23 +2,48 @@
 {% load i18n devices_extras %}
 {% block icon %}lightbulb{% endblock %}
 {% block body %}
-    {% if status.state %}
-        <div class="d-flex align-items-center gap-2 flex-wrap">
-            {% if status.state.on %}
-                <span class="badge text-bg-success fs-6">{% trans "ON" %}</span>
+    {% with slug=status.device.slug state=status.state %}
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+            {% include 'devices/cards/on_switch.html' %}
+            {% if state %}
+                {% if state.on %}
+                    <span class="badge text-bg-success fs-6">{% trans "ON" %}</span>
+                {% else %}
+                    <span class="badge text-bg-secondary fs-6">{% trans "OFF" %}</span>
+                {% endif %}
+                <span>{{ state.brightness }}%</span>
+                {% if state.mode == 'rgb' %}
+                    <span class="color-swatch" style="background-color: {{ state.rgb|rgb_css }}"
+                          title="{% trans 'Colour' %}"></span>
+                    <span>{% trans "Colour" %}</span>
+                {% else %}
+                    <span>{% trans "White" %} {{ state.ct }} K</span>
+                {% endif %}
             {% else %}
-                <span class="badge text-bg-secondary fs-6">{% trans "OFF" %}</span>
-            {% endif %}
-            <span>{{ status.state.brightness }}%</span>
-            {% if status.state.mode == 'rgb' %}
-                <span class="color-swatch" style="background-color: {{ status.state.rgb|rgb_css }}"
-                      title="{% trans 'Colour' %}"></span>
-                <span>{% trans "Colour" %}</span>
-            {% else %}
-                <span>{% trans "White" %} {{ status.state.ct }} K</span>
+                <span class="text-secondary">{% trans "State unknown" %}</span>
             {% endif %}
         </div>
-    {% else %}
-        <span class="text-secondary">{% trans "State unknown" %}</span>
-    {% endif %}
+        {% if state %}
+            {# Każda kontrolka wysyła tylko swoje pole, po puszczeniu suwaka / zamknięciu wyboru koloru. #}
+            <fieldset class="mt-2" {% if not status.available or pending %}disabled{% endif %}>
+                <label class="form-label small mb-0" for="brightness-{{ slug }}">{% trans "Brightness" %}</label>
+                <input type="range" class="form-range" id="brightness-{{ slug }}" name="brightness"
+                       min="1" max="100" value="{{ state.brightness }}"
+                       hx-post="{% url 'devices:device_set' slug %}" hx-trigger="change"
+                       hx-target="#device-{{ slug }}" hx-swap="outerHTML">
+                <label class="form-label small mb-0" for="ct-{{ slug }}">{% trans "White" %} (K)</label>
+                <input type="range" class="form-range" id="ct-{{ slug }}" name="ct"
+                       min="2700" max="6500" step="100" value="{{ state.ct }}"
+                       hx-post="{% url 'devices:device_set' slug %}" hx-trigger="change"
+                       hx-target="#device-{{ slug }}" hx-swap="outerHTML">
+                <div class="d-flex align-items-center gap-2">
+                    <label class="form-label small mb-0" for="color-{{ slug }}">{% trans "Colour" %}</label>
+                    <input type="color" class="form-control form-control-color" id="color-{{ slug }}" name="color"
+                           value="{{ state.rgb|rgb_hex }}"
+                           hx-post="{% url 'devices:device_set' slug %}" hx-trigger="change"
+                           hx-target="#device-{{ slug }}" hx-swap="outerHTML">
+                </div>
+            </fieldset>
+        {% endif %}
+    {% endwith %}
 {% endblock %}

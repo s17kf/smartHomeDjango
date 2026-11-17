@@ -19,10 +19,12 @@ described in [CONTRIBUTING.md](CONTRIBUTING.md) (in Polish).
 
 ## Features
 
-- Manage locations and smart home devices (device control over MQTT is
-  being added).
+- Manage locations and smart home devices; devices are controlled only
+  through MQTT (`home/<slug>/set`), via the gateway.
 - Device cards per kind (switch, RGBCCT light, sensor) with state, measurements and
-  availability, refreshed every 10 s.
+  availability, refreshed every 10 s; on/off switch, brightness, white
+  temperature and colour controls. After a command the card waits up to 5 s
+  for the device to confirm the new state.
 - Login required for every page (Django sessions). No sign-up – accounts are
   created by an administrator.
 - Admin panel to manage devices and user accounts.

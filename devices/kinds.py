@@ -129,6 +129,12 @@ class Kind:
                 raise InvalidCommand(f'{name}={json.dumps(value)}: {error}')
         return dict(command)
 
+    def satisfied(self, state: Mapping[str, Any] | None, command: Mapping[str, Any]) -> bool:
+        """Czy `state` ma już wartości z polecenia (poza modyfikatorami, np. `transition`)."""
+        if not state:
+            return False
+        return all(state.get(name) == value for name, value in command.items() if name not in self.modifiers)
+
 
 # Wyjście włącz/wyłącz: gniazdko, przekaźnik. `on` – wyjście włączone.
 SWITCH = Kind(

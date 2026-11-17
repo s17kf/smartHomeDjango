@@ -70,6 +70,11 @@ def config_messages(device) -> list[Message]:
     return [Message(device_topic(device.slug, 'config'), encode_json(config_payload(device)), retain=True)]
 
 
+def set_message(slug: str, command: dict) -> Message:
+    """Polecenie `home/<slug>/set` – nigdy retained (`specs/topics.md`, „set”)."""
+    return Message(device_topic(slug, 'set'), encode_json(command), retain=False)
+
+
 def removal_messages(slug: str) -> list[Message]:
     """Pusty retained na wszystkich tematach urządzenia – usunięcie z brokera."""
     return [Message(device_topic(slug, name), b'', retain=True) for name in DEVICE_TOPICS]

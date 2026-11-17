@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 19:36+0100\n"
+"POT-Creation-Date: 2026-11-17 20:04+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,6 +30,19 @@ msgstr ""
 msgid ""
 "The device was deleted, but the MQTT broker still has its topics: %(error)s. "
 "Run \"manage.py mqtt_sync --prune\" when the broker is available."
+msgstr ""
+
+#: devices/control.py:31
+msgid "on: expected true or false"
+msgstr ""
+
+#: devices/control.py:38
+#, python-format
+msgid "%(field)s: expected an integer"
+msgstr ""
+
+#: devices/control.py:56
+msgid "color: expected #rrggbb"
 msgstr ""
 
 #: devices/kinds.py:29
@@ -105,15 +118,15 @@ msgstr ""
 msgid "nothing to change – allowed fields: %(fields)s"
 msgstr ""
 
-#: devices/kinds.py:135
+#: devices/kinds.py:141
 msgid "Switch"
 msgstr ""
 
-#: devices/kinds.py:144
+#: devices/kinds.py:150
 msgid "RGBCCT light"
 msgstr ""
 
-#: devices/kinds.py:159
+#: devices/kinds.py:165
 msgid "Sensor"
 msgstr ""
 
@@ -191,36 +204,50 @@ msgstr ""
 msgid "Log out"
 msgstr ""
 
-#: devices/templates/devices/cards/base.html:10
+#: devices/templates/devices/cards/base.html:12
 msgid "online"
 msgstr ""
 
-#: devices/templates/devices/cards/base.html:12
+#: devices/templates/devices/cards/base.html:14
 msgid "unavailable"
 msgstr ""
 
-#: devices/templates/devices/cards/light_rgbcct.html:8
-#: devices/templates/devices/cards/switch.html:7
-msgid "ON"
+#: devices/templates/devices/cards/base.html:23
+msgid "Sent – waiting for the device…"
 msgstr ""
 
 #: devices/templates/devices/cards/light_rgbcct.html:10
 #: devices/templates/devices/cards/switch.html:9
+msgid "ON"
+msgstr ""
+
+#: devices/templates/devices/cards/light_rgbcct.html:12
+#: devices/templates/devices/cards/switch.html:11
 msgid "OFF"
 msgstr ""
 
-#: devices/templates/devices/cards/light_rgbcct.html:15
-#: devices/templates/devices/cards/light_rgbcct.html:16
+#: devices/templates/devices/cards/light_rgbcct.html:17
+#: devices/templates/devices/cards/light_rgbcct.html:18
+#: devices/templates/devices/cards/light_rgbcct.html:40
 msgid "Colour"
 msgstr ""
 
-#: devices/templates/devices/cards/light_rgbcct.html:18
+#: devices/templates/devices/cards/light_rgbcct.html:20
+#: devices/templates/devices/cards/light_rgbcct.html:34
 msgid "White"
 msgstr ""
 
-#: devices/templates/devices/cards/light_rgbcct.html:22
-#: devices/templates/devices/cards/switch.html:12
+#: devices/templates/devices/cards/light_rgbcct.html:23
+#: devices/templates/devices/cards/switch.html:14
 msgid "State unknown"
+msgstr ""
+
+#: devices/templates/devices/cards/light_rgbcct.html:29
+msgid "Brightness"
+msgstr ""
+
+#: devices/templates/devices/cards/on_switch.html:6
+msgid "On / off"
 msgstr ""
 
 #: devices/templates/devices/cards/sensor.html:9
@@ -271,6 +298,20 @@ msgstr ""
 #: devices/templatetags/devices_extras.py:38
 #, python-format
 msgid "%(time)s ago"
+msgstr ""
+
+#: devices/views.py:70
+msgid "No confirmation from the device – check that it is available."
+msgstr ""
+
+#: devices/views.py:85
+#, python-format
+msgid "The device is unavailable (%(reason)s) – the command was not sent."
+msgstr ""
+
+#: devices/views.py:91
+#, python-format
+msgid "The command was not sent: %(error)s"
 msgstr ""
 
 #: smartHomeSite/settings.py:214

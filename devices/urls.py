@@ -12,4 +12,5 @@ urlpatterns = [
     path('favourites/', views.FavouritesView.as_view(), name='favourites'),
     path('device/<slug:slug>/', views.device, name='device'),
     path('device/<slug:slug>/card/', views.device_card, name='device_card'),
+    path('device/<slug:slug>/set/', views.device_set, name='device_set'),
 ]
