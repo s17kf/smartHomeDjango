@@ -2,6 +2,8 @@
 
 from datetime import timedelta
 
+from unittest import mock
+
 from django.urls import reverse
 from django.utils import timezone
 
@@ -106,30 +108,35 @@ class StreamTests(LoggedInTestCase):
 class EventsViewTests(BrokerTestMixin, LoggedInTestCase):
     def setUp(self):
         super().setUp()
+        patcher = mock.patch.object(events, 'STREAM_S', 0)
+        patcher.start()
+        self.addCleanup(patcher.stop)
         self.location = LocationHelper.create_location('room')
         DeviceHelper.create_device(self.location, 'Plug', slug='plug-1')
         system(seen=timezone.now())
         cache('plug-1', state={'on': False})
 
-    def first_chunks(self, response, count):
-        content = iter(response.streaming_content)
-        try:
-            return [next(content).decode() for _ in range(count)]
-        finally:
-            response.close()
+    def chunks(self, response):
+        """Cały strumień – skrócony do jednego kroku (`STREAM_S` = 0).
+
+        Klient testowy po przeczytaniu całości zamyka odpowiedź bez
+        close_old_connections(); przerwanie strumienia w połowie zamknęłoby na
+        PostgreSQL połączenie transakcji testu.
+        """
+        return [chunk.decode() for chunk in response.streaming_content]
 
     def test_location_stream(self):
         response = self.client.get(EVENTS, {'location': self.location.id})
         self.assertEqual(response['Content-Type'], 'text/event-stream')
         self.assertEqual(response['Cache-Control'], 'no-cache')
-        retry, card = self.first_chunks(response, 2)
+        retry, card = self.chunks(response)
         self.assertEqual(retry, f'retry: {events.RETRY_MS}\n\n')
         self.assertTrue(card.startswith('event: device-plug-1\n'))
         self.assertIn('sse-swap="device-plug-1"', card)
 
     def test_device_stream(self):
         response = self.client.get(EVENTS, {'device': 'plug-1'})
-        self.assertTrue(self.first_chunks(response, 2)[1].startswith('event: device-plug-1\n'))
+        self.assertTrue(self.chunks(response)[1].startswith('event: device-plug-1\n'))
 
     def test_not_found(self):
         for params in ({}, {'location': 'x'}, {'location': self.location.id + 1}, {'device': 'nope'}):
