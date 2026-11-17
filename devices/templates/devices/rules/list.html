@@ -1,0 +1,29 @@
+{% extends 'devices/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Rules" %} | {{ block.super }}{% endblock %}
+{% block page_title %}{% trans "Rules" %}{% endblock %}
+
+{% block content %}
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+        {# Filtr po urządzeniu – HTMX podmienia samą listę i adres strony #}
+        <form method="get" class="flex-grow-1" style="max-width: 24rem"
+              hx-get="{% url 'devices:rule_list' %}" hx-trigger="change" hx-target="#rule-list"
+              hx-select="#rule-list" hx-swap="outerHTML" hx-push-url="true">
+            <label class="visually-hidden" for="rule-filter">{% trans "Device" %}</label>
+            <select class="form-select" id="rule-filter" name="device">
+                <option value="">{% trans "All devices" %}</option>
+                {% for device in devices %}
+                    <option value="{{ device.slug }}" {% if device == selected %}selected{% endif %}>
+                        {{ device.name }} ({{ device.location.name }})</option>
+                {% endfor %}
+            </select>
+        </form>
+        <a class="btn btn-primary"
+           href="{% url 'devices:rule_new' %}?{% if selected %}device={{ selected.slug|urlencode }}&amp;{% endif %}next={{ request.get_full_path|urlencode }}">
+            <i class="bi bi-plus-lg" aria-hidden="true"></i> {% trans "Add rule" %}</a>
+    </div>
+    <div id="rule-list">
+        {% include 'devices/rules/grid.html' %}
+    </div>
+{% endblock %}

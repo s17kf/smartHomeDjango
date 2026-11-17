@@ -1,0 +1,10 @@
+{% load i18n devices_extras %}
+{# Stan docelowy reguły: włącz / wyłącz, jasność, biel albo kolor. #}
+<span class="d-inline-flex align-items-center flex-wrap gap-2">
+    {% if state.on is True %}<span class="badge text-bg-success">{% trans "Turn on" %}</span>
+    {% elif state.on is False %}<span class="badge text-bg-secondary">{% trans "Turn off" %}</span>{% endif %}
+    {% if state.brightness %}<span>{{ state.brightness }}%</span>{% endif %}
+    {% if state.mode == 'cct' %}<span>{% trans "White" %} {{ state.ct }} K</span>
+    {% elif state.mode == 'rgb' %}<span class="color-swatch" style="background-color: {{ state.rgb|rgb_css }}"></span>
+        <span>{% trans "Colour" %}</span>{% endif %}
+</span>

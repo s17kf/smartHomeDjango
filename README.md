@@ -26,8 +26,10 @@ described in [CONTRIBUTING.md](CONTRIBUTING.md) (in Polish).
   temperature and colour controls. After a command the card waits up to 5 s
   for the device to confirm the new state.
 - Automation rules: on chosen days of the week at a given time set a device
-  state (e.g. on at 18:00, off at 23:00); "on / off for N minutes" from the
-  device card. Rules run in the MQTT worker.
+  state (e.g. on at 18:00, off at 23:00) – list, form and on/off switch per
+  rule; "on / off for N minutes" from the device card. Rules run in the MQTT
+  worker.
+- Dark Bootstrap theme, cards on every page, one column on a phone.
 - Login required for every page (Django sessions). No sign-up – accounts are
   created by an administrator.
 - Admin panel to manage devices and user accounts.
@@ -318,9 +320,11 @@ python manage.py import_devices devices.json --location Home   # for entries wit
 
 ### Automation rules
 
-Rules are managed in the admin panel (Devices → Rules) for now. A rule
-belongs to a device (not a sensor) and says: on these days of the week
-(`[0, 1, 2, 3, 4]` – Monday to Friday) at this local `time` set
+Rules are managed on the *Rules* page (filter by device, add, edit, switch
+on/off, delete) and on the device page (its rules, *Add rule* with the device
+chosen). The admin panel shows them too (Devices → Rules). A rule belongs to
+a device (not a sensor) and says: on these days of the week (Monday to
+Friday, stored as `[0, 1, 2, 3, 4]`) at this local `time` set
 `target_state` – the fields of a `set` command for the device kind:
 
 ```json

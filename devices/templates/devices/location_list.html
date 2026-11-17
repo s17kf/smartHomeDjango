@@ -2,24 +2,29 @@
 
 {% load i18n %}
 
-{% block page_title %}
-    {% trans "Locations" %}
-{% endblock %}
+{% block page_title %}{% trans "Locations" %}{% endblock %}
 
 {% block content %}
-
     {% if locations %}
-        <div class="d-grid gap-2 d-md-block">
-            {% for location in locations %}
-                <a href="{% url 'devices:location' location.id %}"
-                   class="btn btn-outline-light" role="button"
-                >
-                    {{ location }}
-                </a>
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
+            {% for summary in location_summaries %}
+                <div class="col">
+                    <div class="card h-100 location-card">
+                        <div class="card-body d-flex align-items-center gap-3">
+                            <i class="bi bi-door-open fs-2 text-body-secondary" aria-hidden="true"></i>
+                            <div class="min-w-0">
+                                <a href="{% url 'devices:location' summary.location.id %}"
+                                   class="stretched-link fw-semibold fs-5 link-body-emphasis text-decoration-none">{{ summary.location }}</a>
+                                <div class="small text-body-secondary">
+                                    {% blocktrans count counter=summary.devices %}{{ counter }} device{% plural %}{{ counter }} devices{% endblocktrans %}{% if summary.devices %} · {% blocktrans with count=summary.available %}{{ count }} available{% endblocktrans %}{% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             {% endfor %}
         </div>
     {% else %}
-        <p>{% trans "No locations available." %}</p>
+        <p class="text-body-secondary">{% trans "No locations available." %}</p>
     {% endif %}
-
 {% endblock %}

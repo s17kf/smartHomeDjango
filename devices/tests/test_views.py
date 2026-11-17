@@ -78,8 +78,10 @@ class DeviceViewTests(LoggedInTestCase):
         # adres urządzenia po slugu
         response = self.client.get(reverse('devices:device', args=(self.device.slug,)))
         self.assertEqual(response.context['device'], self.device)
-        self.assertContains(response, f'{self.device.name} ({self.location.name})')
-        self.assertContains(response, reverse('devices:location', args=(self.location.id,)))
+        self.assertContains(response, f'<h1 class="h4 mb-3">{self.device.name}</h1>', html=True)
+        # ścieżka: Lokalizacje › lokalizacja urządzenia
+        self.assertContains(response, f'<a href="{reverse("devices:location", args=(self.location.id,))}">'
+                                      f'{self.location.name}</a>', html=True)
         self.assertContains(response, 'home/device/…')
 
 

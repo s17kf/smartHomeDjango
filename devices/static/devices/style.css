@@ -1,57 +1,21 @@
-header {
-  padding: 1px 0 1px 0;
-  margin: 0 1vw 0 0;
-  background-color: #192114;
+/* Uzupełnienia Bootstrapa – kolory z motywu (data-bs-theme w base.html), bez własnej palety. */
+
+/* Kolor światła RGB na karcie urządzenia i regule */
+.color-swatch {
+  display: inline-block;
+  width: 1.2em;
+  height: 1.2em;
+  border-radius: 50%;
+  border: 1px solid var(--bs-border-color);
+  vertical-align: middle;
 }
 
-header h1 {
-  color: #b3d4fc;
-  text-align: center;
+/* Tekst w elemencie flex może się skracać (text-truncate) */
+.min-w-0 {
+  min-width: 0;
 }
 
-#wrapper {
-  width: 100%;
-  margin: 0 auto;
-  background: #111;
-}
-
-#content {
-  background: #293124;
-  color: #a1afc0;
-  padding: 1vw 2vw 1vw 2vw;
-  margin: 0 0 0 0;
-}
-
-a {
-  color: inherit;
-}
-
-fieldset {
-  border-color: #a1afc0;
-}
-
-.table-fit {
-  width: 1px;
-}
-
-html, body {
-  background-color: #000;
-  color: #aaa;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-}
-
-.minutes {
-  width: 4em;
-}
-
-.rp_edit_buttons, .hidden {
-  display: none;
-}
-
-@media (max-width: 600px) {
-  input[type="time"] {
-    width: 5em;
-  }
+/* Dni tygodnia w formularzu reguły – duże pola dotyku na telefonie */
+.day-button {
+  min-width: 3.25rem;
 }

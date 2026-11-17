@@ -1,17 +1,19 @@
 import logging
 from datetime import timedelta
 
-from django.shortcuts import get_object_or_404, render
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext as _
 from django.views import generic
 from django.views.decorators.http import require_POST
 
-from . import control, mqtt
+from . import control, forms, mqtt
 from . import status as device_status
 from .kinds import InvalidCommand
-from .models import Device, Location, Override
+from .models import Device, Location, Override, Rule
 
 log = logging.getLogger(__name__)
 
@@ -22,6 +24,19 @@ class LocationListView(generic.ListView):
 
     def get_queryset(self):
         return Location.objects.all()
+
+    def get_context_data(self, **kwargs):
+        """Karty lokalizacji: liczba urządzeń i dostępnych (jedno zapytanie do cache dla wszystkich)."""
+        context = super().get_context_data(**kwargs)
+        statuses = device_status.statuses(Device.objects.filter(location__in=context['locations']))
+        summaries = {location.pk: {'location': location, 'devices': 0, 'available': 0}
+                     for location in context['locations']}
+        for status in statuses:
+            summary = summaries[status.device.location_id]
+            summary['devices'] += 1
+            summary['available'] += status.available
+        context['location_summaries'] = list(summaries.values())
+        return context
 
 
 class FavouritesView(generic.ListView):
@@ -49,7 +64,10 @@ def location_cards(request, location_id):
 
 def device(request, slug):
     device_ = get_object_or_404(Device.objects.select_related('location'), slug=slug)
-    return render(request, 'devices/device.html', {'device': device_, 'status': device_status.status(device_)})
+    return render(request, 'devices/device.html', {
+        'device': device_, 'status': device_status.status(device_),
+        'rules': _rules().filter(device=device_) if device_.kind_spec.accepts_rules else None,
+    })
 
 
 def _card(request, status_, **context):
@@ -134,10 +152,84 @@ def device_override(request, slug):
     return _card(request, status_, pending=True, refresh_url=control.refresh_url(device_, state, 1))
 
 
-def get_next_url(request):
-    """Adres powrotu z formularza (`next`) – tylko w obrębie tej strony, inaczej `/`."""
-    next_url = request.POST.get('next', '/')
-    if url_has_allowed_host_and_scheme(next_url, allowed_hosts={request.get_host()},
-                                       require_https=request.is_secure()):
-        return next_url
-    return '/'
+def _safe_url(request, url, default):
+    """`url` tylko w obrębie tej strony (bez `javascript:` i obcych hostów), inaczej `default`."""
+    if url and url_has_allowed_host_and_scheme(url, allowed_hosts={request.get_host()},
+                                               require_https=request.is_secure()):
+        return url
+    return default
+
+
+def get_next_url(request, default='/'):
+    """Adres powrotu z formularza (`next`) – tylko w obrębie tej strony, inaczej `default`."""
+    return _safe_url(request, request.POST.get('next'), default)
+
+
+# Reguły automatyzacji
+
+def _rules():
+    return Rule.objects.select_related('device', 'device__location').order_by('device__name', 'time', 'pk')
+
+
+def rule_list(request):
+    """Lista reguł, filtr `?device=<slug>` (HTMX podmienia samą listę)."""
+    rules = _rules()
+    selected = None
+    slug = request.GET.get('device')
+    if slug:
+        selected = Device.objects.filter(slug=slug).first()
+        if selected is not None:
+            rules = rules.filter(device=selected)
+    return render(request, 'devices/rules/list.html',
+                  {'rules': rules, 'devices': forms.rule_devices(), 'selected': selected})
+
+
+def rule_form(request, pk=None):
+    """Dodanie (`?device=<slug>` wybiera urządzenie) albo edycja reguły; po zapisie powrót do `next`."""
+    rule = get_object_or_404(Rule, pk=pk) if pk is not None else None
+    if request.method == 'POST':
+        form = forms.RuleForm(request.POST, instance=rule)
+        if form.is_valid():
+            form.save()
+            return redirect(get_next_url(request, default=reverse('devices:rule_list')))
+    else:
+        initial = {}
+        if rule is None:
+            initial = {'days': list(range(7)), 'power': 'true'}
+            device_ = forms.rule_devices().filter(slug=request.GET.get('device', '')).first()
+            if device_ is not None:
+                initial['device'] = device_.pk
+        form = forms.RuleForm(instance=rule, initial=initial)
+    next_url = request.POST.get('next') or request.GET.get('next') or ''
+    return render(request, 'devices/rules/form.html', {
+        'form': form, 'rule': rule, 'next': next_url, 'day_presets': forms.DAY_PRESETS,
+        'cancel_url': _safe_url(request, next_url, reverse('devices:rule_list')),
+    })
+
+
+def rule_state_fields(request):
+    """Pola stanu formularza dla urządzenia `?device=<pk>` – fragment po zmianie urządzenia (HTMX)."""
+    form = forms.RuleForm(initial={'device': request.GET.get('device'), 'power': 'true'})
+    return render(request, 'devices/rules/state_fields.html', {'form': form})
+
+
+@require_POST
+def rule_toggle(request, pk):
+    """Włączenie / wyłączenie reguły – odpowiedź to karta reguły.
+
+    Bez walidacji formularza: reguły o tej samej porze z różnym stanem są
+    odrzucane także wtedy, gdy któraś jest wyłączona (`Rule._check_conflict`).
+    """
+    rule = get_object_or_404(_rules(), pk=pk)
+    rule.enabled = not rule.enabled
+    rule.save(update_fields=['enabled'])
+    return render(request, 'devices/rules/card.html', {'rule': rule})
+
+
+@require_POST
+def rule_delete(request, pk):
+    """Usunięcie reguły; przy HTMX pusta odpowiedź (karta znika), inaczej powrót do `next`."""
+    get_object_or_404(Rule, pk=pk).delete()
+    if request.headers.get('HX-Request'):
+        return HttpResponse('')
+    return redirect(get_next_url(request, default=reverse('devices:rule_list')))

@@ -1,0 +1,58 @@
+{% load i18n %}
+{# Pola stanu docelowego według rodzaju wybranego urządzenia – podmieniane przez HTMX po zmianie urządzenia. #}
+{% with kind=form.selected_kind %}
+<fieldset id="rule-state" class="mb-3">
+    <legend class="form-label fs-6 mb-2">{% trans "State to set" %}</legend>
+    {% if kind %}
+        <div class="btn-group flex-wrap mb-2" role="group" aria-label="{{ form.power.label }}">
+            {% for value, text in form.power.field.choices %}
+                {% if value or kind.name == 'light_rgbcct' %}
+                    <input type="radio" class="btn-check" name="{{ form.power.html_name }}"
+                           id="power-{{ forloop.counter }}" value="{{ value }}" autocomplete="off"
+                           {% if form.power.value|default_if_none:'' == value %}checked{% endif %}>
+                    <label class="btn btn-outline-primary" for="power-{{ forloop.counter }}">{{ text }}</label>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% if kind.name == 'light_rgbcct' %}
+            <div class="form-text mb-2">{% trans "Turning off ignores brightness and colour. Empty fields stay unchanged." %}</div>
+            <div class="row g-2">
+                <div class="col-6 col-md-3">
+                    <label class="form-label small" for="{{ form.brightness.id_for_label }}">{{ form.brightness.label }}</label>
+                    <input type="number" class="form-control{% if form.brightness.errors %} is-invalid{% endif %}"
+                           name="{{ form.brightness.html_name }}" id="{{ form.brightness.id_for_label }}"
+                           min="1" max="100" value="{{ form.brightness.value|default_if_none:'' }}">
+                    {% for error in form.brightness.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-6 col-md-3">
+                    <label class="form-label small" for="{{ form.light_mode.id_for_label }}">{{ form.light_mode.label }}</label>
+                    <select class="form-select" name="{{ form.light_mode.html_name }}" id="{{ form.light_mode.id_for_label }}">
+                        {% for value, text in form.light_mode.field.choices %}
+                            <option value="{{ value }}" {% if form.light_mode.value|default_if_none:'' == value %}selected{% endif %}>{{ text }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-6 col-md-3">
+                    <label class="form-label small" for="{{ form.ct.id_for_label }}">{{ form.ct.label }}</label>
+                    <input type="number" class="form-control{% if form.ct.errors %} is-invalid{% endif %}"
+                           name="{{ form.ct.html_name }}" id="{{ form.ct.id_for_label }}"
+                           min="2700" max="6500" step="100" value="{{ form.ct.value|default_if_none:'' }}">
+                    {% for error in form.ct.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-6 col-md-3">
+                    <label class="form-label small" for="{{ form.color.id_for_label }}">{{ form.color.label }}</label>
+                    <input type="color" class="form-control form-control-color w-100{% if form.color.errors %} is-invalid{% endif %}"
+                           name="{{ form.color.html_name }}" id="{{ form.color.id_for_label }}"
+                           value="{{ form.color.value|default:'#ffffff' }}">
+                    {% for error in form.color.errors %}<div class="invalid-feedback">{{ error }}</div>{% endfor %}
+                </div>
+            </div>
+        {% endif %}
+        {% for error in form.target_state.errors %}
+            <div class="text-danger small mt-2" role="alert">{{ error }}</div>
+        {% endfor %}
+    {% else %}
+        <p class="text-body-secondary small mb-0">{% trans "Choose a device first." %}</p>
+    {% endif %}
+</fieldset>
+{% endwith %}

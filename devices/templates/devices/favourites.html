@@ -2,19 +2,17 @@
 
 {% load i18n %}
 
-{% block page_title %}
-    {% trans "Favourites" %}
-{% endblock %}
+{% block page_title %}{% trans "Favourites" %}{% endblock %}
 
 {% block content %}
 
     {% if favourites_devices %}
         <ul>
             {% for device in favourites_devices %}
-                <li><a href="{% url 'devices:device' device.id %}">{{ device.name }}</a></li>
+                <li><a href="{% url 'devices:device' device.slug %}">{{ device.name }}</a></li>
             {% endfor %}
         </ul>
     {% endif %}
-    <p>{% trans "Add favourite devices." %}</p>
+    <p class="text-body-secondary">{% trans "Add favourite devices." %}</p>
 
 {% endblock %}

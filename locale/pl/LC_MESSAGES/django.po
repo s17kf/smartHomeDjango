@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 22:26+0100\n"
+"POT-Creation-Date: 2026-11-17 23:16+0100\n"
 "PO-Revision-Date: 2024-09-15 11:47+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -55,6 +55,124 @@ msgstr "color: oczekiwano #rrggbb"
 #, python-format
 msgid "minutes: allowed range 1–%(max)s"
 msgstr "minuty: dozwolony zakres 1–%(max)s"
+
+#: devices/forms.py:19
+msgid "Mon"
+msgstr "Pn"
+
+#: devices/forms.py:19
+msgid "Tue"
+msgstr "Wt"
+
+#: devices/forms.py:19
+msgid "Wed"
+msgstr "Śr"
+
+#: devices/forms.py:19
+msgid "Thu"
+msgstr "Cz"
+
+#: devices/forms.py:19
+msgid "Fri"
+msgstr "Pt"
+
+#: devices/forms.py:19
+msgid "Sat"
+msgstr "So"
+
+#: devices/forms.py:20
+msgid "Sun"
+msgstr "Nd"
+
+#: devices/forms.py:22 devices/templatetags/devices_extras.py:71
+msgid "Every day"
+msgstr "Codziennie"
+
+#: devices/forms.py:22 devices/templatetags/devices_extras.py:73
+msgid "Mon–Fri"
+msgstr "Pn–Pt"
+
+#: devices/forms.py:22 devices/templatetags/devices_extras.py:75
+msgid "Weekend"
+msgstr "Weekend"
+
+#: devices/forms.py:23 devices/templates/devices/rules/target.html:4
+msgid "Turn on"
+msgstr "Włącz"
+
+#: devices/forms.py:23 devices/templates/devices/rules/target.html:5
+msgid "Turn off"
+msgstr "Wyłącz"
+
+#: devices/forms.py:23
+msgid "Keep on / off"
+msgstr "Bez zmiany włączenia"
+
+#: devices/forms.py:24
+msgid "Keep"
+msgstr "Bez zmiany"
+
+#: devices/forms.py:24 devices/templates/devices/cards/light_rgbcct.html:20
+#: devices/templates/devices/cards/light_rgbcct.html:34
+#: devices/templates/devices/rules/target.html:7
+msgid "White"
+msgstr "Biel"
+
+#: devices/forms.py:24 devices/forms.py:48
+#: devices/templates/devices/cards/light_rgbcct.html:17
+#: devices/templates/devices/cards/light_rgbcct.html:18
+#: devices/templates/devices/cards/light_rgbcct.html:40
+#: devices/templates/devices/rules/target.html:9
+msgid "Colour"
+msgstr "Kolor"
+
+#: devices/forms.py:40 devices/templates/devices/rules/list.html:13
+msgid "Device"
+msgstr "Urządzenie"
+
+#: devices/forms.py:41
+msgid "Days"
+msgstr "Dni"
+
+#: devices/forms.py:43
+msgid "Time"
+msgstr "Godzina"
+
+#: devices/forms.py:44 devices/templates/devices/cards/on_switch.html:6
+msgid "On / off"
+msgstr "Włącz / wyłącz"
+
+#: devices/forms.py:45
+msgid "Brightness (%)"
+msgstr "Jasność (%)"
+
+#: devices/forms.py:46
+msgid "Colour mode"
+msgstr "Tryb koloru"
+
+#: devices/forms.py:47
+msgid "White (K)"
+msgstr "Biel (K)"
+
+#: devices/forms.py:55
+msgid "Name"
+msgstr "Nazwa"
+
+#: devices/forms.py:55 devices/templates/devices/rules/card.html:19
+msgid "Enabled"
+msgstr "Włączona"
+
+#: devices/forms.py:60
+msgid "Optional, e.g. \"Evening\"."
+msgstr "Opcjonalna, np. „Wieczór”."
+
+#: devices/forms.py:133
+msgid "Enter the white temperature."
+msgstr "Podaj temperaturę bieli."
+
+#: devices/forms.py:138
+msgid "Choose a colour."
+msgstr "Wybierz kolor."
 
 #: devices/kinds.py:29
 msgid "expected true or false"
@@ -151,11 +269,18 @@ msgstr "Światło RGBCCT"
 msgid "Sensor"
 msgstr "Czujnik"
 
-#: devices/menus.py:5 devices/templates/devices/location_list.html:6
+#: devices/menus.py:5 devices/templates/devices/breadcrumb.html:5
+#: devices/templates/devices/location_list.html:5
 msgid "Locations"
 msgstr "Miejsca"
 
-#: devices/menus.py:8 devices/templates/devices/favourites.html:6
+#: devices/menus.py:8 devices/templates/devices/device.html:46
+#: devices/templates/devices/rules/list.html:4
+#: devices/templates/devices/rules/list.html:5
+msgid "Rules"
+msgstr "Reguły"
+
+#: devices/menus.py:11 devices/templates/devices/favourites.html:5
 msgid "Favourites"
 msgstr "Ulubione"
 
@@ -234,7 +359,9 @@ msgstr "Czas lokalny."
 msgid ""
 "Fields of a set command for the device kind, e.g. switch {\"on\": true}; "
 "light {\"on\": true, \"brightness\": 30, \"mode\": \"cct\", \"ct\": 2700}."
-msgstr "Pola polecenia set dla rodzaju urządzenia, np. przełącznik {\"on\": true}; światło {\"on\": true, \"brightness\": 30, \"mode\": \"cct\", \"ct\": 2700}."
+msgstr ""
+"Pola polecenia set dla rodzaju urządzenia, np. przełącznik {\"on\": true}; "
+"światło {\"on\": true, \"brightness\": 30, \"mode\": \"cct\", \"ct\": 2700}."
 
 #: devices/models.py:214
 msgid "Choose a device."
@@ -278,13 +405,21 @@ msgstr "urządzenie niedostępne"
 msgid "no data from the device yet"
 msgstr "brak danych z urządzenia"
 
-#: devices/templates/devices/base.html:32
+#: devices/templates/devices/base.html:22
 msgid "Smart home"
 msgstr ""
 
-#: devices/templates/devices/base.html:59
+#: devices/templates/devices/base.html:27
+msgid "Toggle navigation"
+msgstr "Przełącz nawigację"
+
+#: devices/templates/devices/base.html:41
 msgid "Log out"
 msgstr "Wyloguj"
+
+#: devices/templates/devices/breadcrumb.html:3
+msgid "Breadcrumb"
+msgstr "Ścieżka"
 
 #: devices/templates/devices/cards/base.html:12
 msgid "online"
@@ -308,17 +443,6 @@ msgstr "Włączone"
 msgid "OFF"
 msgstr "Wyłączone"
 
-#: devices/templates/devices/cards/light_rgbcct.html:17
-#: devices/templates/devices/cards/light_rgbcct.html:18
-#: devices/templates/devices/cards/light_rgbcct.html:40
-msgid "Colour"
-msgstr "Kolor"
-
-#: devices/templates/devices/cards/light_rgbcct.html:20
-#: devices/templates/devices/cards/light_rgbcct.html:34
-msgid "White"
-msgstr "Biel"
-
 #: devices/templates/devices/cards/light_rgbcct.html:23
 #: devices/templates/devices/cards/switch.html:14
 msgid "State unknown"
@@ -327,10 +451,6 @@ msgstr "Stan nieznany"
 #: devices/templates/devices/cards/light_rgbcct.html:29
 msgid "Brightness"
 msgstr "Jasność"
-
-#: devices/templates/devices/cards/on_switch.html:6
-msgid "On / off"
-msgstr "Włącz / wyłącz"
 
 #: devices/templates/devices/cards/override.html:9
 #, python-format
@@ -343,6 +463,7 @@ msgid "Off until %(time)s"
 msgstr "Wyłączone do %(time)s"
 
 #: devices/templates/devices/cards/override.html:14
+#: devices/templates/devices/rules/form.html:83
 msgid "Cancel"
 msgstr "Anuluj"
 
@@ -354,89 +475,168 @@ msgstr "Na czas"
 msgid "No readings yet"
 msgstr "Brak pomiarów"
 
-#: devices/templates/devices/device.html:10
-msgid "Back to location"
-msgstr "Powrót do lokalizacji"
-
-#: devices/templates/devices/device.html:21
+#: devices/templates/devices/device.html:23
 msgid "Kind"
 msgstr "Rodzaj"
 
-#: devices/templates/devices/device.html:22
+#: devices/templates/devices/device.html:24
 msgid "MQTT topics"
 msgstr "Tematy MQTT"
 
-#: devices/templates/devices/device.html:23
+#: devices/templates/devices/device.html:25
 msgid "Driver"
 msgstr "Sterownik"
 
-#: devices/templates/devices/device.html:31
+#: devices/templates/devices/device.html:33
 msgid "State reported"
 msgstr "Stan zgłoszony"
 
-#: devices/templates/devices/device.html:34
+#: devices/templates/devices/device.html:36
 msgid "Measured"
 msgstr "Pomiar"
 
-#: devices/templates/devices/favourites.html:18
+#: devices/templates/devices/device.html:49
+#: devices/templates/devices/rules/form.html:4
+#: devices/templates/devices/rules/form.html:5
+#: devices/templates/devices/rules/list.html:24
+msgid "Add rule"
+msgstr "Dodaj regułę"
+
+#: devices/templates/devices/favourites.html:16
 msgid "Add favourite devices."
 msgstr "Dodaj do ulubionych."
 
-#: devices/templates/devices/location.html:19
+#: devices/templates/devices/location.html:22
 #, python-format
 msgid "No devices available in %(name)s."
 msgstr "Brak urządzeń w lokalizacji %(name)s."
 
-#: devices/templates/devices/location.html:24
-msgid "Back to locations"
-msgstr "Powrót do listy lokalizacji"
+#: devices/templates/devices/location_list.html:19
+#, python-format
+msgid "%(counter)s device"
+msgid_plural "%(counter)s devices"
+msgstr[0] "%(counter)s urządzenie"
+msgstr[1] "%(counter)s urządzenia"
+msgstr[2] "%(counter)s urządzeń"
 
-#: devices/templates/devices/location_list.html:22
+#: devices/templates/devices/location_list.html:19
+#, python-format
+msgid "%(count)s available"
+msgstr "dostępne: %(count)s"
+
+#: devices/templates/devices/location_list.html:28
 msgid "No locations available."
 msgstr "Brak miejsc do wyświetlenia."
 
-#: devices/templatetags/devices_extras.py:44
+#: devices/templates/devices/rules/card.html:3
+msgid "Rule"
+msgstr "Reguła"
+
+#: devices/templates/devices/rules/card.html:26
+#, python-format
+msgid "Next: %(when)s"
+msgstr "Następnie: %(when)s"
+
+#: devices/templates/devices/rules/card.html:27
+msgid "Disabled"
+msgstr "Wyłączona"
+
+#: devices/templates/devices/rules/card.html:31
+msgid "Edit"
+msgstr "Edytuj"
+
+#: devices/templates/devices/rules/card.html:32
+msgid "Delete"
+msgstr "Usuń"
+
+#: devices/templates/devices/rules/card.html:34
+#, python-format
+msgid "Delete rule “%(label)s”?"
+msgstr "Usunąć regułę „%(label)s”?"
+
+#: devices/templates/devices/rules/form.html:4
+#: devices/templates/devices/rules/form.html:5
+msgid "Edit rule"
+msgstr "Edytuj regułę"
+
+#: devices/templates/devices/rules/form.html:82
+msgid "Save"
+msgstr "Zapisz"
+
+#: devices/templates/devices/rules/grid.html:8
+msgid ""
+"No rules yet. A rule sets a device state on chosen days at a given time, "
+"e.g. turn on at 18:00."
+msgstr "Brak reguł. Reguła ustawia stan urządzenia w wybrane dni o podanej godzinie, np. włącza o 18:00."
+
+#: devices/templates/devices/rules/list.html:15
+msgid "All devices"
+msgstr "Wszystkie urządzenia"
+
+#: devices/templates/devices/rules/state_fields.html:5
+msgid "State to set"
+msgstr "Stan do ustawienia"
+
+#: devices/templates/devices/rules/state_fields.html:18
+msgid "Turning off ignores brightness and colour. Empty fields stay unchanged."
+msgstr "Wyłączenie pomija jasność i kolor. Puste pola zostają bez zmian."
+
+#: devices/templates/devices/rules/state_fields.html:55
+msgid "Choose a device first."
+msgstr "Najpierw wybierz urządzenie."
+
+#: devices/templatetags/devices_extras.py:46
 msgid "just now"
 msgstr "przed chwilą"
 
-#: devices/templatetags/devices_extras.py:45
+#: devices/templatetags/devices_extras.py:47
 #, python-format
 msgid "%(time)s ago"
 msgstr "%(time)s temu"
 
-#: devices/templatetags/devices_extras.py:59
+#: devices/templatetags/devices_extras.py:61
 #, python-format
 msgid "%(n)s h"
 msgstr "%(n)s godz."
 
-#: devices/templatetags/devices_extras.py:59
+#: devices/templatetags/devices_extras.py:61
 #, python-format
 msgid "%(n)s min"
 msgstr "%(n)s min"
 
-#: devices/templatetags/devices_extras.py:61
+#: devices/templatetags/devices_extras.py:63
 msgid "On for"
 msgstr "Włącz na"
 
-#: devices/templatetags/devices_extras.py:61
+#: devices/templatetags/devices_extras.py:63
 msgid "Off for"
 msgstr "Wyłącz na"
 
-#: devices/views.py:72
+#: devices/templatetags/devices_extras.py:90
+#, python-format
+msgid "today %(time)s"
+msgstr "dziś %(time)s"
+
+#: devices/templatetags/devices_extras.py:92
+#, python-format
+msgid "tomorrow %(time)s"
+msgstr "jutro %(time)s"
+
+#: devices/views.py:90
 msgid "No confirmation from the device – check that it is available."
 msgstr "Brak potwierdzenia od urządzenia – sprawdź, czy jest dostępne."
 
-#: devices/views.py:87 devices/views.py:120
+#: devices/views.py:105 devices/views.py:138
 #, python-format
 msgid "The device is unavailable (%(reason)s) – the command was not sent."
 msgstr "Urządzenie niedostępne (%(reason)s) – polecenie nie zostało wysłane."
 
-#: devices/views.py:93
+#: devices/views.py:111
 #, python-format
 msgid "The command was not sent: %(error)s"
 msgstr "Polecenie nie zostało wysłane: %(error)s"
 
-#: devices/views.py:132
+#: devices/views.py:150
 #, python-format
 msgid ""
 "The override was saved, but the command was not sent: %(error)s. The MQTT "
@@ -453,14 +653,20 @@ msgstr "angielski"
 msgid "Polish"
 msgstr "polski"
 
-#: templates/registration/login.html:11 templates/registration/login.html:14
-#: templates/registration/login.html:20 templates/registration/login.html:63
+#: templates/registration/login.html:11 templates/registration/login.html:19
+#: templates/registration/login.html:62
 msgid "Log in"
 msgstr "Zaloguj"
 
-#: templates/registration/login.html:68
+#: templates/registration/login.html:67
 msgid "Accounts are created by the administrator."
 msgstr "Konta zakłada administrator."
+
+#~ msgid "Back to location"
+#~ msgstr "Powrót do lokalizacji"
+
+#~ msgid "Back to locations"
+#~ msgstr "Powrót do listy lokalizacji"
 
 #~ msgid "Relay"
 #~ msgstr "Przekaźnik"
@@ -468,26 +674,14 @@ msgstr "Konta zakłada administrator."
 #~ msgid "Periodic relay"
 #~ msgstr "Przekaźnik okresowy"
 
-#~ msgid "Monday"
-#~ msgstr "Poniedziałek"
-
-#~ msgid "Tuesday"
-#~ msgstr "Wtorek"
-
 #~ msgid "Wednesday"
 #~ msgstr "Środa"
 
 #~ msgid "Thursday"
 #~ msgstr "Czwartek"
 
-#~ msgid "Friday"
-#~ msgstr "Piątek"
-
 #~ msgid "Saturday"
 #~ msgstr "Sobota"
-
-#~ msgid "Sunday"
-#~ msgstr "Niedziela"
 
 #~ msgid "Active days:"
 #~ msgstr "Aktywne dni: "

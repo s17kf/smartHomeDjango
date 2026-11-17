@@ -1,0 +1,40 @@
+{% load i18n devices_extras %}
+{# Karta reguły w siatce (kolumna z id – przełączenie podmienia ją, usunięcie usuwa). #}
+{% with label=rule.name|default:_("Rule") %}
+<div class="col" id="rule-{{ rule.pk }}">
+    <div class="card h-100 rule-card{% if not rule.enabled %} opacity-75{% endif %}">
+        <div class="card-body d-flex align-items-start gap-3">
+            <div class="text-center flex-shrink-0">
+                <div class="fs-3 fw-semibold lh-1">{{ rule.time|time:"H:i" }}</div>
+                <div class="small text-body-secondary mt-1">{{ rule.days|days_label }}</div>
+            </div>
+            <div class="flex-grow-1 min-w-0">
+                <div class="fw-semibold text-truncate">{{ label }}</div>
+                <a href="{% url 'devices:device' rule.device.slug %}" class="small link-secondary">
+                    {{ rule.device.name }} · {{ rule.device.location.name }}</a>
+                <div class="mt-1">{% include 'devices/rules/target.html' with state=rule.target_state %}</div>
+            </div>
+            <div class="form-check form-switch fs-4 mb-0">
+                <input class="form-check-input" type="checkbox" role="switch" id="rule-enabled-{{ rule.pk }}"
+                       aria-label="{% trans 'Enabled' %}" {% if rule.enabled %}checked{% endif %}
+                       hx-post="{% url 'devices:rule_toggle' rule.pk %}"
+                       hx-target="#rule-{{ rule.pk }}" hx-swap="outerHTML">
+            </div>
+        </div>
+        <div class="card-footer d-flex align-items-center gap-2">
+            <span class="small text-body-secondary flex-grow-1">
+                {% if rule.enabled %}{% blocktrans with when=rule|next_run %}Next: {{ when }}{% endblocktrans %}
+                {% else %}{% trans "Disabled" %}{% endif %}
+            </span>
+            <a class="btn btn-outline-secondary"
+               href="{% url 'devices:rule_edit' rule.pk %}?next={{ request.get_full_path|urlencode }}">
+                <i class="bi bi-pencil" aria-hidden="true"></i> {% trans "Edit" %}</a>
+            <button type="button" class="btn btn-outline-danger" aria-label="{% trans 'Delete' %}"
+                    hx-post="{% url 'devices:rule_delete' rule.pk %}"
+                    hx-confirm="{% blocktrans %}Delete rule “{{ label }}”?{% endblocktrans %}"
+                    hx-target="#rule-{{ rule.pk }}" hx-swap="outerHTML">
+                <i class="bi bi-trash" aria-hidden="true"></i></button>
+        </div>
+    </div>
+</div>
+{% endwith %}

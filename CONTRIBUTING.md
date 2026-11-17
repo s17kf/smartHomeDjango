@@ -22,8 +22,14 @@ projektu – trzymamy tu kod aplikacji i ustalenia o niej samej.
 ## Zasady architektury
 
 - UI to szablony Django renderowane po stronie serwera. Interaktywność przez
-  HTMX, Alpine.js tylko tam, gdzie HTMX nie wystarczy. Bez budowania
-  frontendu (Node).
+  HTMX, Alpine.js tylko tam, gdzie HTMX nie wystarczy (drobne skrypty
+  w przeglądarce – `hx-on`, np. skróty dni w formularzu reguły). Bez
+  budowania frontendu (Node).
+- Wygląd: Bootstrap z motywem ciemnym (`data-bs-theme="dark"` w
+  `base.html`) – klasy motywu (`text-body-secondary`, `link-body-emphasis`,
+  …), bez własnych kolorów; `style.css` tylko dla tego, czego Bootstrap nie
+  ma. Treść jako karty w siatce (`row-cols-1` na telefonie), nagłówek strony
+  w bloku `page_title` albo `heading` (ścieżka `breadcrumb.html`).
 - Zasoby statyczne (CSS, JS, ikony) w repo i serwowane lokalnie, nie z CDN –
   UI działa bez internetu. Serwuje je sama aplikacja (whitenoise),
   w produkcji po `collectstatic` (opis w README, sekcja Static files).
@@ -132,6 +138,9 @@ projektu – trzymamy tu kod aplikacji i ustalenia o niej samej.
   `templates/devices/cards/<kind>.html` (rama i pomiary w `cards/base.html`);
   stan do wyświetlenia (urządzenie + cache, dostępność z powodem) –
   `status.py`, filtry szablonów – `templatetags/devices_extras.py`.
+- UI reguł: formularz w `forms.py` (pola stanu docelowego per rodzaj,
+  podmieniane przez HTMX po zmianie urządzenia), szablony
+  w `templates/devices/rules/` (karta reguły, lista, formularz).
 - Statyki w `static/devices/`, biblioteki zewnętrzne w
   `static/devices/vendor/` ([Biblioteki frontendowe](#biblioteki-frontendowe)),
   komendy zarządzania w `management/commands/`.

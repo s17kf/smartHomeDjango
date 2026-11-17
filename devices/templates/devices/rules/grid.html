@@ -1,0 +1,10 @@
+{% load i18n %}
+{% if rules %}
+    <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3">
+        {% for rule in rules %}{% include 'devices/rules/card.html' %}{% endfor %}
+    </div>
+{% else %}
+    <p class="text-body-secondary">
+        {% trans "No rules yet. A rule sets a device state on chosen days at a given time, e.g. turn on at 18:00." %}
+    </p>
+{% endif %}

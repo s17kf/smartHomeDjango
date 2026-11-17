@@ -201,6 +201,14 @@ class RuleInstantTests(SimpleTestCase):
         self.assertEqual(schedule.occurrences(rule, local(2026, 11, 16, 0, 0), local(2026, 11, 19, 0, 0)),
                          [utc(2026, 11, 16, 7, 0), utc(2026, 11, 18, 7, 0)])
 
+    def test_next_occurrence(self):
+        rule = R(time(8), days=(MONDAY, WEDNESDAY)).rule()
+        self.assertEqual(schedule.next_occurrence(rule, local(2026, 11, 16, 7, 0)), utc(2026, 11, 16, 7, 0))
+        # w chwili wykonania – następne
+        self.assertEqual(schedule.next_occurrence(rule, local(2026, 11, 16, 8, 0)), utc(2026, 11, 18, 7, 0))
+        self.assertEqual(schedule.next_occurrence(rule, local(2026, 11, 18, 9, 0)), utc(2026, 11, 23, 7, 0))
+        self.assertIsNone(schedule.next_occurrence(R(time(8), days=()).rule(), local(2026, 11, 16, 7, 0)))
+
     def test_lookback(self):
         rule = R(time(8)).rule()
         found = schedule.occurrences(rule, local(2025, 1, 1), local(2026, 11, 16, 12, 0))

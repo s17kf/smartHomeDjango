@@ -2,11 +2,13 @@ from datetime import timedelta
 
 from django import template
 from django.utils import timezone
-from django.utils.formats import number_format
+from django.utils.formats import date_format, number_format
 from django.utils.timesince import timesince
 from django.utils.translation import gettext as _
 
+from .. import schedule
 from ..control import OVERRIDE_PRESETS
+from ..forms import DAY_CHOICES
 
 register = template.Library()
 
@@ -59,3 +61,33 @@ def override_presets():
     minutes = [(m, _('%(n)s h') % {'n': m // 60} if m % 60 == 0 else _('%(n)s min') % {'n': m})
                for m in OVERRIDE_PRESETS]
     return [('true', _('On for'), minutes), ('false', _('Off for'), minutes)]
+
+
+@register.filter
+def days_label(days):
+    """Dni tygodnia reguły: „codziennie”, „pn–pt”, „weekend” albo lista skrótów."""
+    days = sorted(set(days or []))
+    if days == list(range(7)):
+        return _('Every day')
+    if days == list(range(5)):
+        return _('Mon–Fri')
+    if days == [5, 6]:
+        return _('Weekend')
+    names = dict(DAY_CHOICES)
+    return ', '.join(str(names[d]) for d in days if d in names)
+
+
+@register.filter
+def next_run(rule):
+    """Najbliższe wykonanie reguły: „dziś 18:00”, „jutro 06:00”, „pon. 18:00” (czas lokalny)."""
+    instant = schedule.next_occurrence(rule, timezone.now())
+    if instant is None:
+        return ''
+    local = timezone.localtime(instant)
+    days = (local.date() - timezone.localdate()).days
+    clock = local.strftime('%H:%M')
+    if days == 0:
+        return _('today %(time)s') % {'time': clock}
+    if days == 1:
+        return _('tomorrow %(time)s') % {'time': clock}
+    return f"{date_format(local, 'D')} {clock}"

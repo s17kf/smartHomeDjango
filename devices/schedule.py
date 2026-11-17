@@ -74,6 +74,19 @@ def occurrences(rule, since: datetime, now: datetime) -> list[datetime]:
     return result
 
 
+def next_occurrence(rule, now: datetime) -> datetime | None:
+    """Najbliższe wykonanie reguły po `now` (UTC) – dla UI; None bez dni tygodnia."""
+    tz = timezone.get_default_timezone()
+    today = now.astimezone(tz).date()
+    for offset in range(8):
+        day = today + timedelta(days=offset)
+        if day.weekday() in rule.days:
+            instant = rule_instant(day, rule.time)
+            if instant > now:
+                return instant
+    return None
+
+
 def latest(rules, since: datetime, now: datetime):
     """Najnowsze wykonanie włączonej reguły w `(since, now]`: (chwila, reguła) albo None.
 

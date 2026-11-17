@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 22:26+0100\n"
+"POT-Creation-Date: 2026-11-17 23:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -48,6 +48,124 @@ msgstr ""
 #: devices/control.py:70
 #, python-format
 msgid "minutes: allowed range 1–%(max)s"
+msgstr ""
+
+#: devices/forms.py:19
+msgid "Mon"
+msgstr ""
+
+#: devices/forms.py:19
+msgid "Tue"
+msgstr ""
+
+#: devices/forms.py:19
+msgid "Wed"
+msgstr ""
+
+#: devices/forms.py:19
+msgid "Thu"
+msgstr ""
+
+#: devices/forms.py:19
+msgid "Fri"
+msgstr ""
+
+#: devices/forms.py:19
+msgid "Sat"
+msgstr ""
+
+#: devices/forms.py:20
+msgid "Sun"
+msgstr ""
+
+#: devices/forms.py:22 devices/templatetags/devices_extras.py:71
+msgid "Every day"
+msgstr ""
+
+#: devices/forms.py:22 devices/templatetags/devices_extras.py:73
+msgid "Mon–Fri"
+msgstr ""
+
+#: devices/forms.py:22 devices/templatetags/devices_extras.py:75
+msgid "Weekend"
+msgstr ""
+
+#: devices/forms.py:23 devices/templates/devices/rules/target.html:4
+msgid "Turn on"
+msgstr ""
+
+#: devices/forms.py:23 devices/templates/devices/rules/target.html:5
+msgid "Turn off"
+msgstr ""
+
+#: devices/forms.py:23
+msgid "Keep on / off"
+msgstr ""
+
+#: devices/forms.py:24
+msgid "Keep"
+msgstr ""
+
+#: devices/forms.py:24 devices/templates/devices/cards/light_rgbcct.html:20
+#: devices/templates/devices/cards/light_rgbcct.html:34
+#: devices/templates/devices/rules/target.html:7
+msgid "White"
+msgstr ""
+
+#: devices/forms.py:24 devices/forms.py:48
+#: devices/templates/devices/cards/light_rgbcct.html:17
+#: devices/templates/devices/cards/light_rgbcct.html:18
+#: devices/templates/devices/cards/light_rgbcct.html:40
+#: devices/templates/devices/rules/target.html:9
+msgid "Colour"
+msgstr ""
+
+#: devices/forms.py:40 devices/templates/devices/rules/list.html:13
+msgid "Device"
+msgstr ""
+
+#: devices/forms.py:41
+msgid "Days"
+msgstr ""
+
+#: devices/forms.py:43
+msgid "Time"
+msgstr ""
+
+#: devices/forms.py:44 devices/templates/devices/cards/on_switch.html:6
+msgid "On / off"
+msgstr ""
+
+#: devices/forms.py:45
+msgid "Brightness (%)"
+msgstr ""
+
+#: devices/forms.py:46
+msgid "Colour mode"
+msgstr ""
+
+#: devices/forms.py:47
+msgid "White (K)"
+msgstr ""
+
+#: devices/forms.py:55
+msgid "Name"
+msgstr ""
+
+#: devices/forms.py:55 devices/templates/devices/rules/card.html:19
+msgid "Enabled"
+msgstr ""
+
+#: devices/forms.py:60
+msgid "Optional, e.g. \"Evening\"."
+msgstr ""
+
+#: devices/forms.py:133
+msgid "Enter the white temperature."
+msgstr ""
+
+#: devices/forms.py:138
+msgid "Choose a colour."
 msgstr ""
 
 #: devices/kinds.py:29
@@ -145,11 +263,18 @@ msgstr ""
 msgid "Sensor"
 msgstr ""
 
-#: devices/menus.py:5 devices/templates/devices/location_list.html:6
+#: devices/menus.py:5 devices/templates/devices/breadcrumb.html:5
+#: devices/templates/devices/location_list.html:5
 msgid "Locations"
 msgstr ""
 
-#: devices/menus.py:8 devices/templates/devices/favourites.html:6
+#: devices/menus.py:8 devices/templates/devices/device.html:46
+#: devices/templates/devices/rules/list.html:4
+#: devices/templates/devices/rules/list.html:5
+msgid "Rules"
+msgstr ""
+
+#: devices/menus.py:11 devices/templates/devices/favourites.html:5
 msgid "Favourites"
 msgstr ""
 
@@ -261,12 +386,20 @@ msgstr ""
 msgid "no data from the device yet"
 msgstr ""
 
-#: devices/templates/devices/base.html:32
+#: devices/templates/devices/base.html:22
 msgid "Smart home"
 msgstr ""
 
-#: devices/templates/devices/base.html:59
+#: devices/templates/devices/base.html:27
+msgid "Toggle navigation"
+msgstr ""
+
+#: devices/templates/devices/base.html:41
 msgid "Log out"
+msgstr ""
+
+#: devices/templates/devices/breadcrumb.html:3
+msgid "Breadcrumb"
 msgstr ""
 
 #: devices/templates/devices/cards/base.html:12
@@ -291,17 +424,6 @@ msgstr ""
 msgid "OFF"
 msgstr ""
 
-#: devices/templates/devices/cards/light_rgbcct.html:17
-#: devices/templates/devices/cards/light_rgbcct.html:18
-#: devices/templates/devices/cards/light_rgbcct.html:40
-msgid "Colour"
-msgstr ""
-
-#: devices/templates/devices/cards/light_rgbcct.html:20
-#: devices/templates/devices/cards/light_rgbcct.html:34
-msgid "White"
-msgstr ""
-
 #: devices/templates/devices/cards/light_rgbcct.html:23
 #: devices/templates/devices/cards/switch.html:14
 msgid "State unknown"
@@ -309,10 +431,6 @@ msgstr ""
 
 #: devices/templates/devices/cards/light_rgbcct.html:29
 msgid "Brightness"
-msgstr ""
-
-#: devices/templates/devices/cards/on_switch.html:6
-msgid "On / off"
 msgstr ""
 
 #: devices/templates/devices/cards/override.html:9
@@ -326,6 +444,7 @@ msgid "Off until %(time)s"
 msgstr ""
 
 #: devices/templates/devices/cards/override.html:14
+#: devices/templates/devices/rules/form.html:83
 msgid "Cancel"
 msgstr ""
 
@@ -337,89 +456,167 @@ msgstr ""
 msgid "No readings yet"
 msgstr ""
 
-#: devices/templates/devices/device.html:10
-msgid "Back to location"
-msgstr ""
-
-#: devices/templates/devices/device.html:21
+#: devices/templates/devices/device.html:23
 msgid "Kind"
 msgstr ""
 
-#: devices/templates/devices/device.html:22
+#: devices/templates/devices/device.html:24
 msgid "MQTT topics"
 msgstr ""
 
-#: devices/templates/devices/device.html:23
+#: devices/templates/devices/device.html:25
 msgid "Driver"
 msgstr ""
 
-#: devices/templates/devices/device.html:31
+#: devices/templates/devices/device.html:33
 msgid "State reported"
 msgstr ""
 
-#: devices/templates/devices/device.html:34
+#: devices/templates/devices/device.html:36
 msgid "Measured"
 msgstr ""
 
-#: devices/templates/devices/favourites.html:18
+#: devices/templates/devices/device.html:49
+#: devices/templates/devices/rules/form.html:4
+#: devices/templates/devices/rules/form.html:5
+#: devices/templates/devices/rules/list.html:24
+msgid "Add rule"
+msgstr ""
+
+#: devices/templates/devices/favourites.html:16
 msgid "Add favourite devices."
 msgstr ""
 
-#: devices/templates/devices/location.html:19
+#: devices/templates/devices/location.html:22
 #, python-format
 msgid "No devices available in %(name)s."
 msgstr ""
 
-#: devices/templates/devices/location.html:24
-msgid "Back to locations"
+#: devices/templates/devices/location_list.html:19
+#, python-format
+msgid "%(counter)s device"
+msgid_plural "%(counter)s devices"
+msgstr[0] ""
+msgstr[1] ""
+
+#: devices/templates/devices/location_list.html:19
+#, python-format
+msgid "%(count)s available"
 msgstr ""
 
-#: devices/templates/devices/location_list.html:22
+#: devices/templates/devices/location_list.html:28
 msgid "No locations available."
 msgstr ""
 
-#: devices/templatetags/devices_extras.py:44
+#: devices/templates/devices/rules/card.html:3
+msgid "Rule"
+msgstr ""
+
+#: devices/templates/devices/rules/card.html:26
+#, python-format
+msgid "Next: %(when)s"
+msgstr ""
+
+#: devices/templates/devices/rules/card.html:27
+msgid "Disabled"
+msgstr ""
+
+#: devices/templates/devices/rules/card.html:31
+msgid "Edit"
+msgstr ""
+
+#: devices/templates/devices/rules/card.html:32
+msgid "Delete"
+msgstr ""
+
+#: devices/templates/devices/rules/card.html:34
+#, python-format
+msgid "Delete rule “%(label)s”?"
+msgstr ""
+
+#: devices/templates/devices/rules/form.html:4
+#: devices/templates/devices/rules/form.html:5
+msgid "Edit rule"
+msgstr ""
+
+#: devices/templates/devices/rules/form.html:82
+msgid "Save"
+msgstr ""
+
+#: devices/templates/devices/rules/grid.html:8
+msgid ""
+"No rules yet. A rule sets a device state on chosen days at a given time, "
+"e.g. turn on at 18:00."
+msgstr ""
+
+#: devices/templates/devices/rules/list.html:15
+msgid "All devices"
+msgstr ""
+
+#: devices/templates/devices/rules/state_fields.html:5
+msgid "State to set"
+msgstr ""
+
+#: devices/templates/devices/rules/state_fields.html:18
+msgid "Turning off ignores brightness and colour. Empty fields stay unchanged."
+msgstr ""
+
+#: devices/templates/devices/rules/state_fields.html:55
+msgid "Choose a device first."
+msgstr ""
+
+#: devices/templatetags/devices_extras.py:46
 msgid "just now"
 msgstr ""
 
-#: devices/templatetags/devices_extras.py:45
+#: devices/templatetags/devices_extras.py:47
 #, python-format
 msgid "%(time)s ago"
 msgstr ""
 
-#: devices/templatetags/devices_extras.py:59
+#: devices/templatetags/devices_extras.py:61
 #, python-format
 msgid "%(n)s h"
 msgstr ""
 
-#: devices/templatetags/devices_extras.py:59
+#: devices/templatetags/devices_extras.py:61
 #, python-format
 msgid "%(n)s min"
 msgstr ""
 
-#: devices/templatetags/devices_extras.py:61
+#: devices/templatetags/devices_extras.py:63
 msgid "On for"
 msgstr ""
 
-#: devices/templatetags/devices_extras.py:61
+#: devices/templatetags/devices_extras.py:63
 msgid "Off for"
 msgstr ""
 
-#: devices/views.py:72
+#: devices/templatetags/devices_extras.py:90
+#, python-format
+msgid "today %(time)s"
+msgstr ""
+
+#: devices/templatetags/devices_extras.py:92
+#, python-format
+msgid "tomorrow %(time)s"
+msgstr ""
+
+#: devices/views.py:90
 msgid "No confirmation from the device – check that it is available."
 msgstr ""
 
-#: devices/views.py:87 devices/views.py:120
+#: devices/views.py:105 devices/views.py:138
 #, python-format
 msgid "The device is unavailable (%(reason)s) – the command was not sent."
 msgstr ""
 
-#: devices/views.py:93
+#: devices/views.py:111
 #, python-format
 msgid "The command was not sent: %(error)s"
 msgstr ""
 
-#: devices/views.py:132
+#: devices/views.py:150
 #, python-format
 msgid ""
 "The override was saved, but the command was not sent: %(error)s. The MQTT "
@@ -434,11 +631,11 @@ msgstr ""
 msgid "Polish"
 msgstr ""
 
-#: templates/registration/login.html:11 templates/registration/login.html:14
-#: templates/registration/login.html:20 templates/registration/login.html:63
+#: templates/registration/login.html:11 templates/registration/login.html:19
+#: templates/registration/login.html:62
 msgid "Log in"
 msgstr ""
 
-#: templates/registration/login.html:68
+#: templates/registration/login.html:67
 msgid "Accounts are created by the administrator."
 msgstr ""

@@ -1,0 +1,10 @@
+{% load i18n %}
+{# Ścieżka strony: Lokalizacje › <lokalizacja> › <urządzenie>; `location` i `device` opcjonalne. #}
+<nav aria-label="{% trans 'Breadcrumb' %}">
+    <ol class="breadcrumb mb-1 small">
+        <li class="breadcrumb-item"><a href="{% url 'devices:location_list' %}">{% trans "Locations" %}</a></li>
+        {% if device %}
+            <li class="breadcrumb-item"><a href="{% url 'devices:location' device.location_id %}">{{ device.location.name }}</a></li>
+        {% endif %}
+    </ol>
+</nav>

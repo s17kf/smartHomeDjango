@@ -10,13 +10,12 @@
 
 {% block title %}{% trans "Log in" %} | {{ block.super }}{% endblock %}
 
-{% block page_title %}
-    {% trans "Log in" %}
-{% endblock %}
+{# Nagłówek w kolumnie formularza, nie nad treścią #}
+{% block heading %}{% endblock %}
 
 {% block content %}
     <div class="row justify-content-center py-3">
-        <div class="col-12 col-sm-8 col-md-6 col-lg-4" data-bs-theme="dark">
+        <div class="col-12 col-sm-8 col-md-6 col-lg-4">
             <h1 class="h4 mb-3">{% trans "Log in" %}</h1>
 
             {% if form.non_field_errors %}
@@ -59,7 +58,7 @@
                     {% endfor %}
                 </div>
 
-                <button type="submit" class="btn btn-outline-light w-100">
+                <button type="submit" class="btn btn-primary w-100">
                     <i class="bi bi-box-arrow-in-right"></i> {% trans "Log in" %}
                 </button>
             </form>

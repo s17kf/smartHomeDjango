@@ -1,73 +1,56 @@
-{% load simple_menu %}
-
+{% load simple_menu static i18n %}
 <!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE|default:"en-us" }}">
+{# Motyw ciemny Bootstrapa (data-bs-theme) – bez własnych kolorów w style.css #}
+<html lang="{{ LANGUAGE_CODE|default:"en-us" }}" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <title>{% block title %}Smart home app{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    {% load static %}
-    {% load i18n %}
     {% block stylesheets %}
         {# Biblioteki z repo (devices/static/devices/vendor/), nie z CDN – UI działa bez internetu #}
         <link rel="stylesheet" href="{% static 'devices/vendor/bootstrap/css/bootstrap.min.css' %}">
         <link rel="stylesheet" href="{% static 'devices/vendor/bootstrap-icons/bootstrap-icons.min.css' %}">
-
         <link rel="stylesheet" href="{% static 'devices/style.css' %}">
-        <link rel="stylesheet" href="{% static 'devices/graphics.css' %}">
         {% block additional_stylesheets %}{% endblock %}
     {% endblock %}
 </head>
 {# Token CSRF w nagłówku każdego żądania HTMX (POST w widokach sterowania) #}
 <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-<div id="wrapper">
-    {% block wrapper %}
-        <header>
-            {% block header %}{% endblock %}
-        </header>
-        <nav class="navbar sticky-top navbar-expand-md navbar-dark bg-black">
-            <div class="container-fluid">
-                <a class="navbar-brand" href="{% url 'devices:main' %}">
-                    {% trans "Smart home" %}
-                </a>
-                <div class="d-md-none">
-                    <a class="navbar-text" href="#">
-                        {% block page_title %}{% endblock %}
-                    </a>
-                    {% if user.is_authenticated %}
-                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                                data-bs-target="#navbarCollapsed" aria-controls="navbarCollapsed"
-                                aria-expanded="false"
-                                aria-label="Toggle navigation">
-                            <span class="navbar-toggler-icon"></span>
-                        </button>
-                    {% endif %}
-                </div>
-                {% if user.is_authenticated %}
-                    <div class="collapse navbar-collapse" id="navbarCollapsed">
-                        {% generate_menu %}
-                        {% include 'devices/menu.html' with menu=menus.main navbar_class="ms-auto" %}
-                        {# Wylogowanie tylko przez POST (LogoutView) – formularz z tokenem CSRF #}
-                        <form method="post" action="{% url 'logout' %}"
-                              class="d-flex align-items-center gap-2 mb-2 mb-md-0">
-                            {% csrf_token %}
-                            <span class="navbar-text">
-                                <i class="bi bi-person"></i> {{ user.get_username }}
-                            </span>
-                            <button type="submit" class="btn btn-sm btn-outline-light">
-                                <i class="bi bi-box-arrow-right"></i> {% trans "Log out" %}
-                            </button>
-                        </form>
-                    </div>
-                {% endif %}
+<nav class="navbar sticky-top navbar-expand-md bg-body-tertiary border-bottom">
+    <div class="container-lg">
+        <a class="navbar-brand" href="{% url 'devices:main' %}">
+            <i class="bi bi-house-gear" aria-hidden="true"></i> {% trans "Smart home" %}
+        </a>
+        {% if user.is_authenticated %}
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarCollapsed" aria-controls="navbarCollapsed"
+                    aria-expanded="false" aria-label="{% trans 'Toggle navigation' %}">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapsed">
+                {% generate_menu %}
+                {% include 'devices/menu.html' with menu=menus.main %}
+                {# Wylogowanie tylko przez POST (LogoutView) – formularz z tokenem CSRF #}
+                <form method="post" action="{% url 'logout' %}"
+                      class="d-flex align-items-center gap-2 py-2 py-md-0">
+                    {% csrf_token %}
+                    <span class="navbar-text">
+                        <i class="bi bi-person" aria-hidden="true"></i> {{ user.get_username }}
+                    </span>
+                    <button type="submit" class="btn btn-outline-secondary">
+                        <i class="bi bi-box-arrow-right" aria-hidden="true"></i> {% trans "Log out" %}
+                    </button>
+                </form>
             </div>
-        </nav>
-        <div id="content" class="bg-dark">
-            {% block content %}{% endblock %}
-        </div>
+        {% endif %}
+    </div>
+</nav>
+<main class="container-lg py-3">
+    {% block heading %}
+        <h1 class="h4 mb-3">{% block page_title %}{% endblock %}</h1>
     {% endblock %}
-</div>
+    {% block content %}{% endblock %}
+</main>
 
 <script src="{% static 'devices/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 <script src="{% static 'devices/vendor/htmx/htmx.min.js' %}"></script>
