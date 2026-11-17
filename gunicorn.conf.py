@@ -19,6 +19,18 @@ workers = int(os.environ.get('WEB_CONCURRENCY', '2'))
 # 107 MiB; 1 worker – 63 MiB, każdy kolejny ok. +14 MiB.
 preload_app = True
 
+# Wątki zamiast procesów `sync`: połączenie SSE (`devices/events/`, do 5 min)
+# zajmuje wątek, nie cały proces. 2 procesy × 8 wątków – kilka otwartych kart
+# przeglądarki w domu i zwykłe żądania obok. Przy `gthread` `timeout` dotyczy
+# procesu (heartbeat), nie długości jednego żądania. Każdy wątek w żądaniu
+# trzyma własne połączenie z PostgreSQL (najwyżej procesy × wątki).
+worker_class = 'gthread'
+threads = 8
+# Przy zatrzymaniu procesy czekają na otwarte żądania – strumienie SSE trwają
+# do 5 min, a przeglądarka i tak łączy się ponownie. Krótko, żeby restart
+# kontenera nie czekał do SIGKILL (`docker stop`: 10 s).
+graceful_timeout = 5
+
 # Plik heartbeat procesów roboczych w pamięci zamiast na overlayfs kontenera
 # https://docs.gunicorn.org/en/stable/faq.html#blocking-os-fchmod
 worker_tmp_dir = '/dev/shm'

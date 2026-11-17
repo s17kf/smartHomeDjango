@@ -39,11 +39,17 @@ projektu – trzymamy tu kod aplikacji i ustalenia o niej samej.
   dodatkowego kodu. Wyjątek tylko przez `@login_not_required` z komentarzem,
   dlaczego (np. endpoint z własnym uwierzytelnianiem). Panel admina ma własne
   logowanie i wymaga `is_staff`.
-- Fragmenty dla HTMX to zwykłe widoki zwracające kawałek strony (np. karty
-  urządzeń odświeżane co 10 s, tylko przy widocznej karcie przeglądarki).
-  Żądania HTMX bez ważnej sesji dostają `HX-Redirect` na logowanie
+- Fragmenty dla HTMX to zwykłe widoki zwracające kawałek strony (np. karta
+  urządzenia po poleceniu, pola stanu w formularzu reguły). Żądania HTMX bez ważnej sesji dostają `HX-Redirect` na logowanie
   (`devices/middleware.py`), żeby formularz logowania nie trafił do
   fragmentu. Token CSRF wysyła HTMX w nagłówku (`hx-headers` na `<body>`).
+- Zmiany kart przez SSE (`devices/events.py`, widok `device_events`,
+  rozszerzenie `htmx-ext-sse`): strumień `text/event-stream` co 1 s sprawdza
+  w bazie cache stanu, status systemu i nadpisania i wysyła zmienione karty
+  (`sse-swap="device-<slug>"`); po 5 min serwer kończy strumień,
+  przeglądarka łączy się ponownie. Bez `LISTEN/NOTIFY` (kod niezależny od
+  silnika bazy). gunicorn `gthread` – połączenie trzyma wątek, nie proces;
+  przed zmianą liczby wątków pomiar RAM na RPi.
 - Sterowanie z karty (`devices/control.py`, widok `device_set`): pola
   kontrolek → polecenie `set`, sprawdzenie według rodzaju (`kinds.py`),
   publikacja krótkim połączeniem tylko do dostępnego urządzenia. Karta
@@ -220,6 +226,7 @@ sprawdza, że strony nie ładują CSS ani JS z zewnątrz.
 | `bootstrap` | 5.3.3 | `dist/css/bootstrap.min.css`, `dist/js/bootstrap.bundle.min.js` (z `.map`) |
 | `bootstrap-icons` | 1.11.3 | `font/bootstrap-icons.min.css`, `font/fonts/bootstrap-icons.woff2`, `.woff` |
 | `htmx.org` | 2.0.11 | `dist/htmx.min.js` (katalog `vendor/htmx/`) |
+| `htmx-ext-sse` | 2.2.4 | `dist/sse.min.js` (katalog `vendor/htmx-ext-sse/`) |
 
 Dodanie lub aktualizacja biblioteki:
 

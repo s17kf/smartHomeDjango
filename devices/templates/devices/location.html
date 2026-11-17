@@ -11,11 +11,10 @@
 
 {% block content %}
     {% if statuses %}
-        {# Karty odświeżane co 10 s, tylko gdy karta przeglądarki jest widoczna i nie jest otwarte menu (np. nadpisania) #}
+        {# Zmiany kart przez SSE (events.py); przy otwartym menu karty (np. „Na czas”) zmiana czeka na następną #}
         <div id="device-cards" class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-3 mb-3"
-             hx-get="{% url 'devices:location_cards' location.id %}"
-             hx-trigger="every 10s [document.visibilityState === 'visible' && !document.querySelector('.dropdown-menu.show')]"
-             hx-swap="innerHTML">
+             hx-ext="sse" sse-connect="{% url 'devices:events' %}?location={{ location.id }}"
+             hx-on:htmx:sse-before-message="if (event.target.querySelector('.dropdown-menu.show')) event.preventDefault()">
             {% include 'devices/cards/list.html' %}
         </div>
     {% else %}

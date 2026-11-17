@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 23:16+0100\n"
+"POT-Creation-Date: 2026-11-18 00:30+0100\n"
 "PO-Revision-Date: 2024-09-15 11:47+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -421,15 +421,15 @@ msgstr "Wyloguj"
 msgid "Breadcrumb"
 msgstr "Ścieżka"
 
-#: devices/templates/devices/cards/base.html:12
+#: devices/templates/devices/cards/base.html:14
 msgid "online"
 msgstr "dostępne"
 
-#: devices/templates/devices/cards/base.html:14
+#: devices/templates/devices/cards/base.html:16
 msgid "unavailable"
 msgstr "niedostępne"
 
-#: devices/templates/devices/cards/base.html:24
+#: devices/templates/devices/cards/base.html:26
 msgid "Sent – waiting for the device…"
 msgstr "Wysłano – czekam na urządzenie…"
 
@@ -506,7 +506,7 @@ msgstr "Dodaj regułę"
 msgid "Add favourite devices."
 msgstr "Dodaj do ulubionych."
 
-#: devices/templates/devices/location.html:22
+#: devices/templates/devices/location.html:21
 #, python-format
 msgid "No devices available in %(name)s."
 msgstr "Brak urządzeń w lokalizacji %(name)s."
@@ -567,7 +567,9 @@ msgstr "Zapisz"
 msgid ""
 "No rules yet. A rule sets a device state on chosen days at a given time, "
 "e.g. turn on at 18:00."
-msgstr "Brak reguł. Reguła ustawia stan urządzenia w wybrane dni o podanej godzinie, np. włącza o 18:00."
+msgstr ""
+"Brak reguł. Reguła ustawia stan urządzenia w wybrane dni o podanej godzinie, "
+"np. włącza o 18:00."
 
 #: devices/templates/devices/rules/list.html:15
 msgid "All devices"
@@ -622,21 +624,21 @@ msgstr "dziś %(time)s"
 msgid "tomorrow %(time)s"
 msgstr "jutro %(time)s"
 
-#: devices/views.py:90
+#: devices/views.py:105
 msgid "No confirmation from the device – check that it is available."
 msgstr "Brak potwierdzenia od urządzenia – sprawdź, czy jest dostępne."
 
-#: devices/views.py:105 devices/views.py:138
+#: devices/views.py:120 devices/views.py:153
 #, python-format
 msgid "The device is unavailable (%(reason)s) – the command was not sent."
 msgstr "Urządzenie niedostępne (%(reason)s) – polecenie nie zostało wysłane."
 
-#: devices/views.py:111
+#: devices/views.py:126
 #, python-format
 msgid "The command was not sent: %(error)s"
 msgstr "Polecenie nie zostało wysłane: %(error)s"
 
-#: devices/views.py:150
+#: devices/views.py:165
 #, python-format
 msgid ""
 "The override was saved, but the command was not sent: %(error)s. The MQTT "

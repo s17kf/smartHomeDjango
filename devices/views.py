@@ -1,7 +1,7 @@
 import logging
 from datetime import timedelta
 
-from django.http import HttpResponse
+from django.http import Http404, HttpResponse, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -10,7 +10,7 @@ from django.utils.translation import gettext as _
 from django.views import generic
 from django.views.decorators.http import require_POST
 
-from . import control, forms, mqtt
+from . import control, events, forms, mqtt
 from . import status as device_status
 from .kinds import InvalidCommand
 from .models import Device, Location, Override, Rule
@@ -57,11 +57,6 @@ def location(request, location_id):
     return render(request, 'devices/location.html', _location_context(location_id))
 
 
-def location_cards(request, location_id):
-    """Karty urządzeń lokalizacji – fragment odświeżany przez HTMX."""
-    return render(request, 'devices/cards/list.html', _location_context(location_id))
-
-
 def device(request, slug):
     device_ = get_object_or_404(Device.objects.select_related('location'), slug=slug)
     return render(request, 'devices/device.html', {
@@ -72,6 +67,26 @@ def device(request, slug):
 
 def _card(request, status_, **context):
     return render(request, status_.template, {'status': status_, **context})
+
+
+def device_events(request):
+    """Strumień SSE ze zmienionymi kartami urządzeń: `?location=<id>` albo `?device=<slug>` (`events.py`)."""
+    devices = Device.objects.select_related('location').order_by('name')
+    if 'device' in request.GET:
+        devices = devices.filter(slug=request.GET['device'])
+    elif request.GET.get('location', '').isdigit():
+        devices = devices.filter(location_id=int(request.GET['location']))
+    else:
+        raise Http404('location or device required')
+    devices = list(devices)
+    if not devices:
+        raise Http404('no devices')
+    response = StreamingHttpResponse(events.stream(events.CardStream(devices, request)),
+                                     content_type='text/event-stream')
+    response['Cache-Control'] = 'no-cache'
+    # bez buforowania w proxy (nginx; Caddy przepuszcza text/event-stream od razu)
+    response['X-Accel-Buffering'] = 'no'
+    return response
 
 
 def device_card(request, slug):

@@ -22,7 +22,7 @@ described in [CONTRIBUTING.md](CONTRIBUTING.md) (in Polish).
 - Manage locations and smart home devices; devices are controlled only
   through MQTT (`home/<slug>/set`), via the gateway.
 - Device cards per kind (switch, RGBCCT light, sensor) with state, measurements and
-  availability, refreshed every 10 s; on/off switch, brightness, white
+  availability, updated live (Server-Sent Events); on/off switch, brightness, white
   temperature and colour controls. After a command the card waits up to 5 s
   for the device to confirm the new state.
 - Automation rules: on chosen days of the week at a given time set a device
@@ -213,10 +213,11 @@ docker run --rm -p 8000:8000 \
   other command runs without migrations, so only one container migrates the
   database, e.g. the MQTT worker:
   `docker run … smart-home-django python manage.py mqtt_worker`.
-- gunicorn settings are in `gunicorn.conf.py`: 2 worker processes, request
-  log on stdout. Change them without rebuilding with `WEB_CONCURRENCY`
-  (number of processes) or `GUNICORN_CMD_ARGS` (any gunicorn option, e.g.
-  `--log-level debug`).
+- gunicorn settings are in `gunicorn.conf.py`: 2 worker processes with
+  8 threads each (`gthread` – a live update stream holds a thread, not a
+  process), request log on stdout. Change them without rebuilding with
+  `WEB_CONCURRENCY` (number of processes) or `GUNICORN_CMD_ARGS` (any gunicorn
+  option, e.g. `--threads 4` or `--log-level debug`).
 - Run the tests in the image:
   `docker run --rm -e DJANGO_DEBUG=true -e DATABASE_URL=… smart-home-django python manage.py test`.
 

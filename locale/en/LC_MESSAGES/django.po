@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 23:16+0100\n"
+"POT-Creation-Date: 2026-11-18 00:30+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -402,15 +402,15 @@ msgstr ""
 msgid "Breadcrumb"
 msgstr ""
 
-#: devices/templates/devices/cards/base.html:12
+#: devices/templates/devices/cards/base.html:14
 msgid "online"
 msgstr ""
 
-#: devices/templates/devices/cards/base.html:14
+#: devices/templates/devices/cards/base.html:16
 msgid "unavailable"
 msgstr ""
 
-#: devices/templates/devices/cards/base.html:24
+#: devices/templates/devices/cards/base.html:26
 msgid "Sent – waiting for the device…"
 msgstr ""
 
@@ -487,7 +487,7 @@ msgstr ""
 msgid "Add favourite devices."
 msgstr ""
 
-#: devices/templates/devices/location.html:22
+#: devices/templates/devices/location.html:21
 #, python-format
 msgid "No devices available in %(name)s."
 msgstr ""
@@ -602,21 +602,21 @@ msgstr ""
 msgid "tomorrow %(time)s"
 msgstr ""
 
-#: devices/views.py:90
+#: devices/views.py:105
 msgid "No confirmation from the device – check that it is available."
 msgstr ""
 
-#: devices/views.py:105 devices/views.py:138
+#: devices/views.py:120 devices/views.py:153
 #, python-format
 msgid "The device is unavailable (%(reason)s) – the command was not sent."
 msgstr ""
 
-#: devices/views.py:111
+#: devices/views.py:126
 #, python-format
 msgid "The command was not sent: %(error)s"
 msgstr ""
 
-#: devices/views.py:150
+#: devices/views.py:165
 #, python-format
 msgid ""
 "The override was saved, but the command was not sent: %(error)s. The MQTT "

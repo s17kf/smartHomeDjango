@@ -42,8 +42,8 @@ class LocationViewTests(LoggedInTestCase):
 
     def test_location_not_exist(self):
         self.assertEqual(self.get_location_response(self.location.id + 1).status_code, 404)
-        url = reverse('devices:location_cards', args=(self.location.id + 1,))
-        self.assertEqual(self.client.get(url).status_code, 404)
+        url = reverse('devices:events')
+        self.assertEqual(self.client.get(url, {'location': self.location.id + 1}).status_code, 404)
 
     def test_no_devices(self):
         response = self.get_location_response(self.location.id)

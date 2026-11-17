@@ -128,15 +128,11 @@ class CardsTests(LoggedInTestCase):
         response = self.client.get(self.page_url)
         for slug in ('plug-1', 'bulb-1', 'temp-1'):
             self.assertContains(response, f'id="device-{slug}"')
-        # odświeżanie fragmentu co 10 s, tylko przy widocznej karcie przeglądarki i zamkniętym menu
-        self.assertContains(response, f'hx-get="{reverse("devices:location_cards", args=(self.location.id,))}"')
-        self.assertContains(response, "every 10s [document.visibilityState === 'visible' && "
-                                      "!document.querySelector('.dropdown-menu.show')]")
-
-    def test_cards_fragment(self):
-        response = self.client.get(reverse('devices:location_cards', args=(self.location.id,)))
-        self.assertContains(response, 'id="device-plug-1"')
-        self.assertNotContains(response, '<html')
+        # zmiany kart przez SSE; przy otwartym menu karty zmiana czeka
+        self.assertContains(response, f'sse-connect="{reverse("devices:events")}?location={self.location.id}"')
+        self.assertContains(response, 'sse-swap="device-plug-1"')
+        self.assertContains(response, "if (event.target.querySelector('.dropdown-menu.show')) event.preventDefault()")
+        self.assertContains(response, 'devices/vendor/htmx-ext-sse/sse.min.js')
 
     def test_htmx_instead_of_jquery(self):
         response = self.client.get(self.page_url)
@@ -150,8 +146,9 @@ class HtmxLoginRedirectTests(TestCase):
 
     def setUp(self):
         self.location = LocationHelper.create_location('room')
+        DeviceHelper.create_device(self.location, 'plug', slug='plug-1')
         self.page = reverse('devices:location', args=(self.location.id,))
-        self.fragment = reverse('devices:location_cards', args=(self.location.id,))
+        self.fragment = reverse('devices:device_card', args=('plug-1',))
 
     def test_htmx_request(self):
         response = self.client.get(self.fragment, headers={

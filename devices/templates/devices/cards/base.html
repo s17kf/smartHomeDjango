@@ -1,9 +1,11 @@
 {% load i18n devices_extras %}
 {# Karta urządzenia: nagłówek z dostępnością, treść per rodzaj (block body), pomiary, czas danych. #}
-{# Po wysłaniu polecenia (pending): karta co 1 s pobiera się od nowa, aż stan potwierdzi zmianę. #}
+{# Zmiany przychodzą przez SSE (sse-swap, events.py). Po wysłaniu polecenia (pending) karta zamiast #}
+{# SSE co 1 s pobiera się sama, aż stan potwierdzi zmianę – SSE nie zdejmuje wtedy „wysłano”. #}
 <div class="card h-100 device-card" id="device-{{ status.device.slug }}"
-     data-available="{{ status.available|yesno:'true,false' }}"
-     {% if refresh_url %}hx-get="{{ refresh_url }}" hx-trigger="load delay:1s" hx-target="this" hx-swap="outerHTML"{% endif %}>
+     data-available="{{ status.available|yesno:'true,false' }}" hx-swap="outerHTML"
+     {% if refresh_url %}hx-get="{{ refresh_url }}" hx-trigger="load delay:1s" hx-target="this"
+     {% else %}sse-swap="device-{{ status.device.slug }}"{% endif %}>
     <div class="card-header d-flex align-items-center gap-2">
         <i class="bi bi-{% block icon %}cpu{% endblock %} {% if status.available %}text-success{% else %}text-secondary{% endif %}"></i>
         <a href="{% url 'devices:device' status.device.slug %}"
