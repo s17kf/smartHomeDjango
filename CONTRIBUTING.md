@@ -66,9 +66,23 @@ projektu – trzymamy tu kod aplikacji i ustalenia o niej samej.
   połączeniu synchronizuje `config` z bazą. Widoki czytają stan z cache,
   nie z brokera. Logika workera (`Worker`) nie zależy od pętli paho –
   testy podają jej wiadomości wprost.
-- Reguły automatyzacji to osobny model, niezależny od typu urządzenia:
-  przypięty do urządzenia, z `target_state` walidowanym per rodzaj
-  urządzenia.
+- Reguły automatyzacji to osobny model (`Rule`), niezależny od typu
+  urządzenia: przypięty do urządzenia, „w te dni o tej godzinie (czas
+  lokalny) ustaw `target_state`”, stan walidowany per rodzaj
+  (`Kind.validate_target`). Semantyka – ADR 0010 w repo nadrzędnym:
+  - które reguły się wykonują, liczą czyste funkcje `schedule.py` (reguły,
+    nadpisanie, przedział `(since, now]`) – te same dla workera i UI, bez
+    bazy i zegara;
+  - worker (`automation.py`, co 5 s) wysyła `set` przy wykonaniu reguły
+    i ponawia go do potwierdzenia przez `state` (co minutę, najwyżej 5 razy,
+    tylko do dostępnego urządzenia). Między regułami nic nie wysyła – nie
+    dopisujemy wyrównywania stanu, cofałoby ręczne zmiany. Koniec
+    sprawdzonego przedziału jest w bazie (`SystemStatus.rules_checked_at`),
+    po restarcie wykonuje się tylko najnowsza przegapiona reguła;
+  - nadpisanie z wygaśnięciem (`Override`, „włącz na N minut” z karty) –
+    widok od razu wysyła `set` i zapamiętuje stan sprzed nadpisania; reguły
+    w trakcie czekają, koniec (także anulowanie: `until` = teraz) obsługuje
+    worker.
 - JSON API tylko tam, gdzie jest potrzebne (np. komendy głosowe), jako
   zwykłe widoki w tym projekcie. DRF dopiero, gdy API urośnie.
 - Baza: PostgreSQL. Bez kodu zależnego od silnika bazy (surowy SQL, funkcje
@@ -112,6 +126,8 @@ projektu – trzymamy tu kod aplikacji i ustalenia o niej samej.
 
 - Modele, widoki, `urls.py`, admin i menu; rodzaje urządzeń (pola `set`,
   `state`, `telemetry`) w `kinds.py`.
+- Worker MQTT: `worker.py` (połączenie, cache, synchronizacja `config`),
+  `automation.py` (reguły i nadpisania); chwile wykonania reguł – `schedule.py`.
 - Szablony w `templates/devices/`. Karta urządzenia per rodzaj:
   `templates/devices/cards/<kind>.html` (rama i pomiary w `cards/base.html`);
   stan do wyświetlenia (urządzenie + cache, dostępność z powodem) –
@@ -164,7 +180,14 @@ projektu – trzymamy tu kod aplikacji i ustalenia o niej samej.
 - Testy: `DJANGO_DEBUG=true DATABASE_URL=postgres://… python manage.py test`
   (bez `DJANGO_SECRET_KEY` ustawienia wymagają trybu debug; Django zakłada
   i usuwa osobną bazę `test_<nazwa>`). Nowe widoki i logika reguł / harmonogramów
-  – z testami. Testy widoków dziedziczą po `LoggedInTestCase` z
+  – z testami.
+- Zachowanie reguł opisuje tabela `SCHEDULE_CASES`
+  w `devices/tests/test_schedule.py`: reguły, nadpisanie, przedział kroku
+  workera i oczekiwany stan do ustawienia (dni tygodnia, przegapione
+  reguły, nadpisanie, zmiana czasu). Tabelę sprawdzamy dla
+  `schedule.event` i kroku workera (`test_automation.py` – `set` wysłany
+  albo nie przy danym stanie w cache). Zmianę zachowania zaczynamy od
+  zmiany tabeli. Testy widoków dziedziczą po `LoggedInTestCase` z
   `devices/tests/base.py` (klient zalogowany jako zwykły użytkownik); test
   `LoginRequiredTests` sprawdza przekierowanie na logowanie dla wszystkich
   adresów `devices`.

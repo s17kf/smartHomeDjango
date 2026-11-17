@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 20:24+0100\n"
+"POT-Creation-Date: 2026-11-17 22:26+0100\n"
 "PO-Revision-Date: 2024-09-15 11:47+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -38,18 +38,23 @@ msgstr ""
 "Urządzenie usunięte, ale jego tematy zostały w brokerze MQTT: %(error)s. "
 "Uruchom „manage.py mqtt_sync --prune”, gdy broker będzie dostępny."
 
-#: devices/control.py:31
+#: devices/control.py:34
 msgid "on: expected true or false"
 msgstr "on: oczekiwano true albo false"
 
-#: devices/control.py:38
+#: devices/control.py:41
 #, python-format
 msgid "%(field)s: expected an integer"
 msgstr "%(field)s: oczekiwano liczby całkowitej"
 
-#: devices/control.py:56
+#: devices/control.py:59
 msgid "color: expected #rrggbb"
 msgstr "color: oczekiwano #rrggbb"
+
+#: devices/control.py:70
+#, python-format
+msgid "minutes: allowed range 1–%(max)s"
+msgstr "minuty: dozwolony zakres 1–%(max)s"
 
 #: devices/kinds.py:29
 msgid "expected true or false"
@@ -124,15 +129,25 @@ msgstr "pola spoza rodzaju %(kind)s: %(fields)s"
 msgid "nothing to change – allowed fields: %(fields)s"
 msgstr "brak pól do zmiany – dozwolone: %(fields)s"
 
-#: devices/kinds.py:141
+#: devices/kinds.py:140
+#, python-format
+msgid "kind %(kind)s does not accept rules"
+msgstr "rodzaj %(kind)s nie przyjmuje reguł"
+
+#: devices/kinds.py:144
+#, python-format
+msgid "%(field)s requires \"mode\": \"%(mode)s\""
+msgstr "%(field)s wymaga \"mode\": \"%(mode)s\""
+
+#: devices/kinds.py:156
 msgid "Switch"
 msgstr "Przełącznik"
 
-#: devices/kinds.py:150
+#: devices/kinds.py:165
 msgid "RGBCCT light"
 msgstr "Światło RGBCCT"
 
-#: devices/kinds.py:165
+#: devices/kinds.py:180
 msgid "Sensor"
 msgstr "Czujnik"
 
@@ -144,7 +159,7 @@ msgstr "Miejsca"
 msgid "Favourites"
 msgstr "Ulubione"
 
-#: devices/models.py:16
+#: devices/models.py:17
 msgid ""
 "Lowercase letters and digits, words separated by single hyphens, e.g. plug-"
 "living-room."
@@ -152,15 +167,15 @@ msgstr ""
 "Małe litery i cyfry, słowa oddzielone pojedynczym łącznikiem, np. gniazdko-"
 "salon."
 
-#: devices/models.py:23
+#: devices/models.py:24
 msgid "Lowercase letters, digits and underscores, e.g. shelly."
 msgstr "Małe litery, cyfry i podkreślenia, np. shelly."
 
-#: devices/models.py:45 devices/models.py:101
+#: devices/models.py:46 devices/models.py:105
 msgid "Parameters must be a JSON object."
 msgstr "Parametry muszą być obiektem JSON."
 
-#: devices/models.py:49
+#: devices/models.py:50
 #, python-format
 msgid ""
 "Parameters look like a secret: %(keys)s. Passwords do not belong in the "
@@ -169,7 +184,7 @@ msgstr ""
 "Parametry wyglądają na sekret: %(keys)s. Hasła nie należą do konfiguracji "
 "urządzenia."
 
-#: devices/models.py:69
+#: devices/models.py:70
 msgid ""
 "Device identifier in MQTT topics (home/&lt;slug&gt;/…). Cannot be changed "
 "later."
@@ -177,11 +192,11 @@ msgstr ""
 "Identyfikator urządzenia w tematach MQTT (home/&lt;slug&gt;/…). Nie można go "
 "później zmienić."
 
-#: devices/models.py:74
+#: devices/models.py:75
 msgid "Device family handled by the gateway: shelly, tasmota, w1."
 msgstr "Rodzina urządzeń obsługiwana przez gateway: shelly, tasmota, w1."
 
-#: devices/models.py:78
+#: devices/models.py:79
 msgid ""
 "Driver parameters, e.g. shelly: {\"prefix\": \"shelly/plug1\", "
 "\"component\": \"switch:0\"}; tasmota: {\"topic\": \"nous1\"}; w1: "
@@ -191,9 +206,61 @@ msgstr ""
 "\"component\": \"switch:0\"}; tasmota: {\"topic\": \"nous1\"}; w1: "
 "{\"sensor\": \"28-00000a99077c\", \"interval_s\": 60}."
 
-#: devices/models.py:104
+#: devices/models.py:108
 msgid "The slug cannot be changed – create a new device instead."
 msgstr "Sluga nie można zmienić – dodaj nowe urządzenie."
+
+#: devices/models.py:112
+msgid ""
+"The kind cannot be changed while the device has rules – delete its rules "
+"first."
+msgstr ""
+"Nie można zmienić rodzaju urządzenia, które ma reguły – najpierw usuń jego "
+"reguły."
+
+#: devices/models.py:171
+msgid "Days must be a non-empty list of distinct numbers 0–6 (0 = Monday)."
+msgstr "Dni muszą być niepustą listą różnych liczb 0–6 (0 = poniedziałek)."
+
+#: devices/models.py:185
+msgid "Days of the week, 0 = Monday … 6 = Sunday, e.g. [0, 1, 2, 3, 4]."
+msgstr "Dni tygodnia, 0 = poniedziałek … 6 = niedziela, np. [0, 1, 2, 3, 4]."
+
+#: devices/models.py:187
+msgid "Local time."
+msgstr "Czas lokalny."
+
+#: devices/models.py:189
+msgid ""
+"Fields of a set command for the device kind, e.g. switch {\"on\": true}; "
+"light {\"on\": true, \"brightness\": 30, \"mode\": \"cct\", \"ct\": 2700}."
+msgstr "Pola polecenia set dla rodzaju urządzenia, np. przełącznik {\"on\": true}; światło {\"on\": true, \"brightness\": 30, \"mode\": \"cct\", \"ct\": 2700}."
+
+#: devices/models.py:214
+msgid "Choose a device."
+msgstr "Wybierz urządzenie."
+
+#: devices/models.py:217
+#, python-format
+msgid "%(kind)s devices do not accept rules."
+msgstr "Urządzenia rodzaju %(kind)s nie przyjmują reguł."
+
+#: devices/models.py:235
+#, python-format
+msgid "Rule \"%(rule)s\" sets a different state at the same time."
+msgstr "Reguła „%(rule)s” ustawia o tej samej porze inny stan."
+
+#: devices/models.py:282
+msgid "waiting for confirmation"
+msgstr "czeka na potwierdzenie"
+
+#: devices/models.py:282
+msgid "confirmed"
+msgstr "potwierdzony"
+
+#: devices/models.py:283
+msgid "no confirmation"
+msgstr "brak potwierdzenia"
 
 #: devices/status.py:24
 msgid "no data from the MQTT worker"
@@ -227,7 +294,7 @@ msgstr "dostępne"
 msgid "unavailable"
 msgstr "niedostępne"
 
-#: devices/templates/devices/cards/base.html:23
+#: devices/templates/devices/cards/base.html:24
 msgid "Sent – waiting for the device…"
 msgstr "Wysłano – czekam na urządzenie…"
 
@@ -264,6 +331,24 @@ msgstr "Jasność"
 #: devices/templates/devices/cards/on_switch.html:6
 msgid "On / off"
 msgstr "Włącz / wyłącz"
+
+#: devices/templates/devices/cards/override.html:9
+#, python-format
+msgid "On until %(time)s"
+msgstr "Włączone do %(time)s"
+
+#: devices/templates/devices/cards/override.html:10
+#, python-format
+msgid "Off until %(time)s"
+msgstr "Wyłączone do %(time)s"
+
+#: devices/templates/devices/cards/override.html:14
+msgid "Cancel"
+msgstr "Anuluj"
+
+#: devices/templates/devices/cards/override.html:21
+msgid "Timer"
+msgstr "Na czas"
 
 #: devices/templates/devices/cards/sensor.html:9
 msgid "No readings yet"
@@ -310,28 +395,55 @@ msgstr "Powrót do listy lokalizacji"
 msgid "No locations available."
 msgstr "Brak miejsc do wyświetlenia."
 
-#: devices/templatetags/devices_extras.py:42
+#: devices/templatetags/devices_extras.py:44
 msgid "just now"
 msgstr "przed chwilą"
 
-#: devices/templatetags/devices_extras.py:43
+#: devices/templatetags/devices_extras.py:45
 #, python-format
 msgid "%(time)s ago"
 msgstr "%(time)s temu"
 
-#: devices/views.py:70
+#: devices/templatetags/devices_extras.py:59
+#, python-format
+msgid "%(n)s h"
+msgstr "%(n)s godz."
+
+#: devices/templatetags/devices_extras.py:59
+#, python-format
+msgid "%(n)s min"
+msgstr "%(n)s min"
+
+#: devices/templatetags/devices_extras.py:61
+msgid "On for"
+msgstr "Włącz na"
+
+#: devices/templatetags/devices_extras.py:61
+msgid "Off for"
+msgstr "Wyłącz na"
+
+#: devices/views.py:72
 msgid "No confirmation from the device – check that it is available."
 msgstr "Brak potwierdzenia od urządzenia – sprawdź, czy jest dostępne."
 
-#: devices/views.py:85
+#: devices/views.py:87 devices/views.py:120
 #, python-format
 msgid "The device is unavailable (%(reason)s) – the command was not sent."
 msgstr "Urządzenie niedostępne (%(reason)s) – polecenie nie zostało wysłane."
 
-#: devices/views.py:91
+#: devices/views.py:93
 #, python-format
 msgid "The command was not sent: %(error)s"
 msgstr "Polecenie nie zostało wysłane: %(error)s"
+
+#: devices/views.py:132
+#, python-format
+msgid ""
+"The override was saved, but the command was not sent: %(error)s. The MQTT "
+"worker will send it."
+msgstr ""
+"Nadpisanie zapisane, ale polecenie nie zostało wysłane: %(error)s. Wyśle je "
+"worker MQTT."
 
 #: smartHomeSite/settings.py:214
 msgid "English"
@@ -412,9 +524,6 @@ msgstr "Konta zakłada administrator."
 
 #~ msgid "till "
 #~ msgstr "do"
-
-#~ msgid "cancel"
-#~ msgstr "anuluj"
 
 #~ msgid "one-time ON"
 #~ msgstr "włącz jednorazowo"

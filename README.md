@@ -25,6 +25,9 @@ described in [CONTRIBUTING.md](CONTRIBUTING.md) (in Polish).
   availability, refreshed every 10 s; on/off switch, brightness, white
   temperature and colour controls. After a command the card waits up to 5 s
   for the device to confirm the new state.
+- Automation rules: on chosen days of the week at a given time set a device
+  state (e.g. on at 18:00, off at 23:00); "on / off for N minutes" from the
+  device card. Rules run in the MQTT worker.
 - Login required for every page (Django sessions). No sign-up – accounts are
   created by an administrator.
 - Admin panel to manage devices and user accounts.
@@ -292,8 +295,10 @@ every device and of `gateway/status` in the database (visible read-only in
 the admin panel: Device states, System status), reconnects to the broker on
 its own and after every connection publishes missing or changed device
 configs, like `mqtt_sync` without `--prune`. A heartbeat every 30 s tells the
-pages whether the cached data is current. Without the worker the pages and
-the admin panel still work, but show no device state.
+pages whether the cached data is current. Every 5 s it runs the automation
+rules ([Automation rules](#automation-rules)). Without the worker the pages
+and the admin panel still work, but show no device state and rules do not
+run.
 
 Devices can also be imported from a JSON object (slug → device). The whole
 file is checked first and on any error nothing is saved; slugs already in
@@ -310,6 +315,42 @@ the database are skipped; locations are created by name:
 python manage.py import_devices devices.json             # "-" reads standard input
 python manage.py import_devices devices.json --location Home   # for entries without "location"
 ```
+
+### Automation rules
+
+Rules are managed in the admin panel (Devices → Rules) for now. A rule
+belongs to a device (not a sensor) and says: on these days of the week
+(`[0, 1, 2, 3, 4]` – Monday to Friday) at this local `time` set
+`target_state` – the fields of a `set` command for the device kind:
+
+```json
+{"on": true}
+{"on": true, "brightness": 30, "mode": "cct", "ct": 2700}
+{"brightness": 10}
+```
+
+"On from 18:00 to 23:00" is two rules. Two rules of one device at the same
+time on the same day must set the same state.
+
+- The worker sends `set` when a rule's time comes and repeats it every
+  minute, at most 5 times and only while the device is available, until
+  `state` confirms it. Between rules it sends nothing: a manual change
+  (card, button, wall switch) stays until the next rule.
+- A worker restart without a missed rule sends nothing. Rules missed while
+  the worker was down: only the latest one is sent after the start. A rule
+  added after its time today first runs on its next day.
+- *Timer* on the device card – on or off for 15 min … 2 h (an override). The
+  command is sent at once and rules wait. When the time is up or the
+  override is cancelled, the device gets the state of the latest rule from
+  that time, or the state it had before the override.
+- Times come from the local wall clock: on the spring clock change a rule in
+  the missing hour runs at 03:00, in autumn a rule in the repeated hour runs
+  once.
+
+The worker logs every rule and override event and every `set` it sends
+(INFO), and a warning when a state is not confirmed after 5 attempts. The
+admin panel shows the last event of each device (Devices → Automation
+states).
 
 ## License
 

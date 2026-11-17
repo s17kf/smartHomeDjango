@@ -11,7 +11,7 @@
     <div class="row g-3 mt-1">
         <div class="col-12 col-md-6 col-lg-4"
              hx-get="{% url 'devices:device_card' device.slug %}"
-             hx-trigger="every 10s [document.visibilityState === 'visible']"
+             hx-trigger="every 10s [document.visibilityState === 'visible' && !document.querySelector('.dropdown-menu.show')]"
              hx-swap="innerHTML">
             {% include status.template %}
         </div>

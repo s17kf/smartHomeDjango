@@ -8,10 +8,10 @@
 
 {% block content %}
     {% if statuses %}
-        {# Karty odświeżane co 10 s, tylko gdy karta przeglądarki jest widoczna #}
+        {# Karty odświeżane co 10 s, tylko gdy karta przeglądarki jest widoczna i nie jest otwarte menu (np. nadpisania) #}
         <div id="device-cards" class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3 mb-3"
              hx-get="{% url 'devices:location_cards' location.id %}"
-             hx-trigger="every 10s [document.visibilityState === 'visible']"
+             hx-trigger="every 10s [document.visibilityState === 'visible' && !document.querySelector('.dropdown-menu.show')]"
              hx-swap="innerHTML">
             {% include 'devices/cards/list.html' %}
         </div>

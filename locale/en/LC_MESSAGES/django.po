@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 20:24+0100\n"
+"POT-Creation-Date: 2026-11-17 22:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,17 +32,22 @@ msgid ""
 "Run \"manage.py mqtt_sync --prune\" when the broker is available."
 msgstr ""
 
-#: devices/control.py:31
+#: devices/control.py:34
 msgid "on: expected true or false"
 msgstr ""
 
-#: devices/control.py:38
+#: devices/control.py:41
 #, python-format
 msgid "%(field)s: expected an integer"
 msgstr ""
 
-#: devices/control.py:56
+#: devices/control.py:59
 msgid "color: expected #rrggbb"
+msgstr ""
+
+#: devices/control.py:70
+#, python-format
+msgid "minutes: allowed range 1–%(max)s"
 msgstr ""
 
 #: devices/kinds.py:29
@@ -118,15 +123,25 @@ msgstr ""
 msgid "nothing to change – allowed fields: %(fields)s"
 msgstr ""
 
-#: devices/kinds.py:141
+#: devices/kinds.py:140
+#, python-format
+msgid "kind %(kind)s does not accept rules"
+msgstr ""
+
+#: devices/kinds.py:144
+#, python-format
+msgid "%(field)s requires \"mode\": \"%(mode)s\""
+msgstr ""
+
+#: devices/kinds.py:156
 msgid "Switch"
 msgstr ""
 
-#: devices/kinds.py:150
+#: devices/kinds.py:165
 msgid "RGBCCT light"
 msgstr ""
 
-#: devices/kinds.py:165
+#: devices/kinds.py:180
 msgid "Sensor"
 msgstr ""
 
@@ -138,46 +153,96 @@ msgstr ""
 msgid "Favourites"
 msgstr ""
 
-#: devices/models.py:16
+#: devices/models.py:17
 msgid ""
 "Lowercase letters and digits, words separated by single hyphens, e.g. plug-"
 "living-room."
 msgstr ""
 
-#: devices/models.py:23
+#: devices/models.py:24
 msgid "Lowercase letters, digits and underscores, e.g. shelly."
 msgstr ""
 
-#: devices/models.py:45 devices/models.py:101
+#: devices/models.py:46 devices/models.py:105
 msgid "Parameters must be a JSON object."
 msgstr ""
 
-#: devices/models.py:49
+#: devices/models.py:50
 #, python-format
 msgid ""
 "Parameters look like a secret: %(keys)s. Passwords do not belong in the "
 "device config."
 msgstr ""
 
-#: devices/models.py:69
+#: devices/models.py:70
 msgid ""
 "Device identifier in MQTT topics (home/&lt;slug&gt;/…). Cannot be changed "
 "later."
 msgstr ""
 
-#: devices/models.py:74
+#: devices/models.py:75
 msgid "Device family handled by the gateway: shelly, tasmota, w1."
 msgstr ""
 
-#: devices/models.py:78
+#: devices/models.py:79
 msgid ""
 "Driver parameters, e.g. shelly: {\"prefix\": \"shelly/plug1\", "
 "\"component\": \"switch:0\"}; tasmota: {\"topic\": \"nous1\"}; w1: "
 "{\"sensor\": \"28-00000a99077c\", \"interval_s\": 60}."
 msgstr ""
 
-#: devices/models.py:104
+#: devices/models.py:108
 msgid "The slug cannot be changed – create a new device instead."
+msgstr ""
+
+#: devices/models.py:112
+msgid ""
+"The kind cannot be changed while the device has rules – delete its rules "
+"first."
+msgstr ""
+
+#: devices/models.py:171
+msgid "Days must be a non-empty list of distinct numbers 0–6 (0 = Monday)."
+msgstr ""
+
+#: devices/models.py:185
+msgid "Days of the week, 0 = Monday … 6 = Sunday, e.g. [0, 1, 2, 3, 4]."
+msgstr ""
+
+#: devices/models.py:187
+msgid "Local time."
+msgstr ""
+
+#: devices/models.py:189
+msgid ""
+"Fields of a set command for the device kind, e.g. switch {\"on\": true}; "
+"light {\"on\": true, \"brightness\": 30, \"mode\": \"cct\", \"ct\": 2700}."
+msgstr ""
+
+#: devices/models.py:214
+msgid "Choose a device."
+msgstr ""
+
+#: devices/models.py:217
+#, python-format
+msgid "%(kind)s devices do not accept rules."
+msgstr ""
+
+#: devices/models.py:235
+#, python-format
+msgid "Rule \"%(rule)s\" sets a different state at the same time."
+msgstr ""
+
+#: devices/models.py:282
+msgid "waiting for confirmation"
+msgstr ""
+
+#: devices/models.py:282
+msgid "confirmed"
+msgstr ""
+
+#: devices/models.py:283
+msgid "no confirmation"
 msgstr ""
 
 #: devices/status.py:24
@@ -212,7 +277,7 @@ msgstr ""
 msgid "unavailable"
 msgstr ""
 
-#: devices/templates/devices/cards/base.html:23
+#: devices/templates/devices/cards/base.html:24
 msgid "Sent – waiting for the device…"
 msgstr ""
 
@@ -248,6 +313,24 @@ msgstr ""
 
 #: devices/templates/devices/cards/on_switch.html:6
 msgid "On / off"
+msgstr ""
+
+#: devices/templates/devices/cards/override.html:9
+#, python-format
+msgid "On until %(time)s"
+msgstr ""
+
+#: devices/templates/devices/cards/override.html:10
+#, python-format
+msgid "Off until %(time)s"
+msgstr ""
+
+#: devices/templates/devices/cards/override.html:14
+msgid "Cancel"
+msgstr ""
+
+#: devices/templates/devices/cards/override.html:21
+msgid "Timer"
 msgstr ""
 
 #: devices/templates/devices/cards/sensor.html:9
@@ -295,27 +378,52 @@ msgstr ""
 msgid "No locations available."
 msgstr ""
 
-#: devices/templatetags/devices_extras.py:42
+#: devices/templatetags/devices_extras.py:44
 msgid "just now"
 msgstr ""
 
-#: devices/templatetags/devices_extras.py:43
+#: devices/templatetags/devices_extras.py:45
 #, python-format
 msgid "%(time)s ago"
 msgstr ""
 
-#: devices/views.py:70
+#: devices/templatetags/devices_extras.py:59
+#, python-format
+msgid "%(n)s h"
+msgstr ""
+
+#: devices/templatetags/devices_extras.py:59
+#, python-format
+msgid "%(n)s min"
+msgstr ""
+
+#: devices/templatetags/devices_extras.py:61
+msgid "On for"
+msgstr ""
+
+#: devices/templatetags/devices_extras.py:61
+msgid "Off for"
+msgstr ""
+
+#: devices/views.py:72
 msgid "No confirmation from the device – check that it is available."
 msgstr ""
 
-#: devices/views.py:85
+#: devices/views.py:87 devices/views.py:120
 #, python-format
 msgid "The device is unavailable (%(reason)s) – the command was not sent."
 msgstr ""
 
-#: devices/views.py:91
+#: devices/views.py:93
 #, python-format
 msgid "The command was not sent: %(error)s"
+msgstr ""
+
+#: devices/views.py:132
+#, python-format
+msgid ""
+"The override was saved, but the command was not sent: %(error)s. The MQTT "
+"worker will send it."
 msgstr ""
 
 #: smartHomeSite/settings.py:214

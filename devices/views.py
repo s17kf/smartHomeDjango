@@ -1,6 +1,8 @@
 import logging
+from datetime import timedelta
 
 from django.shortcuts import get_object_or_404, render
+from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext as _
 from django.views import generic
@@ -9,7 +11,7 @@ from django.views.decorators.http import require_POST
 from . import control, mqtt
 from . import status as device_status
 from .kinds import InvalidCommand
-from .models import Location, Device
+from .models import Device, Location, Override
 
 log = logging.getLogger(__name__)
 
@@ -90,6 +92,46 @@ def device_set(request, slug):
         log.warning('%s: set not sent: %s', device_.slug, exc)
         return _card(request, status_, error=_('The command was not sent: %(error)s') % {'error': exc})
     return _card(request, status_, pending=True, refresh_url=control.refresh_url(device_, command, 1))
+
+
+@require_POST
+def device_override(request, slug):
+    """Nadpisanie z karty: „włącz / wyłącz na N minut” (`on`, `minutes`) albo anulowanie (`cancel`).
+
+    Nadpisanie od razu wysyła `set` (jak zwykłe sterowanie) i zapamiętuje
+    stan sprzed niego; worker MQTT wstrzymuje reguły do `until`, a potem
+    ustawia stan z reguły z tego czasu albo stan sprzed nadpisania
+    (`automation.py`). Przedłużenie zostawia stan sprzed pierwszego
+    nadpisania. Anulowanie przesuwa `until` na teraz – koniec obsługuje
+    worker tak samo jak wygaśnięcie.
+    """
+    device_ = get_object_or_404(Device.objects.select_related('location'), slug=slug)
+    now = timezone.now()
+    if 'cancel' in request.POST:
+        Override.objects.filter(device=device_, until__gt=now).update(until=now)
+        return _card(request, device_status.status(device_))
+    status_ = device_status.status(device_)
+    try:
+        state, minutes = control.parse_override(request.POST)
+        state = device_.kind_spec.validate_target(state)
+    except InvalidCommand as exc:
+        return _card(request, status_, error=str(exc))
+    if not status_.available:
+        return _card(request, status_, error=_('The device is unavailable (%(reason)s) – the command was not sent.')
+                     % {'reason': status_.reason_label})
+    Override.objects.update_or_create(
+        device=device_, defaults={'state': state, 'until': now + timedelta(minutes=minutes)},
+        create_defaults={'state': state, 'until': now + timedelta(minutes=minutes), 'created_at': now,
+                         'previous_state': control.previous_state(status_)},
+    )
+    status_ = device_status.status(device_)
+    try:
+        control.send(device_, state)
+    except mqtt.MqttError as exc:
+        log.warning('%s: override set not sent: %s', device_.slug, exc)
+        return _card(request, status_, error=_('The override was saved, but the command was not sent: %(error)s. '
+                                               'The MQTT worker will send it.') % {'error': exc})
+    return _card(request, status_, pending=True, refresh_url=control.refresh_url(device_, state, 1))
 
 
 def get_next_url(request):

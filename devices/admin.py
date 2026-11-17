@@ -2,7 +2,7 @@ from django.contrib import admin, messages
 from django.db import transaction
 from django.utils.translation import gettext as _
 
-from .models import Location, Device, DeviceState, SystemStatus
+from .models import AutomationState, Device, DeviceState, Location, Override, Rule, SystemStatus
 
 
 class DeviceInline(admin.TabularInline):
@@ -82,3 +82,22 @@ class DeviceStateAdmin(ReadOnlyAdmin):
 @admin.register(SystemStatus)
 class SystemStatusAdmin(ReadOnlyAdmin):
     list_display = ['gateway_status', 'worker_connected', 'worker_seen_at', 'updated_at']
+
+
+# Reguły i nadpisania – w adminie do czasu UI reguł; worker MQTT czyta je co kilka sekund.
+
+@admin.register(Rule)
+class RuleAdmin(admin.ModelAdmin):
+    list_display = ['device', 'name', 'days', 'time', 'target_state', 'enabled']
+    list_filter = ['enabled', 'device']
+    list_editable = ['enabled']
+
+
+@admin.register(Override)
+class OverrideAdmin(admin.ModelAdmin):
+    list_display = ['device', 'state', 'until', 'previous_state', 'created_at']
+
+
+@admin.register(AutomationState)
+class AutomationStateAdmin(ReadOnlyAdmin):
+    list_display = ['device', 'desired', 'reason', 'changed_at', 'outcome', 'attempts', 'sent_at', 'outcome_at']

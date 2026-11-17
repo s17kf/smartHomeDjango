@@ -13,7 +13,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from .kinds import MEASUREMENTS
-from .models import Device, DeviceState, SystemStatus
+from .models import Device, DeviceState, Override, SystemStatus
 
 WORKER_STALE_AFTER = timedelta(seconds=90)
 CARD_MEASUREMENTS = ('power_w', 'energy_wh', 'temperature_c', 'humidity_pct')
@@ -46,6 +46,8 @@ class DeviceStatus:
     telemetry_ts: datetime | None = None
     reason: str = 'unknown'
     readings: list[Reading] = field(default_factory=list)
+    override: Override | None = None
+    """Trwające nadpisanie („włącz na N minut”)."""
 
     @property
     def available(self) -> bool:
@@ -58,6 +60,10 @@ class DeviceStatus:
     @property
     def kind(self):
         return self.device.kind_spec
+
+    @property
+    def accepts_override(self) -> bool:
+        return self.kind.accepts_rules
 
     @property
     def template(self) -> str:
@@ -107,6 +113,7 @@ def statuses(devices, now=None) -> list[DeviceStatus]:
     # Tylko odczyt – wiersz zakłada worker; przed jego pierwszym startem „brak danych”.
     system = SystemStatus.objects.filter(pk=1).first() or SystemStatus()
     cache = {s.slug: s for s in DeviceState.objects.filter(slug__in=[d.slug for d in devices])}
+    overrides = {o.device_id: o for o in Override.objects.filter(device__in=devices, until__gt=now)}
     result = []
     for device in devices:
         cached = cache.get(device.slug)
@@ -118,6 +125,7 @@ def statuses(devices, now=None) -> list[DeviceStatus]:
             telemetry_ts=cached.telemetry_ts if cached else None,
             reason=_reason(system, cached, now),
             readings=_readings(cached.telemetry if cached else None),
+            override=overrides.get(device.pk),
         ))
     return result
 

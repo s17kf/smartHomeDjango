@@ -6,6 +6,8 @@ from django.utils.formats import number_format
 from django.utils.timesince import timesince
 from django.utils.translation import gettext as _
 
+from ..control import OVERRIDE_PRESETS
+
 register = template.Library()
 
 
@@ -49,3 +51,11 @@ def rgb_hex(value):
     if rgb_css(value):
         return '#{:02x}{:02x}{:02x}'.format(*value)
     return '#ffffff'
+
+
+@register.simple_tag
+def override_presets():
+    """Przyciski nadpisania na karcie: [(on, opis grupy, [(minuty, napis)])]."""
+    minutes = [(m, _('%(n)s h') % {'n': m // 60} if m % 60 == 0 else _('%(n)s min') % {'n': m})
+               for m in OVERRIDE_PRESETS]
+    return [('true', _('On for'), minutes), ('false', _('Off for'), minutes)]

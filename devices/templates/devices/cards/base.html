@@ -17,6 +17,7 @@
     {# Niedostępne urządzenie: ostatnie znane wartości, przygaszone #}
     <div class="card-body{% if not status.available %} opacity-50{% endif %}">
         {% block body %}{% endblock %}
+        {% if status.accepts_override %}{% include 'devices/cards/override.html' %}{% endif %}
         {% if pending %}
             <div class="small text-info mt-2">
                 <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>

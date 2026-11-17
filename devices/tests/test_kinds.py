@@ -56,12 +56,35 @@ class ValidateSetTests(SimpleTestCase):
         self.assert_invalid(SENSOR, {})
 
 
+class ValidateTargetTests(SimpleTestCase):
+    """Stan docelowy reguły i nadpisania: polecenie `set`, kolor i biel z właściwym trybem."""
+
+    def test_valid(self):
+        for kind, state in ((SWITCH, {'on': False}),
+                            (LIGHT_RGBCCT, {'on': True, 'brightness': 30, 'mode': 'cct', 'ct': 2700}),
+                            (LIGHT_RGBCCT, {'brightness': 10}),
+                            (LIGHT_RGBCCT, {'on': True, 'mode': 'rgb', 'rgb': [255, 0, 0], 'transition': 2})):
+            with self.subTest(state=state):
+                self.assertEqual(kind.validate_target(state), state)
+
+    def test_invalid(self):
+        cases = (
+            (SWITCH, {'on': 'yes'}, 'on='),
+            (LIGHT_RGBCCT, {'on': True, 'rgb': [255, 0, 0]}, '"mode": "rgb"'),
+            (LIGHT_RGBCCT, {'on': True, 'mode': 'rgb', 'ct': 3000}, '"mode": "cct"'),
+            (SENSOR, {'on': True}, 'does not accept rules'),
+        )
+        for kind, state, message in cases:
+            with self.subTest(state=state), self.assertRaisesMessage(InvalidCommand, message):
+                kind.validate_target(state)
+
+
 class KindTests(SimpleTestCase):
     def test_kinds(self):
         self.assertEqual(list(KINDS), ['switch', 'light_rgbcct', 'sensor'])
 
     def test_rules_and_rest_state(self):
-        # stan spoczynkowy – `set` poza oknami reguł; czujnik nie ma reguł
+        # stan spoczynkowy – po nadpisaniu, gdy stan sprzed niego jest nieznany; czujnik nie ma reguł
         self.assertTrue(SWITCH.accepts_rules)
         self.assertTrue(LIGHT_RGBCCT.accepts_rules)
         self.assertFalse(SENSOR.accepts_rules)

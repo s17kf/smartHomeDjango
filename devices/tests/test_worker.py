@@ -198,6 +198,42 @@ class ConfigSyncTests(WorkerTestCase):
         self.assertEqual(self.worker.config_retained, {})
 
 
+class AutomationTickTests(WorkerTestCase):
+    """Reguły co `AUTOMATION_S`, tylko przy połączeniu i po synchronizacji `config`; `set` przez klienta workera."""
+
+    def setUp(self):
+        super().setUp()
+        patcher = mock.patch('devices.worker.automation.step')
+        self.step = patcher.start()
+        self.addCleanup(patcher.stop)
+
+    def test_not_connected(self):
+        self.worker.tick(monotonic=1000)
+        self.step.assert_not_called()
+
+    def test_after_sync(self):
+        with mock.patch('devices.worker.time.monotonic', return_value=100.0):
+            self.worker.on_connect(OK)
+        self.worker.tick(monotonic=100.5)
+        self.step.assert_not_called()
+        with self.assertLogs('devices.worker', 'INFO'):
+            self.worker.tick(monotonic=101.5)
+        self.step.assert_called_once()
+        self.worker.tick(monotonic=103)
+        self.assertEqual(self.step.call_count, 1)
+        self.worker.tick(monotonic=106.5)
+        self.assertEqual(self.step.call_count, 2)
+
+    def test_publish_set(self):
+        with mock.patch('devices.worker.time.monotonic', return_value=100.0):
+            self.worker.on_connect(OK)
+        with self.assertLogs('devices.worker', 'INFO'):
+            self.worker.tick(monotonic=101.5)
+        publish = self.step.call_args.args[0]
+        publish('plug-1', {'on': True})
+        self.assertEqual(self.client.published, [('home/plug-1/set', b'{"on":true}', False)])
+
+
 class CommandTests(TestCase):
     @override_settings(MQTT_PASSWORD='')
     def test_requires_password(self):

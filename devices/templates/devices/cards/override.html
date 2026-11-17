@@ -1,0 +1,39 @@
+{% load i18n devices_extras %}
+{# Nadpisanie z wygaśnięciem: trwające – „do 12:30” i anulowanie; inaczej menu „włącz / wyłącz na N min”. #}
+{# Odświeżanie listy kart czeka, gdy menu jest otwarte (warunek w hx-trigger na stronach). #}
+{% with slug=status.device.slug %}
+    {% if status.override %}
+        <div class="d-flex align-items-center gap-2 small mt-2 text-info device-override">
+            <i class="bi bi-clock" aria-hidden="true"></i>
+            <span>
+                {% if status.override.state.on %}{% blocktrans with time=status.override.until|time:"H:i" %}On until {{ time }}{% endblocktrans %}
+                {% else %}{% blocktrans with time=status.override.until|time:"H:i" %}Off until {{ time }}{% endblocktrans %}{% endif %}
+            </span>
+            <button type="button" class="btn btn-sm btn-outline-secondary py-0 ms-auto"
+                    hx-post="{% url 'devices:device_override' slug %}" hx-vals='{"cancel": "1"}'
+                    hx-target="#device-{{ slug }}" hx-swap="outerHTML">{% trans "Cancel" %}</button>
+        </div>
+    {% else %}
+        <div class="dropdown mt-2">
+            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle"
+                    data-bs-toggle="dropdown" aria-expanded="false"
+                    {% if not status.available or pending %}disabled{% endif %}>
+                <i class="bi bi-clock" aria-hidden="true"></i> {% trans "Timer" %}
+            </button>
+            <div class="dropdown-menu dropdown-menu-dark p-2">
+                {% override_presets as presets %}
+                {% for on, label, choices in presets %}
+                    <div class="small text-secondary mb-1">{{ label }}</div>
+                    <div class="btn-group btn-group-sm{% if forloop.first %} mb-2{% endif %}" role="group" aria-label="{{ label }}">
+                        {% for minutes, text in choices %}
+                            <button type="button" class="btn btn-outline-light"
+                                    hx-post="{% url 'devices:device_override' slug %}"
+                                    hx-vals='{"on": "{{ on }}", "minutes": "{{ minutes }}"}'
+                                    hx-target="#device-{{ slug }}" hx-swap="outerHTML">{{ text }}</button>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+{% endwith %}

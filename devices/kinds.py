@@ -99,7 +99,7 @@ class Kind:
     modifiers: frozenset[str] = frozenset()
     """Pola `set`, które same niczego nie zmieniają (np. czas przejścia)."""
     rest_state: Mapping[str, Any] | None = field(default=None)
-    """Stan spoczynkowy – `set` poza oknami reguł; None: rodzaj bez reguł."""
+    """Stan spoczynkowy – po nadpisaniu, gdy stan sprzed niego jest nieznany; None: rodzaj bez reguł."""
 
     @property
     def accepts_commands(self) -> bool:
@@ -128,6 +128,21 @@ class Kind:
             if error:
                 raise InvalidCommand(f'{name}={json.dumps(value)}: {error}')
         return dict(command)
+
+    def validate_target(self, state: Any) -> dict[str, Any]:
+        """Stan docelowy reguły albo nadpisania – polecenie `set` rodzaju przyjmującego reguły.
+
+        Kolor tylko z `mode: "rgb"`, biel tylko z `mode: "cct"` – samo `rgb`
+        nie zmienia trybu (`payloads.md`), a reguła opisuje to, co urządzenie
+        ma pokazywać.
+        """
+        if not self.accepts_rules:
+            raise InvalidCommand(_('kind %(kind)s does not accept rules') % {'kind': self.name})
+        command = self.validate_set(state)
+        for name, mode in (('rgb', 'rgb'), ('ct', 'cct')):
+            if name in command and command.get('mode') != mode:
+                raise InvalidCommand(_('%(field)s requires "mode": "%(mode)s"') % {'field': name, 'mode': mode})
+        return command
 
     def satisfied(self, state: Mapping[str, Any] | None, command: Mapping[str, Any]) -> bool:
         """Czy `state` ma już wartości z polecenia (poza modyfikatorami, np. `transition`)."""

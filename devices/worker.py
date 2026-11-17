@@ -8,6 +8,8 @@
   brakujące lub zmienione wpisy (`sync.py`) – bez usuwania.
 - Heartbeat w `SystemStatus` – UI uznaje dane za aktualne tylko przy żywym
   i połączonym workerze.
+- Co `AUTOMATION_S` wykonuje reguły i nadpisania (`automation.py`) – tylko
+  przy połączeniu i po synchronizacji, gdy cache ma już retained stan.
 
 Callbacki paho działają w wątku pętli sieciowej, `tick()` w wątku głównym.
 Każda porcja pracy z bazą jest otoczona `close_old_connections()`, jak
@@ -23,7 +25,7 @@ from datetime import datetime, timezone as dt_timezone
 from django.db import close_old_connections
 from django.utils import timezone
 
-from . import mqtt, sync
+from . import automation, mqtt, sync
 from .models import Device, DeviceState, SystemStatus
 
 log = logging.getLogger(__name__)
@@ -33,6 +35,8 @@ SUBSCRIPTIONS = (f'{mqtt.PREFIX}/+/state', f'{mqtt.PREFIX}/+/telemetry',
                  f'{mqtt.PREFIX}/+/availability', GATEWAY_STATUS_TOPIC)
 AVAILABILITY = ('online', 'offline')
 HEARTBEAT_S = 30
+# Reguły: godziny z dokładnością do minuty, a nadpisanie z UI ma działać od razu.
+AUTOMATION_S = 5
 # Synchronizacja `config`: koniec zbierania retained, gdy przez tyle sekund
 # nie przyszła żadna wiadomość `config` (broker oddaje je zaraz po SUBACK).
 SYNC_QUIET_S = 1.0
@@ -59,6 +63,7 @@ class Worker:
         self.config_retained: dict[str, bytes] = {}
         self.last_config_at = 0.0
         self.last_heartbeat = None
+        self.last_automation = None
 
     # Zdarzenia połączenia (wątek paho)
 
@@ -161,7 +166,7 @@ class Worker:
     # Wątek główny
 
     def tick(self, monotonic=None):
-        """Krok pętli głównej: synchronizacja `config` po połączeniu i heartbeat."""
+        """Krok pętli głównej: synchronizacja `config` po połączeniu, heartbeat, reguły."""
         now = time.monotonic() if monotonic is None else monotonic
         if self.sync_pending and now - self.last_config_at >= SYNC_QUIET_S:
             self.sync_pending = False
@@ -169,6 +174,19 @@ class Worker:
         if self.last_heartbeat is None or now - self.last_heartbeat >= HEARTBEAT_S:
             self.last_heartbeat = now
             self._save_status(worker_connected=self.connected, worker_seen_at=timezone.now())
+        # Po heartbeacie – dostępność urządzeń wymaga świeżego heartbeatu workera.
+        if (self.connected and not self.sync_pending
+                and (self.last_automation is None or now - self.last_automation >= AUTOMATION_S)):
+            self.last_automation = now
+            close_old_connections()
+            automation.step(self._publish_set, timezone.now())
+
+    def _publish_set(self, slug, command):
+        message = mqtt.set_message(slug, command)
+        info = self.client.publish(message.topic, message.payload, qos=1, retain=message.retain)
+        if getattr(info, 'rc', 0):
+            # rozłączony w międzyczasie – ponowienie przy następnej próbie
+            log.warning('%s: set not queued (paho rc=%s)', slug, info.rc)
 
     def _sync_configs(self):
         self.client.unsubscribe(mqtt.CONFIG_FILTER)

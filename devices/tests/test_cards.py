@@ -128,9 +128,10 @@ class CardsTests(LoggedInTestCase):
         response = self.client.get(self.page_url)
         for slug in ('plug-1', 'bulb-1', 'temp-1'):
             self.assertContains(response, f'id="device-{slug}"')
-        # odświeżanie fragmentu co 10 s, tylko przy widocznej karcie przeglądarki
+        # odświeżanie fragmentu co 10 s, tylko przy widocznej karcie przeglądarki i zamkniętym menu
         self.assertContains(response, f'hx-get="{reverse("devices:location_cards", args=(self.location.id,))}"')
-        self.assertContains(response, "every 10s [document.visibilityState === 'visible']")
+        self.assertContains(response, "every 10s [document.visibilityState === 'visible' && "
+                                      "!document.querySelector('.dropdown-menu.show')]")
 
     def test_cards_fragment(self):
         response = self.client.get(reverse('devices:location_cards', args=(self.location.id,)))
