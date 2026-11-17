@@ -63,12 +63,11 @@ projektu – trzymamy tu kod aplikacji i ustalenia o niej samej.
 Część kodu powstała przed przejściem na MQTT i zostanie zastąpiona. Nie
 rozwijamy jej – poprawiamy tylko wtedy, gdy blokuje bieżącą pracę:
 
-- sterowanie przekaźnikiem przez GPIO (`gpiocontrol` w
-  `devices/device_helpers.py`) i pliki konfiguracyjne urządzeń
-  (`Device.config_file`) – w obrazie nie działa (brak `pinctrl`),
-- typ `relay-periodic` i modele `RelayPeriodic*` – harmonogram przechodzi do
-  reguł automatyzacji,
-- jQuery (`devices/static/devices/js/`) – interaktywność przechodzi na HTMX.
+- pola `Device.type` i `Device.config_file` oraz modele `RelayPeriodic*` –
+  bez użycia w kodzie; zastąpi je model urządzenia dla MQTT (slug, rodzaj,
+  sterownik, parametry), a harmonogram przechodzi do reguł automatyzacji,
+- jQuery (`devices/static/devices/vendor/jquery/`) – interaktywność
+  przechodzi na HTMX.
 
 ## Struktura katalogów
 
@@ -96,9 +95,7 @@ rozwijamy jej – poprawiamy tylko wtedy, gdy blokuje bieżącą pracę:
 ### `devices/`
 
 - Modele, widoki, `urls.py`, admin i menu.
-- Szablony w `templates/devices/`. Status i szczegóły urządzenia mają osobne
-  szablony per typ w `templates/devices/details/`
-  (`<typ>_status.html`, `<typ>_details.html`).
+- Szablony w `templates/devices/`.
 - Statyki w `static/devices/`, biblioteki zewnętrzne w
   `static/devices/vendor/` ([Biblioteki frontendowe](#biblioteki-frontendowe)),
   komendy zarządzania w `management/commands/`, testy w `tests.py`.
@@ -147,12 +144,7 @@ rozwijamy jej – poprawiamy tylko wtedy, gdy blokuje bieżącą pracę:
   i usuwa osobną bazę `test_<nazwa>`). Nowe widoki i logika reguł / harmonogramów
   – z testami. Testy widoków dziedziczą po `LoggedInTestCase` (klient
   zalogowany jako zwykły użytkownik); test `LoginRequiredTests` sprawdza
-  przekierowanie na logowanie dla wszystkich adresów `devices`. Przekaźniki
-  z zamockowanym GPIO daje `RelayDeviceTestCase`.
-- Zachowanie harmonogramu opisuje tabela `SCHEDULE_CASES` w `devices/tests.py`:
-  okresy `[begin, end)`, także przez północ, dni tygodnia i ręczne włączenie.
-  Tabelę sprawdzamy dla strony urządzenia i komendy workera. Zmianę
-  zachowania zaczynamy od zmiany tabeli.
+  przekierowanie na logowanie dla wszystkich adresów `devices`.
 - Zależności przypięte do wersji (`==`) w `requirements.txt`. Przed dodaniem
   nowej sprawdzamy, czy działa na arm64 i ile kosztuje w RAM.
 

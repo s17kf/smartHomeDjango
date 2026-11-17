@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-13 21:01+0100\n"
+"POT-Creation-Date: 2026-11-17 02:03+0100\n"
 "PO-Revision-Date: 2024-09-15 11:47+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -36,131 +36,56 @@ msgstr "Przekaźnik"
 msgid "Periodic relay"
 msgstr "Przekaźnik okresowy"
 
-#: devices/models.py:59
+#: devices/models.py:69
 msgid "Monday"
 msgstr "Poniedziałek"
 
-#: devices/models.py:60
+#: devices/models.py:70
 msgid "Tuesday"
 msgstr "Wtorek"
 
-#: devices/models.py:61
+#: devices/models.py:71
 msgid "Wednesday"
 msgstr "Środa"
 
-#: devices/models.py:62
+#: devices/models.py:72
 msgid "Thursday"
 msgstr "Czwartek"
 
-#: devices/models.py:63
+#: devices/models.py:73
 msgid "Friday"
 msgstr "Piątek"
 
-#: devices/models.py:64
+#: devices/models.py:74
 msgid "Saturday"
 msgstr "Sobota"
 
-#: devices/models.py:65
+#: devices/models.py:75
 msgid "Sunday"
 msgstr "Niedziela"
 
-#: devices/templates/devices/base.html:38
+#: devices/templates/devices/base.html:31
 msgid "Smart home"
 msgstr ""
 
-#: devices/templates/devices/base.html:65
+#: devices/templates/devices/base.html:58
 msgid "Log out"
 msgstr "Wyloguj"
-
-#: devices/templates/devices/details/relay_periodic_details.html:4
-msgid "Active days:"
-msgstr "Aktywne dni: "
-
-#: devices/templates/devices/details/relay_periodic_details.html:9
-#: devices/templates/devices/details/relay_periodic_details.html:38
-msgid "Remove"
-msgstr "usuń"
-
-#: devices/templates/devices/details/relay_periodic_details.html:23
-msgid "Add new day:"
-msgstr "Dodaj dzień:"
-
-#: devices/templates/devices/details/relay_periodic_details.html:25
-msgid "Select day"
-msgstr "Wybierz dzień"
-
-#: devices/templates/devices/details/relay_periodic_details.html:30
-#: devices/templates/devices/details/relay_periodic_details.html:57
-msgid "Add"
-msgstr "dodaj"
-
-#: devices/templates/devices/details/relay_periodic_details.html:34
-msgid "Active periods:"
-msgstr "Aktywne okresy: "
-
-#: devices/templates/devices/details/relay_periodic_details.html:52
-msgid "Add new: "
-msgstr "Dodaj nowy:"
-
-#: devices/templates/devices/details/relay_periodic_details.html:53
-msgid "begin:"
-msgstr "od:"
-
-#: devices/templates/devices/details/relay_periodic_details.html:55
-msgid "end:"
-msgstr "do:"
-
-#: devices/templates/devices/details/relay_periodic_details.html:60
-msgid "edit"
-msgstr "edytuj"
-
-#: devices/templates/devices/details/relay_periodic_details.html:61
-msgid "hide edit"
-msgstr "ukryj edycję"
-
-#: devices/templates/devices/details/relay_periodic_status.html:5
-msgid "ON"
-msgstr "Aktywny"
-
-#: devices/templates/devices/details/relay_periodic_status.html:9
-msgid "till "
-msgstr "do"
-
-#: devices/templates/devices/details/relay_periodic_status.html:11
-#: devices/templates/devices/details/relay_periodic_status.html:53
-msgid "cancel"
-msgstr "anuluj"
-
-#: devices/templates/devices/details/relay_periodic_status.html:25
-msgid "OFF"
-msgstr "Nieaktywny"
-
-#: devices/templates/devices/details/relay_periodic_status.html:31
-msgid "one-time ON"
-msgstr "włącz jednorazowo"
-
-#: devices/templates/devices/details/relay_periodic_status.html:40
-msgid "Minutes:"
-msgstr "Minuty:"
-
-#: devices/templates/devices/details/relay_periodic_status.html:48
-msgid "set"
-msgstr "OK"
-
-#: devices/templates/devices/details/relay_periodic_status.html:65
-#: devices/templates/devices/details/relay_status.html:28
-msgid "Relay state not available"
-msgstr "Stan przekaźnika niedostępny"
 
 #: devices/templates/devices/device.html:10
 msgid "Back to location"
 msgstr "Powrót do lokalizacji"
 
-#: devices/templates/devices/favourites.html:25
+#: devices/templates/devices/favourites.html:18
 msgid "Add favourite devices."
 msgstr "Dodaj do ulubionych."
 
-#: devices/templates/devices/location.html:61
+#: devices/templates/devices/location.html:30
+#, python-format
+msgid "No devices available in %(name)s."
+msgstr "Brak urządzeń w lokalizacji %(name)s."
+
+#: devices/templates/devices/location.html:35
 msgid "Back to locations"
 msgstr "Powrót do listy lokalizacji"
 
@@ -168,11 +93,11 @@ msgstr "Powrót do listy lokalizacji"
 msgid "No locations available."
 msgstr "Brak miejsc do wyświetlenia."
 
-#: smartHomeSite/settings.py:169
+#: smartHomeSite/settings.py:185
 msgid "English"
 msgstr "angielski"
 
-#: smartHomeSite/settings.py:170
+#: smartHomeSite/settings.py:186
 msgid "Polish"
 msgstr "polski"
 
@@ -184,6 +109,63 @@ msgstr "Zaloguj"
 #: templates/registration/login.html:68
 msgid "Accounts are created by the administrator."
 msgstr "Konta zakłada administrator."
+
+#~ msgid "Active days:"
+#~ msgstr "Aktywne dni: "
+
+#~ msgid "Remove"
+#~ msgstr "usuń"
+
+#~ msgid "Add new day:"
+#~ msgstr "Dodaj dzień:"
+
+#~ msgid "Select day"
+#~ msgstr "Wybierz dzień"
+
+#~ msgid "Add"
+#~ msgstr "dodaj"
+
+#~ msgid "Active periods:"
+#~ msgstr "Aktywne okresy: "
+
+#~ msgid "Add new: "
+#~ msgstr "Dodaj nowy:"
+
+#~ msgid "begin:"
+#~ msgstr "od:"
+
+#~ msgid "end:"
+#~ msgstr "do:"
+
+#~ msgid "edit"
+#~ msgstr "edytuj"
+
+#~ msgid "hide edit"
+#~ msgstr "ukryj edycję"
+
+#~ msgid "ON"
+#~ msgstr "Aktywny"
+
+#~ msgid "till "
+#~ msgstr "do"
+
+#~ msgid "cancel"
+#~ msgstr "anuluj"
+
+#~ msgid "OFF"
+#~ msgstr "Nieaktywny"
+
+#~ msgid "one-time ON"
+#~ msgstr "włącz jednorazowo"
+
+#~ msgid "Minutes:"
+#~ msgstr "Minuty:"
+
+#~ msgid "set"
+#~ msgstr "OK"
+
+#~ msgid "Relay state not available"
+#~ msgstr "Stan przekaźnika niedostępny"
 
 #~ msgid "Relay is "
 #~ msgstr " "

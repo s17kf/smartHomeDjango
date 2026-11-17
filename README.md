@@ -19,7 +19,8 @@ described in [CONTRIBUTING.md](CONTRIBUTING.md) (in Polish).
 
 ## Features
 
-- Manage smart home devices (relay, more types soon).
+- Manage locations and smart home devices (device control over MQTT is
+  being added).
 - Responsive web interface for manage device's state.
 - Login required for every page (Django sessions). No sign-up – accounts are
   created by an administrator.
@@ -195,16 +196,14 @@ docker run --rm -p 8000:8000 \
 
 - The default command (`gunicorn`) applies database migrations first. Any
   other command runs without migrations, so only one container migrates the
-  database, e.g. a worker:
-  `docker run … smart-home-django python manage.py relays_periodic_update`.
+  database, e.g.:
+  `docker run … smart-home-django python manage.py check --deploy`.
 - gunicorn settings are in `gunicorn.conf.py`: 2 worker processes, request
   log on stdout. Change them without rebuilding with `WEB_CONCURRENCY`
   (number of processes) or `GUNICORN_CMD_ARGS` (any gunicorn option, e.g.
   `--log-level debug`).
 - Run the tests in the image:
   `docker run --rm -e DJANGO_DEBUG=true -e DATABASE_URL=… smart-home-django python manage.py test`.
-- Relays controlled through GPIO (`pinctrl`) do not work in the image –
-  device control moves to MQTT.
 
 ## Moving data from SQLite to PostgreSQL
 

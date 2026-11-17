@@ -1,15 +1,8 @@
-from datetime import datetime, timedelta
-
-from django.http import HttpResponseRedirect
-from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
-from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views import generic
-from django.views.decorators.http import require_POST
 
-from .device_helpers import DeviceConfig, RelayDeviceConfig, RelayPeriodicDeviceConfig
-from .models import Location, Device, RelayPeriodicManualActivation
+from .models import Location, Device
 
 
 class LocationListView(generic.ListView):
@@ -25,53 +18,26 @@ class FavouritesView(generic.ListView):
     context_object_name = 'favourites_devices'
 
     def get_queryset(self):
-        return
+        return Device.objects.none()
 
 
 class DeviceView(generic.DetailView):
     template_name = 'devices/device.html'
     model = Device
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['device_config'] = DeviceConfig.parse_device(context['device'])
-        return context
-
 
 class LocationView(generic.ListView):
     template_name = 'devices/location.html'
+    context_object_name = 'devices'
 
     def get_queryset(self):
-        return
+        self.location = get_object_or_404(Location, pk=self.kwargs['location_id'])
+        return Device.objects.filter(location=self.location).order_by('name')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        location_id = self.kwargs['location_id']
-        devices = []
-        for device in Device.objects.filter(location=self.kwargs['location_id']):
-            devices.append(DeviceConfig.parse_device(device))
-        context.update({
-            'location_id': location_id,
-            'location_name': get_object_or_404(Location, pk=location_id),
-            'device_config_list': devices,
-        })
+        context['location'] = self.location
         return context
-
-
-def relay_update(request, device_id):
-    if request.method == 'POST':
-        try:
-            device = Device.objects.get(pk=device_id)
-            device_config = RelayDeviceConfig(device)
-            new_state = device_config.active_state \
-                if request.POST.get('state', 'off') == 'on' else device_config.inactive_state
-            device_config.setstate(new_state)
-            return JsonResponse({'status': 'success', 'message': 'Device state updated'})
-        except Device.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': 'Device not found'})
-        except Exception as e:
-            return JsonResponse({'status': 'error', 'message': str(e)})
-    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
 
 
 def get_next_url(request):
@@ -81,138 +47,3 @@ def get_next_url(request):
                                        require_https=request.is_secure()):
         return next_url
     return '/'
-
-
-@require_POST
-def periodic_relay_manual_activate(request, device_id):
-    next = get_next_url(request)
-    try:
-        device = Device.objects.get(pk=device_id)
-    except Device.DoesNotExist:
-        # todo: log error
-        return HttpResponseRedirect(next)
-    try:
-        minutes = int(request.POST.get('minutes', '0'))
-    except ValueError:
-        minutes = 0
-    # Nieprawidłowa liczba minut niczego nie zmienia, także trwającego włączenia.
-    if minutes <= 0:
-        return HttpResponseRedirect(next)
-    # Czas trwania liczony od chwili w UTC – przy zmianie czasu włączenie
-    # nadal trwa podaną liczbę minut.
-    end_time = timezone.now().replace(second=0, microsecond=0) + timedelta(minutes=minutes)
-    RelayPeriodicManualActivation.objects.update_or_create(device=device, defaults={'end_time': end_time})
-    device_config = RelayPeriodicDeviceConfig(device)
-    device_config.setstate(device_config.active_state)
-    return HttpResponseRedirect(next)
-
-
-@require_POST
-def periodic_relay_manual_deactivate(request, device_id):
-    next = get_next_url(request)
-    try:
-        device = Device.objects.get(pk=device_id)
-    except Device.DoesNotExist:
-        # todo: log error
-        return HttpResponseRedirect(next)
-    manual_activation = RelayPeriodicManualActivation.objects.filter(device=device).first()
-    if manual_activation is None:
-        print(f"no manual activation to deactivate (dev: {device.name})")
-        return HttpResponseRedirect(next)
-    manual_activation.delete()
-    device_config = RelayPeriodicDeviceConfig(device)
-    if not device_config.is_active_day() and device_config.current_period is None:
-        device_config.setstate(device_config.inactive_state)
-    return HttpResponseRedirect(next)
-
-
-@require_POST
-def periodic_relay_add_active_day(request, device_id):
-    next = get_next_url(request)
-    try:
-        device = Device.objects.get(pk=device_id)
-    except Device.DoesNotExist:
-        # todo: log error
-        return HttpResponseRedirect(next)
-    try:
-        day = int(request.POST.get('day', '-1'))
-    except ValueError:
-        return HttpResponseRedirect(next)
-    if day < 0 or day > 6:
-        return HttpResponseRedirect(next)
-    if device.relayperiodicday_set.filter(day=day).exists():
-        return HttpResponseRedirect(next)
-    device.relayperiodicday_set.create(day=day)
-    device_config = RelayPeriodicDeviceConfig(device)
-    if not device_config.is_active() and day == timezone.localtime().weekday():
-        device_config.setstate(device_config.active_state)
-    return HttpResponseRedirect(next)
-
-
-@require_POST
-def periodic_relay_remove_active_day(request, device_id):
-    next = get_next_url(request)
-    try:
-        device = Device.objects.get(pk=device_id)
-    except Device.DoesNotExist:
-        # todo: log error
-        return HttpResponseRedirect(next)
-    try:
-        day = int(request.POST.get('day', '-1'))
-    except ValueError:
-        return HttpResponseRedirect(next)
-    if day < 0 or day > 6:
-        return HttpResponseRedirect(next)
-    device.relayperiodicday_set.filter(day=day).delete()
-    if day == timezone.localtime().weekday():
-        device_config = RelayPeriodicDeviceConfig(device)
-        if not device_config.is_manual_activated() and device_config.current_period is None:
-            device_config.setstate(device_config.inactive_state)
-    return HttpResponseRedirect(next)
-
-
-@require_POST
-def periodic_relay_add_active_period(request, device_id):
-    next = get_next_url(request)
-    try:
-        device = Device.objects.get(pk=device_id)
-    except Device.DoesNotExist:
-        # todo: log error
-        return HttpResponseRedirect(next)
-    try:
-        begin = request.POST.get('begin', '00:00')
-        end = request.POST.get('end', '00:00')
-        begin_time = datetime.strptime(begin, '%H:%M').time()
-        end_time = datetime.strptime(end, '%H:%M').time()
-    except ValueError:
-        return HttpResponseRedirect(next)
-    if begin_time == end_time:
-        return HttpResponseRedirect(next)
-    if device.relayperiodicperiod_set.filter(begin=begin_time, end=end_time).exists():
-        return HttpResponseRedirect(next)
-    device.relayperiodicperiod_set.create(begin=begin_time, end=end_time)
-    device_config = RelayPeriodicDeviceConfig(device)
-    if not device_config.is_active() and device_config.current_period is not None:
-        device_config.setstate(device_config.active_state)
-    return HttpResponseRedirect(next)
-
-
-@require_POST
-def periodic_relay_remove_active_period(request, device_id):
-    next = get_next_url(request)
-    try:
-        device = Device.objects.get(pk=device_id)
-    except Device.DoesNotExist:
-        # todo: log error
-        return HttpResponseRedirect(next)
-    try:
-        period_id = int(request.POST.get('period_id', '-1'))
-    except ValueError:
-        return HttpResponseRedirect(next)
-    device.relayperiodicperiod_set.filter(pk=period_id).delete()
-    device_config = RelayPeriodicDeviceConfig(device)
-    if (device_config.is_active() and device_config.current_period is None
-            and not device_config.is_manual_activated()
-            and not device_config.is_active_day()):
-        device_config.setstate(device_config.inactive_state)
-    return HttpResponseRedirect(next)

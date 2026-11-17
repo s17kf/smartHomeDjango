@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-13 21:01+0100\n"
+"POT-Creation-Date: 2026-11-17 02:03+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -34,131 +34,56 @@ msgstr ""
 msgid "Periodic relay"
 msgstr ""
 
-#: devices/models.py:59
+#: devices/models.py:69
 msgid "Monday"
 msgstr ""
 
-#: devices/models.py:60
+#: devices/models.py:70
 msgid "Tuesday"
 msgstr ""
 
-#: devices/models.py:61
+#: devices/models.py:71
 msgid "Wednesday"
 msgstr ""
 
-#: devices/models.py:62
+#: devices/models.py:72
 msgid "Thursday"
 msgstr ""
 
-#: devices/models.py:63
+#: devices/models.py:73
 msgid "Friday"
 msgstr ""
 
-#: devices/models.py:64
+#: devices/models.py:74
 msgid "Saturday"
 msgstr ""
 
-#: devices/models.py:65
+#: devices/models.py:75
 msgid "Sunday"
 msgstr ""
 
-#: devices/templates/devices/base.html:38
+#: devices/templates/devices/base.html:31
 msgid "Smart home"
 msgstr ""
 
-#: devices/templates/devices/base.html:65
+#: devices/templates/devices/base.html:58
 msgid "Log out"
-msgstr ""
-
-#: devices/templates/devices/details/relay_periodic_details.html:4
-msgid "Active days:"
-msgstr ""
-
-#: devices/templates/devices/details/relay_periodic_details.html:9
-#: devices/templates/devices/details/relay_periodic_details.html:38
-msgid "Remove"
-msgstr ""
-
-#: devices/templates/devices/details/relay_periodic_details.html:23
-msgid "Add new day:"
-msgstr ""
-
-#: devices/templates/devices/details/relay_periodic_details.html:25
-msgid "Select day"
-msgstr ""
-
-#: devices/templates/devices/details/relay_periodic_details.html:30
-#: devices/templates/devices/details/relay_periodic_details.html:57
-msgid "Add"
-msgstr ""
-
-#: devices/templates/devices/details/relay_periodic_details.html:34
-msgid "Active periods:"
-msgstr ""
-
-#: devices/templates/devices/details/relay_periodic_details.html:52
-msgid "Add new: "
-msgstr ""
-
-#: devices/templates/devices/details/relay_periodic_details.html:53
-msgid "begin:"
-msgstr ""
-
-#: devices/templates/devices/details/relay_periodic_details.html:55
-msgid "end:"
-msgstr ""
-
-#: devices/templates/devices/details/relay_periodic_details.html:60
-msgid "edit"
-msgstr ""
-
-#: devices/templates/devices/details/relay_periodic_details.html:61
-msgid "hide edit"
-msgstr ""
-
-#: devices/templates/devices/details/relay_periodic_status.html:5
-msgid "ON"
-msgstr ""
-
-#: devices/templates/devices/details/relay_periodic_status.html:9
-msgid "till "
-msgstr ""
-
-#: devices/templates/devices/details/relay_periodic_status.html:11
-#: devices/templates/devices/details/relay_periodic_status.html:53
-msgid "cancel"
-msgstr ""
-
-#: devices/templates/devices/details/relay_periodic_status.html:25
-msgid "OFF"
-msgstr ""
-
-#: devices/templates/devices/details/relay_periodic_status.html:31
-msgid "one-time ON"
-msgstr ""
-
-#: devices/templates/devices/details/relay_periodic_status.html:40
-msgid "Minutes:"
-msgstr ""
-
-#: devices/templates/devices/details/relay_periodic_status.html:48
-msgid "set"
-msgstr ""
-
-#: devices/templates/devices/details/relay_periodic_status.html:65
-#: devices/templates/devices/details/relay_status.html:28
-msgid "Relay state not available"
 msgstr ""
 
 #: devices/templates/devices/device.html:10
 msgid "Back to location"
 msgstr ""
 
-#: devices/templates/devices/favourites.html:25
+#: devices/templates/devices/favourites.html:18
 msgid "Add favourite devices."
 msgstr ""
 
-#: devices/templates/devices/location.html:61
+#: devices/templates/devices/location.html:30
+#, python-format
+msgid "No devices available in %(name)s."
+msgstr ""
+
+#: devices/templates/devices/location.html:35
 msgid "Back to locations"
 msgstr ""
 
@@ -166,11 +91,11 @@ msgstr ""
 msgid "No locations available."
 msgstr ""
 
-#: smartHomeSite/settings.py:169
+#: smartHomeSite/settings.py:185
 msgid "English"
 msgstr ""
 
-#: smartHomeSite/settings.py:170
+#: smartHomeSite/settings.py:186
 msgid "Polish"
 msgstr ""
 

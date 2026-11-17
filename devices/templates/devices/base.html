@@ -70,12 +70,6 @@
 
 <script src="{% static 'devices/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
 <script src="{% static 'devices/vendor/jquery/jquery.min.js' %}"></script>
-<script>
-    const RELAY_UPDATE_URL = "{% url 'devices:relay_update' 0 %}";
-    const CSRF_TOKEN = '{{ csrf_token }}';
-</script>
-<script src="{% static 'devices/js/relay_periodic_edit.js' %}"></script>
-<script src="{% static 'devices/js/device_status_update.js' %}"></script>
 {% block scripts %}{% endblock %}
 </body>
 </html>
