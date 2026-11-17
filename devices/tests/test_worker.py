@@ -42,6 +42,12 @@ class WorkerTestCase(TestCase):
         logger = logging.getLogger('devices.worker')
         self.addCleanup(logger.setLevel, logger.level)
         logger.setLevel(logging.WARNING)
+        # TestCase trzyma transakcję (bez autocommit), a close_old_connections()
+        # zamyka wtedy połączenie – na PostgreSQL test traci bazę. Klient
+        # testowy Django wyłącza ją z tego samego powodu.
+        patcher = mock.patch('devices.worker.close_old_connections')
+        patcher.start()
+        self.addCleanup(patcher.stop)
         self.client = FakeClient()
         self.worker = Worker(self.client)
 
