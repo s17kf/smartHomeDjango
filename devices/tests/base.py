@@ -1,10 +1,13 @@
 """Wspólne pomoce testów: zalogowany klient, tworzenie lokalizacji i urządzeń."""
 
+import json
+
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.text import slugify
 
+from .. import mqtt
 from ..models import Device, Location
 
 User = get_user_model()
@@ -44,3 +47,16 @@ class DeviceHelper:
             location=location, name=name, slug=slug or slugify(name), kind=kind, driver=driver,
             params={'prefix': f'shelly/{slugify(name)}', 'component': 'switch:0'} if params is None else params,
         )
+
+
+class BrokerTestMixin:
+    """Czysty broker w pamięci (`MemoryBroker`, ustawia go runner testów) w `self.broker`."""
+
+    def setUp(self):
+        super().setUp()
+        self.broker = mqtt.broker()
+        self.broker.reset()
+
+    def retained_json(self, topic):
+        payload = self.broker.retained_messages.get(topic)
+        return None if payload is None else json.loads(payload)

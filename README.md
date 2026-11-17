@@ -102,6 +102,10 @@ secret or host-specific is stored in the code.
 | `DJANGO_ALLOWED_HOSTS` | yes, in production | empty | Comma-separated host names / IP addresses the app is served under, e.g. `smarthome.lan,192.168.1.10`. |
 | `DATABASE_URL` | yes | – | Database URL in the [dj-database-url](https://github.com/jazzband/dj-database-url) format, e.g. `postgres://user:password@host:5432/name`. |
 | `DJANGO_HTTPS` | no | `false` | `true` when the app is served over HTTPS by a reverse proxy (e.g. Caddy) that terminates TLS – see [HTTPS behind a reverse proxy](#https-behind-a-reverse-proxy). |
+| `MQTT_HOST` | no | `localhost` | Address of the MQTT broker (its listener for services). |
+| `MQTT_PORT` | no | `1883` | Broker port. |
+| `MQTT_BACKEND_USER` | no | `backend` | Broker account of the app. |
+| `MQTT_BACKEND_PASSWORD` | yes, to reach the broker | empty | Password of that account. Without it the pages work, but device changes are not published to the broker (warning in the admin panel and in the log). |
 
 Notes:
 
@@ -124,7 +128,10 @@ Notes:
   only for `collectstatic`). Database connections are kept open for 60 s
   between requests.
 - **Tests** create and drop a separate `test_<name>` database, so the
-  PostgreSQL user needs the `CREATEDB` privilege.
+  PostgreSQL user needs the `CREATEDB` privilege. They never connect to the
+  MQTT broker, even with the `MQTT_*` variables set – the test runner
+  replaces it with an in-memory one.
+- **`MQTT_*`**: an empty value means the default.
 - **Logs** go to stderr, also with debug off: Django warnings and errors,
   including server errors (500) with a traceback. Client errors (4xx) are
   only in the web server's request log.
@@ -234,6 +241,11 @@ contains password hashes – delete it afterwards.
    users need no special permissions to use the app; the admin panel requires
    the *staff status* flag.
 
+Sessions are stored in the database and last two weeks (Django default
+`SESSION_COOKIE_AGE`). The *Log out* button is in the navigation bar.
+Expired sessions stay in the database until `python manage.py clearsessions`
+removes them.
+
 ### Devices
 
 Devices are added in the admin panel (Devices → Devices). The app talks to
@@ -247,10 +259,38 @@ canonical MQTT contract (`smart-home-mqtt`, `specs/payloads.md`):
 | `driver` | Device family handled by the gateway, e.g. `shelly`, `tasmota`, `w1`. The app does not check the list – a device with an unknown driver stays offline. |
 | `params` | Driver parameters as a JSON object, e.g. `{"prefix": "shelly/plug1", "component": "switch:0"}`. No passwords – devices log in to the broker themselves; keys that look like a secret (`pass`, `secret`, `token`) are rejected. |
 
-Sessions are stored in the database and last two weeks (Django default
-`SESSION_COOKIE_AGE`). The *Log out* button is in the navigation bar.
-Expired sessions stay in the database until `python manage.py clearsessions`
-removes them.
+The database is the source of the device configuration for the gateway.
+Saving a device publishes its retained `home/<slug>/config` (`kind`,
+`driver`, `params`); deleting it – also by deleting its location – clears
+`config`, `state`, `telemetry` and `availability` with empty retained
+messages. The broker gets the change after the database transaction
+commits. When the broker is unavailable, the change is saved anyway and the
+admin panel shows a warning. Bring the broker in line with the database:
+
+```bash
+python manage.py mqtt_sync --dry-run   # only compare
+python manage.py mqtt_sync             # publish missing and changed configs
+python manage.py mqtt_sync --prune     # also remove devices known only to the broker
+```
+
+The exit code is 2 when the broker is unavailable. `loaddata` does not
+publish anything – run `mqtt_sync` afterwards.
+
+Devices can also be imported from a JSON object (slug → device). The whole
+file is checked first and on any error nothing is saved; slugs already in
+the database are skipped; locations are created by name:
+
+```json
+{
+  "plug-1": {"name": "Plug", "location": "Living room", "kind": "switch",
+             "driver": "shelly", "params": {"prefix": "shelly/plug1", "component": "switch:0"}}
+}
+```
+
+```bash
+python manage.py import_devices devices.json             # "-" reads standard input
+python manage.py import_devices devices.json --location Home   # for entries without "location"
+```
 
 ## License
 

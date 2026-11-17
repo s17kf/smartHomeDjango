@@ -1,8 +1,8 @@
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
 
 from ..models import Device
-from .base import DeviceHelper, LocationHelper, User
+from .base import BrokerTestMixin, DeviceHelper, LocationHelper, User
 
 
 class DeviceAdminTests(TestCase):
@@ -46,3 +46,30 @@ class DeviceAdminTests(TestCase):
         device = DeviceHelper.create_device(self.location, 'plug')
         response = self.client.get(reverse('admin:devices_location_change', args=(self.location.pk,)))
         self.assertContains(response, device.slug)
+
+
+class DeviceAdminBrokerErrorTests(BrokerTestMixin, TransactionTestCase):
+    """Broker niedostępny: zapis i usunięcie się udają, admin ostrzega (publikacja po commicie)."""
+
+    def setUp(self):
+        super().setUp()
+        self.client.force_login(User.objects.create_superuser('admin'))
+        self.location = LocationHelper.create_location('room')
+        self.broker.error = 'connection refused'
+
+    def test_add_warns(self):
+        with self.assertLogs('devices.signals', 'WARNING'):
+            response = self.client.post(reverse('admin:devices_device_add'), {
+                'name': 'Plug', 'location': self.location.pk, 'slug': 'plug-1', 'kind': 'switch',
+                'driver': 'shelly', 'params': '{}',
+            }, follow=True)
+        self.assertTrue(Device.objects.filter(slug='plug-1').exists())
+        self.assertContains(response, 'did not reach the MQTT broker: connection refused')
+
+    def test_delete_warns(self):
+        with self.assertLogs('devices.signals', 'WARNING'):
+            device = DeviceHelper.create_device(self.location, 'plug')
+            response = self.client.post(reverse('admin:devices_device_delete', args=(device.pk,)),
+                                        {'post': 'yes'}, follow=True)
+        self.assertFalse(Device.objects.exists())
+        self.assertContains(response, 'mqtt_sync --prune')

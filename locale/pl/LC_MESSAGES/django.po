@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 02:15+0100\n"
+"POT-Creation-Date: 2026-11-17 02:34+0100\n"
 "PO-Revision-Date: 2024-09-15 11:47+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -19,6 +19,20 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<12 "
 "|| n%100>14) ? 1 : 2);\n"
 "X-Generator: Poedit 3.5\n"
+
+#: devices/admin.py:48
+#, python-format
+msgid ""
+"The device was saved, but its config did not reach the MQTT broker: "
+"%(error)s. Run \"manage.py mqtt_sync\" when the broker is available."
+msgstr "Urządzenie zapisane, ale jego konfiguracja nie dotarła do brokera MQTT: %(error)s. Uruchom „manage.py mqtt_sync”, gdy broker będzie dostępny."
+
+#: devices/admin.py:54
+#, python-format
+msgid ""
+"The device was deleted, but the MQTT broker still has its topics: %(error)s. "
+"Run \"manage.py mqtt_sync --prune\" when the broker is available."
+msgstr "Urządzenie usunięte, ale jego tematy zostały w brokerze MQTT: %(error)s. Uruchom „manage.py mqtt_sync --prune”, gdy broker będzie dostępny."
 
 #: devices/kinds.py:29
 msgid "expected true or false"
@@ -117,7 +131,9 @@ msgstr "Ulubione"
 msgid ""
 "Lowercase letters and digits, words separated by single hyphens, e.g. plug-"
 "living-room."
-msgstr "Małe litery i cyfry, słowa oddzielone pojedynczym łącznikiem, np. gniazdko-salon."
+msgstr ""
+"Małe litery i cyfry, słowa oddzielone pojedynczym łącznikiem, np. gniazdko-"
+"salon."
 
 #: devices/models.py:23
 msgid "Lowercase letters, digits and underscores, e.g. shelly."
@@ -132,13 +148,17 @@ msgstr "Parametry muszą być obiektem JSON."
 msgid ""
 "Parameters look like a secret: %(keys)s. Passwords do not belong in the "
 "device config."
-msgstr "Parametry wyglądają na sekret: %(keys)s. Hasła nie należą do konfiguracji urządzenia."
+msgstr ""
+"Parametry wyglądają na sekret: %(keys)s. Hasła nie należą do konfiguracji "
+"urządzenia."
 
 #: devices/models.py:69
 msgid ""
 "Device identifier in MQTT topics (home/&lt;slug&gt;/…). Cannot be changed "
 "later."
-msgstr "Identyfikator urządzenia w tematach MQTT (home/&lt;slug&gt;/…). Nie można go później zmienić."
+msgstr ""
+"Identyfikator urządzenia w tematach MQTT (home/&lt;slug&gt;/…). Nie można go "
+"później zmienić."
 
 #: devices/models.py:74
 msgid "Device family handled by the gateway: shelly, tasmota, w1."
@@ -149,7 +169,10 @@ msgid ""
 "Driver parameters, e.g. shelly: {\"prefix\": \"shelly/plug1\", "
 "\"component\": \"switch:0\"}; tasmota: {\"topic\": \"nous1\"}; w1: "
 "{\"sensor\": \"28-00000a99077c\", \"interval_s\": 60}."
-msgstr "Parametry sterownika, np. shelly: {\"prefix\": \"shelly/plug1\", \"component\": \"switch:0\"}; tasmota: {\"topic\": \"nous1\"}; w1: {\"sensor\": \"28-00000a99077c\", \"interval_s\": 60}."
+msgstr ""
+"Parametry sterownika, np. shelly: {\"prefix\": \"shelly/plug1\", "
+"\"component\": \"switch:0\"}; tasmota: {\"topic\": \"nous1\"}; w1: "
+"{\"sensor\": \"28-00000a99077c\", \"interval_s\": 60}."
 
 #: devices/models.py:104
 msgid "The slug cannot be changed – create a new device instead."
@@ -184,11 +207,11 @@ msgstr "Powrót do listy lokalizacji"
 msgid "No locations available."
 msgstr "Brak miejsc do wyświetlenia."
 
-#: smartHomeSite/settings.py:185
+#: smartHomeSite/settings.py:212
 msgid "English"
 msgstr "angielski"
 
-#: smartHomeSite/settings.py:186
+#: smartHomeSite/settings.py:213
 msgid "Polish"
 msgstr "polski"
 

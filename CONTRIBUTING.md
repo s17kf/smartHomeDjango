@@ -45,6 +45,11 @@ projektu – trzymamy tu kod aplikacji i ustalenia o niej samej.
   w bazie); `kind` – rodzaj z kontraktu (`devices/kinds.py`, `smart-home-mqtt`
   `specs/payloads.md`); `driver` i `params` – trafiają do `config`
   w brokerze, sprawdza je gateway. W `params` bez haseł.
+- Baza jest źródłem konfiguracji urządzeń w brokerze: sygnały modelu
+  (`devices/signals.py`) publikują `config` po zapisie i czyszczą tematy
+  po usunięciu, po zatwierdzeniu transakcji. Urządzeń nie zmieniamy przez
+  `QuerySet.update()` (bez sygnałów). Publikacja przez krótkie połączenie
+  (`devices/mqtt.py`) – bez stałego klienta MQTT w procesach gunicorna.
 - Reguły automatyzacji to osobny model, niezależny od typu urządzenia:
   przypięty do urządzenia, z `target_state` walidowanym per rodzaj
   urządzenia.
@@ -53,7 +58,8 @@ projektu – trzymamy tu kod aplikacji i ustalenia o niej samej.
 - Baza: PostgreSQL. Bez kodu zależnego od silnika bazy (surowy SQL, funkcje
   tylko jednego silnika), dopóki nie będzie naprawdę potrzebny.
 - Konfiguracja ze zmiennych środowiskowych (`DJANGO_SECRET_KEY`,
-  `DJANGO_DEBUG`, `DJANGO_ALLOWED_HOSTS`, `DATABASE_URL`, `DJANGO_HTTPS`) –
+  `DJANGO_DEBUG`, `DJANGO_ALLOWED_HOSTS`, `DATABASE_URL`, `DJANGO_HTTPS`,
+  `MQTT_HOST`, `MQTT_PORT`, `MQTT_BACKEND_USER`, `MQTT_BACKEND_PASSWORD`) –
   lista i wartości domyślne w README (sekcja Configuration), nowe zmienne
   dopisujemy tam.
 - HTTPS kończy reverse proxy (Caddy), aplikacja mówi zwykłym HTTP.
@@ -148,8 +154,14 @@ rozwijamy jej – poprawiamy tylko wtedy, gdy blokuje bieżącą pracę:
   (bez `DJANGO_SECRET_KEY` ustawienia wymagają trybu debug; Django zakłada
   i usuwa osobną bazę `test_<nazwa>`). Nowe widoki i logika reguł / harmonogramów
   – z testami. Testy widoków dziedziczą po `LoggedInTestCase` z
-  `devices/tests/base.py` (klient zalogowany jako zwykły użytkownik); test `LoginRequiredTests` sprawdza
-  przekierowanie na logowanie dla wszystkich adresów `devices`.
+  `devices/tests/base.py` (klient zalogowany jako zwykły użytkownik); test
+  `LoginRequiredTests` sprawdza przekierowanie na logowanie dla wszystkich
+  adresów `devices`.
+- Testy nie łączą się z brokerem MQTT: runner (`devices/tests/runner.py`)
+  podmienia go na `MemoryBroker` (retained jak w Mosquitto, lista publikacji).
+  Testy publikacji dziedziczą po `BrokerTestMixin` (czysty broker
+  w `self.broker`), a publikację po zatwierdzeniu transakcji uruchamia
+  `captureOnCommitCallbacks(execute=True)`.
 - Zależności przypięte do wersji (`==`) w `requirements.txt`. Przed dodaniem
   nowej sprawdzamy, czy działa na arm64 i ile kosztuje w RAM.
 

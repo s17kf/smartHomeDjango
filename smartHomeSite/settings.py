@@ -38,6 +38,22 @@ def env_list(name):
     return [item.strip() for item in os.environ.get(name, '').split(',') if item.strip()]
 
 
+def env_str(name, default):
+    """Napis ze zmiennej środowiskowej; pusta wartość (np. `NAZWA=` w pliku env) = domyślna."""
+    return os.environ.get(name, '').strip() or default
+
+
+def env_int(name, default, low, high):
+    value = env_str(name, str(default))
+    try:
+        number = int(value)
+    except ValueError:
+        raise ImproperlyConfigured(f'{name}: expected an integer, got {value!r}') from None
+    if not low <= number <= high:
+        raise ImproperlyConfigured(f'{name}: allowed range {low}–{high}, got {number}')
+    return number
+
+
 # Konfiguracja zależna od środowiska pochodzi ze zmiennych środowiskowych –
 # lista i znaczenie w README (sekcja Configuration).
 # Lista kontrolna wdrożenia: https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
@@ -63,6 +79,17 @@ ALLOWED_HOSTS = env_list('DJANGO_ALLOWED_HOSTS')
 # przekierowałby też healthcheck łączący się bezpośrednio po HTTP).
 HTTPS = env_bool('DJANGO_HTTPS')
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') if HTTPS else None
+
+# Broker MQTT (`devices/mqtt.py`). Nazwy zmiennych jak we wspólnym pliku env
+# całego stosu – stąd prefiks BACKEND przy koncie. Bez hasła strony działają,
+# a publikacja (np. `config` po zapisie urządzenia) kończy się błędem.
+MQTT_HOST = env_str('MQTT_HOST', 'localhost')
+MQTT_PORT = env_int('MQTT_PORT', 1883, 1, 65535)
+MQTT_USER = env_str('MQTT_BACKEND_USER', 'backend')
+MQTT_PASSWORD = os.environ.get('MQTT_BACKEND_PASSWORD', '')
+# Implementacja brokera – w testach podmienia ją runner (broker w pamięci).
+MQTT_BROKER = 'devices.mqtt.MqttBroker'
+TEST_RUNNER = 'devices.tests.runner.TestRunner'
 SESSION_COOKIE_SECURE = CSRF_COOKIE_SECURE = HTTPS
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static_root')

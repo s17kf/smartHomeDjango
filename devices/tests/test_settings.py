@@ -118,3 +118,29 @@ class HttpsBehindProxyTests(TestCase):
         response = self.client.get(reverse('login'))
         self.assertEqual(response.status_code, 200)
         self.assertFalse(response.wsgi_request.is_secure())
+
+
+class MqttSettingsTests(SimpleTestCase):
+    """Zmienne MQTT_* – nazwy jak we wspólnym pliku env stosu; pusta wartość = domyślna."""
+
+    def mqtt_settings(self, **env):
+        namespace = settings_from_env(**env)
+        return {name: namespace[name] for name in ('MQTT_HOST', 'MQTT_PORT', 'MQTT_USER', 'MQTT_PASSWORD')}
+
+    def test_defaults(self):
+        unset = dict.fromkeys(('MQTT_HOST', 'MQTT_PORT', 'MQTT_BACKEND_USER', 'MQTT_BACKEND_PASSWORD'))
+        self.assertEqual(self.mqtt_settings(**unset), {
+            'MQTT_HOST': 'localhost', 'MQTT_PORT': 1883, 'MQTT_USER': 'backend', 'MQTT_PASSWORD': '',
+        })
+        self.assertEqual(self.mqtt_settings(MQTT_HOST='', MQTT_PORT='')['MQTT_PORT'], 1883)
+
+    def test_from_env(self):
+        self.assertEqual(self.mqtt_settings(MQTT_HOST='mosquitto', MQTT_PORT='1884',
+                                            MQTT_BACKEND_USER='django', MQTT_BACKEND_PASSWORD='secret'), {
+            'MQTT_HOST': 'mosquitto', 'MQTT_PORT': 1884, 'MQTT_USER': 'django', 'MQTT_PASSWORD': 'secret',
+        })
+
+    def test_invalid_port(self):
+        for port in ('abc', '0', '70000'):
+            with self.subTest(port=port), self.assertRaises(ImproperlyConfigured):
+                settings_from_env(MQTT_PORT=port)
