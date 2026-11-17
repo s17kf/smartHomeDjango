@@ -1,4 +1,7 @@
+from datetime import timedelta
+
 from django import template
+from django.utils import timezone
 from django.utils.formats import number_format
 from django.utils.timesince import timesince
 from django.utils.translation import gettext as _
@@ -32,9 +35,11 @@ def reading(value):
 
 @register.filter
 def ago(moment):
-    """Ile czasu minęło – jedna jednostka („3 minuty temu”)."""
+    """Ile czasu minęło – jedna jednostka („3 minuty temu”), poniżej minuty „przed chwilą”."""
     if not moment:
         return ''
+    if timezone.now() - moment < timedelta(minutes=1):
+        return _('just now')
     return _('%(time)s ago') % {'time': timesince(moment, depth=1)}
 
 

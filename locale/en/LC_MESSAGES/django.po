@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 20:04+0100\n"
+"POT-Creation-Date: 2026-11-17 20:24+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -295,7 +295,11 @@ msgstr ""
 msgid "No locations available."
 msgstr ""
 
-#: devices/templatetags/devices_extras.py:38
+#: devices/templatetags/devices_extras.py:42
+msgid "just now"
+msgstr ""
+
+#: devices/templatetags/devices_extras.py:43
 #, python-format
 msgid "%(time)s ago"
 msgstr ""

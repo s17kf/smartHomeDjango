@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 20:04+0100\n"
+"POT-Creation-Date: 2026-11-17 20:24+0100\n"
 "PO-Revision-Date: 2024-09-15 11:47+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -310,7 +310,11 @@ msgstr "Powrót do listy lokalizacji"
 msgid "No locations available."
 msgstr "Brak miejsc do wyświetlenia."
 
-#: devices/templatetags/devices_extras.py:38
+#: devices/templatetags/devices_extras.py:42
+msgid "just now"
+msgstr "przed chwilą"
+
+#: devices/templatetags/devices_extras.py:43
 #, python-format
 msgid "%(time)s ago"
 msgstr "%(time)s temu"

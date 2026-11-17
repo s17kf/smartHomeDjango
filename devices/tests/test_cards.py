@@ -199,3 +199,5 @@ class ReadingFilterTests(SimpleTestCase):
         with translation.override('en'):
             self.assertEqual(ago(timezone.now() - timedelta(hours=6, minutes=35)), '6\xa0hours ago')
         self.assertEqual(ago(None), '')
+        with translation.override('en'):
+            self.assertEqual(ago(timezone.now() - timedelta(seconds=20)), 'just now')
