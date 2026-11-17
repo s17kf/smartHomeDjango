@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 02:03+0100\n"
+"POT-Creation-Date: 2026-11-17 02:15+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,91 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: devices/kinds.py:29
+msgid "expected true or false"
+msgstr ""
+
+#: devices/kinds.py:40
+msgid "expected an integer"
+msgstr ""
+
+#: devices/kinds.py:42
+#, python-format
+msgid "allowed range %(low)s–%(high)s"
+msgstr ""
+
+#: devices/kinds.py:52
+#, python-format
+msgid "allowed values: %(values)s"
+msgstr ""
+
+#: devices/kinds.py:60
+msgid "expected [r, g, b], each component 0–255"
+msgstr ""
+
+#: devices/kinds.py:66
+msgid "expected a number of seconds ≥ 0"
+msgstr ""
+
+#: devices/kinds.py:80
+msgid "Power"
+msgstr ""
+
+#: devices/kinds.py:81
+msgid "Energy"
+msgstr ""
+
+#: devices/kinds.py:82
+msgid "Voltage"
+msgstr ""
+
+#: devices/kinds.py:83
+msgid "Current"
+msgstr ""
+
+#: devices/kinds.py:84
+msgid "Device temperature"
+msgstr ""
+
+#: devices/kinds.py:85
+msgid "Temperature"
+msgstr ""
+
+#: devices/kinds.py:86
+msgid "Humidity"
+msgstr ""
+
+#: devices/kinds.py:115
+#, python-format
+msgid "kind %(kind)s does not accept commands"
+msgstr ""
+
+#: devices/kinds.py:117
+msgid "expected a JSON object"
+msgstr ""
+
+#: devices/kinds.py:120
+#, python-format
+msgid "fields outside kind %(kind)s: %(fields)s"
+msgstr ""
+
+#: devices/kinds.py:124
+#, python-format
+msgid "nothing to change – allowed fields: %(fields)s"
+msgstr ""
+
+#: devices/kinds.py:135
+msgid "Switch"
+msgstr ""
+
+#: devices/kinds.py:144
+msgid "RGBCCT light"
+msgstr ""
+
+#: devices/kinds.py:159
+msgid "Sensor"
+msgstr ""
 
 #: devices/menus.py:5 devices/templates/devices/location_list.html:6
 msgid "Locations"
@@ -27,39 +112,45 @@ msgid "Favourites"
 msgstr ""
 
 #: devices/models.py:16
-msgid "Relay"
+msgid ""
+"Lowercase letters and digits, words separated by single hyphens, e.g. plug-"
+"living-room."
 msgstr ""
 
-#: devices/models.py:17
-msgid "Periodic relay"
+#: devices/models.py:23
+msgid "Lowercase letters, digits and underscores, e.g. shelly."
+msgstr ""
+
+#: devices/models.py:45 devices/models.py:101
+msgid "Parameters must be a JSON object."
+msgstr ""
+
+#: devices/models.py:49
+#, python-format
+msgid ""
+"Parameters look like a secret: %(keys)s. Passwords do not belong in the "
+"device config."
 msgstr ""
 
 #: devices/models.py:69
-msgid "Monday"
-msgstr ""
-
-#: devices/models.py:70
-msgid "Tuesday"
-msgstr ""
-
-#: devices/models.py:71
-msgid "Wednesday"
-msgstr ""
-
-#: devices/models.py:72
-msgid "Thursday"
-msgstr ""
-
-#: devices/models.py:73
-msgid "Friday"
+msgid ""
+"Device identifier in MQTT topics (home/&lt;slug&gt;/…). Cannot be changed "
+"later."
 msgstr ""
 
 #: devices/models.py:74
-msgid "Saturday"
+msgid "Device family handled by the gateway: shelly, tasmota, w1."
 msgstr ""
 
-#: devices/models.py:75
-msgid "Sunday"
+#: devices/models.py:78
+msgid ""
+"Driver parameters, e.g. shelly: {\"prefix\": \"shelly/plug1\", "
+"\"component\": \"switch:0\"}; tasmota: {\"topic\": \"nous1\"}; w1: "
+"{\"sensor\": \"28-00000a99077c\", \"interval_s\": 60}."
+msgstr ""
+
+#: devices/models.py:104
+msgid "The slug cannot be changed – create a new device instead."
 msgstr ""
 
 #: devices/templates/devices/base.html:31

@@ -234,6 +234,19 @@ contains password hashes – delete it afterwards.
    users need no special permissions to use the app; the admin panel requires
    the *staff status* flag.
 
+### Devices
+
+Devices are added in the admin panel (Devices → Devices). The app talks to
+them only through the MQTT gateway, so a device is described in terms of the
+canonical MQTT contract (`smart-home-mqtt`, `specs/payloads.md`):
+
+| Field | Meaning |
+|---|---|
+| `slug` | Identifier in the MQTT topics `home/<slug>/…`: lowercase letters and digits, words separated by single hyphens, at most 50 characters, e.g. `plug-living-room`. It cannot be changed after the device is created – a new slug means new topics. |
+| `kind` | `switch` – on/off output (a plug or a relay; power readings when the device measures them), `light_rgbcct` – light with colour and white, `sensor` – measurements only, no commands. |
+| `driver` | Device family handled by the gateway, e.g. `shelly`, `tasmota`, `w1`. The app does not check the list – a device with an unknown driver stays offline. |
+| `params` | Driver parameters as a JSON object, e.g. `{"prefix": "shelly/plug1", "component": "switch:0"}`. No passwords – devices log in to the broker themselves; keys that look like a secret (`pass`, `secret`, `token`) are rejected. |
+
 Sessions are stored in the database and last two weeks (Django default
 `SESSION_COOKIE_AGE`). The *Log out* button is in the navigation bar.
 Expired sessions stay in the database until `python manage.py clearsessions`

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 02:03+0100\n"
+"POT-Creation-Date: 2026-11-17 02:15+0100\n"
 "PO-Revision-Date: 2024-09-15 11:47+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -20,6 +20,91 @@ msgstr ""
 "|| n%100>14) ? 1 : 2);\n"
 "X-Generator: Poedit 3.5\n"
 
+#: devices/kinds.py:29
+msgid "expected true or false"
+msgstr "oczekiwano true albo false"
+
+#: devices/kinds.py:40
+msgid "expected an integer"
+msgstr "oczekiwano liczby całkowitej"
+
+#: devices/kinds.py:42
+#, python-format
+msgid "allowed range %(low)s–%(high)s"
+msgstr "dozwolony zakres %(low)s–%(high)s"
+
+#: devices/kinds.py:52
+#, python-format
+msgid "allowed values: %(values)s"
+msgstr "dozwolone wartości: %(values)s"
+
+#: devices/kinds.py:60
+msgid "expected [r, g, b], each component 0–255"
+msgstr "oczekiwano [r, g, b], każda składowa 0–255"
+
+#: devices/kinds.py:66
+msgid "expected a number of seconds ≥ 0"
+msgstr "oczekiwano liczby sekund ≥ 0"
+
+#: devices/kinds.py:80
+msgid "Power"
+msgstr "Moc"
+
+#: devices/kinds.py:81
+msgid "Energy"
+msgstr "Energia"
+
+#: devices/kinds.py:82
+msgid "Voltage"
+msgstr "Napięcie"
+
+#: devices/kinds.py:83
+msgid "Current"
+msgstr "Prąd"
+
+#: devices/kinds.py:84
+msgid "Device temperature"
+msgstr "Temperatura urządzenia"
+
+#: devices/kinds.py:85
+msgid "Temperature"
+msgstr "Temperatura"
+
+#: devices/kinds.py:86
+msgid "Humidity"
+msgstr "Wilgotność"
+
+#: devices/kinds.py:115
+#, python-format
+msgid "kind %(kind)s does not accept commands"
+msgstr "rodzaj %(kind)s nie przyjmuje poleceń"
+
+#: devices/kinds.py:117
+msgid "expected a JSON object"
+msgstr "oczekiwano obiektu JSON"
+
+#: devices/kinds.py:120
+#, python-format
+msgid "fields outside kind %(kind)s: %(fields)s"
+msgstr "pola spoza rodzaju %(kind)s: %(fields)s"
+
+#: devices/kinds.py:124
+#, python-format
+msgid "nothing to change – allowed fields: %(fields)s"
+msgstr "brak pól do zmiany – dozwolone: %(fields)s"
+
+#: devices/kinds.py:135
+msgid "Switch"
+msgstr "Przełącznik"
+
+#: devices/kinds.py:144
+msgid "RGBCCT light"
+msgstr "Światło RGBCCT"
+
+#: devices/kinds.py:159
+msgid "Sensor"
+msgstr "Czujnik"
+
 #: devices/menus.py:5 devices/templates/devices/location_list.html:6
 msgid "Locations"
 msgstr "Miejsca"
@@ -29,40 +114,46 @@ msgid "Favourites"
 msgstr "Ulubione"
 
 #: devices/models.py:16
-msgid "Relay"
-msgstr "Przekaźnik"
+msgid ""
+"Lowercase letters and digits, words separated by single hyphens, e.g. plug-"
+"living-room."
+msgstr "Małe litery i cyfry, słowa oddzielone pojedynczym łącznikiem, np. gniazdko-salon."
 
-#: devices/models.py:17
-msgid "Periodic relay"
-msgstr "Przekaźnik okresowy"
+#: devices/models.py:23
+msgid "Lowercase letters, digits and underscores, e.g. shelly."
+msgstr "Małe litery, cyfry i podkreślenia, np. shelly."
+
+#: devices/models.py:45 devices/models.py:101
+msgid "Parameters must be a JSON object."
+msgstr "Parametry muszą być obiektem JSON."
+
+#: devices/models.py:49
+#, python-format
+msgid ""
+"Parameters look like a secret: %(keys)s. Passwords do not belong in the "
+"device config."
+msgstr "Parametry wyglądają na sekret: %(keys)s. Hasła nie należą do konfiguracji urządzenia."
 
 #: devices/models.py:69
-msgid "Monday"
-msgstr "Poniedziałek"
-
-#: devices/models.py:70
-msgid "Tuesday"
-msgstr "Wtorek"
-
-#: devices/models.py:71
-msgid "Wednesday"
-msgstr "Środa"
-
-#: devices/models.py:72
-msgid "Thursday"
-msgstr "Czwartek"
-
-#: devices/models.py:73
-msgid "Friday"
-msgstr "Piątek"
+msgid ""
+"Device identifier in MQTT topics (home/&lt;slug&gt;/…). Cannot be changed "
+"later."
+msgstr "Identyfikator urządzenia w tematach MQTT (home/&lt;slug&gt;/…). Nie można go później zmienić."
 
 #: devices/models.py:74
-msgid "Saturday"
-msgstr "Sobota"
+msgid "Device family handled by the gateway: shelly, tasmota, w1."
+msgstr "Rodzina urządzeń obsługiwana przez gateway: shelly, tasmota, w1."
 
-#: devices/models.py:75
-msgid "Sunday"
-msgstr "Niedziela"
+#: devices/models.py:78
+msgid ""
+"Driver parameters, e.g. shelly: {\"prefix\": \"shelly/plug1\", "
+"\"component\": \"switch:0\"}; tasmota: {\"topic\": \"nous1\"}; w1: "
+"{\"sensor\": \"28-00000a99077c\", \"interval_s\": 60}."
+msgstr "Parametry sterownika, np. shelly: {\"prefix\": \"shelly/plug1\", \"component\": \"switch:0\"}; tasmota: {\"topic\": \"nous1\"}; w1: {\"sensor\": \"28-00000a99077c\", \"interval_s\": 60}."
+
+#: devices/models.py:104
+msgid "The slug cannot be changed – create a new device instead."
+msgstr "Sluga nie można zmienić – dodaj nowe urządzenie."
 
 #: devices/templates/devices/base.html:31
 msgid "Smart home"
@@ -109,6 +200,33 @@ msgstr "Zaloguj"
 #: templates/registration/login.html:68
 msgid "Accounts are created by the administrator."
 msgstr "Konta zakłada administrator."
+
+#~ msgid "Relay"
+#~ msgstr "Przekaźnik"
+
+#~ msgid "Periodic relay"
+#~ msgstr "Przekaźnik okresowy"
+
+#~ msgid "Monday"
+#~ msgstr "Poniedziałek"
+
+#~ msgid "Tuesday"
+#~ msgstr "Wtorek"
+
+#~ msgid "Wednesday"
+#~ msgstr "Środa"
+
+#~ msgid "Thursday"
+#~ msgstr "Czwartek"
+
+#~ msgid "Friday"
+#~ msgstr "Piątek"
+
+#~ msgid "Saturday"
+#~ msgstr "Sobota"
+
+#~ msgid "Sunday"
+#~ msgstr "Niedziela"
 
 #~ msgid "Active days:"
 #~ msgstr "Aktywne dni: "

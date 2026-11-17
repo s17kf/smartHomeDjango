@@ -37,9 +37,14 @@ projektu – trzymamy tu kod aplikacji i ustalenia o niej samej.
   działała ochrona CSRF). Adres powrotu z formularza (`next`) bierzemy przez
   `get_next_url`, która nie przepuszcza adresów spoza strony.
 - Panel admina Django służy do zarządzania urządzeniami i lokalizacjami.
-- Sterowanie urządzeniami: komendy na `home/<id>/set`, stan z `…/state`,
+- Sterowanie urządzeniami: komendy na `home/<slug>/set`, stan z `…/state`,
   `…/telemetry` i `…/availability`. Nie dopisujemy kodu, który komunikuje się
   z urządzeniami bezpośrednio (GPIO, HTTP do urządzeń).
+- Urządzenie: `slug` – identyfikator w tematach MQTT (`[a-z0-9]+(-[a-z0-9]+)*`,
+  najwyżej 50 znaków), niezmienny po utworzeniu (`pk` zostaje kluczem
+  w bazie); `kind` – rodzaj z kontraktu (`devices/kinds.py`, `smart-home-mqtt`
+  `specs/payloads.md`); `driver` i `params` – trafiają do `config`
+  w brokerze, sprawdza je gateway. W `params` bez haseł.
 - Reguły automatyzacji to osobny model, niezależny od typu urządzenia:
   przypięty do urządzenia, z `target_state` walidowanym per rodzaj
   urządzenia.
@@ -63,9 +68,6 @@ projektu – trzymamy tu kod aplikacji i ustalenia o niej samej.
 Część kodu powstała przed przejściem na MQTT i zostanie zastąpiona. Nie
 rozwijamy jej – poprawiamy tylko wtedy, gdy blokuje bieżącą pracę:
 
-- pola `Device.type` i `Device.config_file` oraz modele `RelayPeriodic*` –
-  bez użycia w kodzie; zastąpi je model urządzenia dla MQTT (slug, rodzaj,
-  sterownik, parametry), a harmonogram przechodzi do reguł automatyzacji,
 - jQuery (`devices/static/devices/vendor/jquery/`) – interaktywność
   przechodzi na HTMX.
 
@@ -94,11 +96,14 @@ rozwijamy jej – poprawiamy tylko wtedy, gdy blokuje bieżącą pracę:
 
 ### `devices/`
 
-- Modele, widoki, `urls.py`, admin i menu.
+- Modele, widoki, `urls.py`, admin i menu; rodzaje urządzeń (pola `set`,
+  `state`, `telemetry`) w `kinds.py`.
 - Szablony w `templates/devices/`.
 - Statyki w `static/devices/`, biblioteki zewnętrzne w
   `static/devices/vendor/` ([Biblioteki frontendowe](#biblioteki-frontendowe)),
-  komendy zarządzania w `management/commands/`, testy w `tests.py`.
+  komendy zarządzania w `management/commands/`.
+- Testy w pakiecie `tests/`: moduł na obszar (`test_models.py`,
+  `test_views.py`, …), wspólne pomoce w `tests/base.py`.
 
 ### `templates/`
 
@@ -142,8 +147,8 @@ rozwijamy jej – poprawiamy tylko wtedy, gdy blokuje bieżącą pracę:
 - Testy: `DJANGO_DEBUG=true DATABASE_URL=postgres://… python manage.py test`
   (bez `DJANGO_SECRET_KEY` ustawienia wymagają trybu debug; Django zakłada
   i usuwa osobną bazę `test_<nazwa>`). Nowe widoki i logika reguł / harmonogramów
-  – z testami. Testy widoków dziedziczą po `LoggedInTestCase` (klient
-  zalogowany jako zwykły użytkownik); test `LoginRequiredTests` sprawdza
+  – z testami. Testy widoków dziedziczą po `LoggedInTestCase` z
+  `devices/tests/base.py` (klient zalogowany jako zwykły użytkownik); test `LoginRequiredTests` sprawdza
   przekierowanie na logowanie dla wszystkich adresów `devices`.
 - Zależności przypięte do wersji (`==`) w `requirements.txt`. Przed dodaniem
   nowej sprawdzamy, czy działa na arm64 i ile kosztuje w RAM.
