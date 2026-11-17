@@ -50,6 +50,12 @@ projektu – trzymamy tu kod aplikacji i ustalenia o niej samej.
   po usunięciu, po zatwierdzeniu transakcji. Urządzeń nie zmieniamy przez
   `QuerySet.update()` (bez sygnałów). Publikacja przez krótkie połączenie
   (`devices/mqtt.py`) – bez stałego klienta MQTT w procesach gunicorna.
+- Jedyny stały klient MQTT to worker (`manage.py mqtt_worker`,
+  `devices/worker.py`): subskrybuje stany, zapisuje cache (`DeviceState`
+  po slugu, bez klucza obcego; `SystemStatus` z heartbeatem) i po każdym
+  połączeniu synchronizuje `config` z bazą. Widoki czytają stan z cache,
+  nie z brokera. Logika workera (`Worker`) nie zależy od pętli paho –
+  testy podają jej wiadomości wprost.
 - Reguły automatyzacji to osobny model, niezależny od typu urządzenia:
   przypięty do urządzenia, z `target_state` walidowanym per rodzaj
   urządzenia.

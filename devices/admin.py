@@ -2,7 +2,7 @@ from django.contrib import admin, messages
 from django.db import transaction
 from django.utils.translation import gettext as _
 
-from .models import Location, Device
+from .models import Location, Device, DeviceState, SystemStatus
 
 
 class DeviceInline(admin.TabularInline):
@@ -58,3 +58,27 @@ class DeviceAdmin(admin.ModelAdmin):
         error = getattr(obj, 'mqtt_error', None)
         if error:
             self.message_user(request, message % {'error': error}, messages.WARNING)
+
+
+class ReadOnlyAdmin(admin.ModelAdmin):
+    """Cache z brokera – zapisuje go worker MQTT; w adminie tylko podgląd."""
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+@admin.register(DeviceState)
+class DeviceStateAdmin(ReadOnlyAdmin):
+    list_display = ['slug', 'availability', 'state', 'state_ts', 'telemetry_ts', 'updated_at']
+    search_fields = ['slug']
+
+
+@admin.register(SystemStatus)
+class SystemStatusAdmin(ReadOnlyAdmin):
+    list_display = ['gateway_status', 'worker_connected', 'worker_seen_at', 'updated_at']

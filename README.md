@@ -203,8 +203,8 @@ docker run --rm -p 8000:8000 \
 
 - The default command (`gunicorn`) applies database migrations first. Any
   other command runs without migrations, so only one container migrates the
-  database, e.g.:
-  `docker run … smart-home-django python manage.py check --deploy`.
+  database, e.g. the MQTT worker:
+  `docker run … smart-home-django python manage.py mqtt_worker`.
 - gunicorn settings are in `gunicorn.conf.py`: 2 worker processes, request
   log on stdout. Change them without rebuilding with `WEB_CONCURRENCY`
   (number of processes) or `GUNICORN_CMD_ARGS` (any gunicorn option, e.g.
@@ -275,6 +275,22 @@ python manage.py mqtt_sync --prune     # also remove devices known only to the b
 
 The exit code is 2 when the broker is unavailable. `loaddata` does not
 publish anything – run `mqtt_sync` afterwards.
+
+The state of the devices comes from the MQTT worker – a separate,
+long-running process (one per installation, MQTT client id
+`backend-worker`):
+
+```bash
+python manage.py mqtt_worker   # stops on SIGTERM / Ctrl+C
+```
+
+It keeps a cache of the latest `state`, `telemetry` and `availability` of
+every device and of `gateway/status` in the database (visible read-only in
+the admin panel: Device states, System status), reconnects to the broker on
+its own and after every connection publishes missing or changed device
+configs, like `mqtt_sync` without `--prune`. A heartbeat every 30 s tells the
+pages whether the cached data is current. Without the worker the pages and
+the admin panel still work, but show no device state.
 
 Devices can also be imported from a JSON object (slug → device). The whole
 file is checked first and on any error nothing is saved; slugs already in

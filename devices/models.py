@@ -110,3 +110,43 @@ class Device(models.Model):
         if stored is not None and stored != self.slug:
             raise ValueError(f'slug of device {self.pk} cannot change ({stored!r} → {self.slug!r})')
         super().save(*args, **kwargs)
+
+
+class DeviceState(models.Model):
+    """Ostatni stan, pomiary i dostępność urządzenia z brokera (cache, zapisuje worker MQTT).
+
+    Kluczem jest slug, nie urządzenie: retained stan urządzenia, które powstanie
+    w Django później (np. przy imporcie), jest w cache od razu. `state`
+    i `telemetry` bez pola `ts` – czas wiadomości w `*_ts` (UTC).
+    """
+    slug = models.SlugField(max_length=50, unique=True)
+    state = models.JSONField(null=True, blank=True)
+    state_ts = models.DateTimeField(null=True, blank=True)
+    telemetry = models.JSONField(null=True, blank=True)
+    telemetry_ts = models.DateTimeField(null=True, blank=True)
+    availability = models.CharField(max_length=10, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['slug']
+
+    def __str__(self):
+        return self.slug
+
+
+class SystemStatus(models.Model):
+    """Jeden wiersz (pk=1): status gatewaya z `gateway/status` i stan workera MQTT."""
+    gateway_status = models.CharField(max_length=10, blank=True)
+    worker_connected = models.BooleanField(default=False)
+    worker_seen_at = models.DateTimeField(null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = 'system status'
+
+    def __str__(self):
+        return 'system status'
+
+    @classmethod
+    def get(cls):
+        return cls.objects.get_or_create(pk=1)[0]
