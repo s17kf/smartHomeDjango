@@ -1,0 +1,12 @@
+{% extends 'devices/cards/base.html' %}
+{% load i18n devices_extras %}
+{% block icon %}thermometer-half{% endblock %}
+{% block body %}
+    {% for reading in status.card_readings %}
+        <div class="fs-3">{{ reading.value|reading }} {{ reading.unit }}</div>
+        <div class="small text-secondary">{{ reading.label }}</div>
+    {% empty %}
+        <span class="text-secondary">{% trans "No readings yet" %}</span>
+    {% endfor %}
+{% endblock %}
+{% block readings %}{% endblock %}

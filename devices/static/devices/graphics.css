@@ -11,3 +11,12 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+/* Kolor światła RGB na karcie urządzenia */
+.color-swatch {
+  display: inline-block;
+  width: 1.2em;
+  height: 1.2em;
+  border-radius: 50%;
+  border: 1px solid #888;
+}

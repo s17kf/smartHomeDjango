@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 02:34+0100\n"
+"POT-Creation-Date: 2026-11-17 19:36+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -167,28 +167,100 @@ msgstr ""
 msgid "The slug cannot be changed – create a new device instead."
 msgstr ""
 
-#: devices/templates/devices/base.html:31
+#: devices/status.py:24
+msgid "no data from the MQTT worker"
+msgstr ""
+
+#: devices/status.py:25
+msgid "gateway offline"
+msgstr ""
+
+#: devices/status.py:26
+msgid "device offline"
+msgstr ""
+
+#: devices/status.py:27
+msgid "no data from the device yet"
+msgstr ""
+
+#: devices/templates/devices/base.html:32
 msgid "Smart home"
 msgstr ""
 
-#: devices/templates/devices/base.html:58
+#: devices/templates/devices/base.html:59
 msgid "Log out"
+msgstr ""
+
+#: devices/templates/devices/cards/base.html:10
+msgid "online"
+msgstr ""
+
+#: devices/templates/devices/cards/base.html:12
+msgid "unavailable"
+msgstr ""
+
+#: devices/templates/devices/cards/light_rgbcct.html:8
+#: devices/templates/devices/cards/switch.html:7
+msgid "ON"
+msgstr ""
+
+#: devices/templates/devices/cards/light_rgbcct.html:10
+#: devices/templates/devices/cards/switch.html:9
+msgid "OFF"
+msgstr ""
+
+#: devices/templates/devices/cards/light_rgbcct.html:15
+#: devices/templates/devices/cards/light_rgbcct.html:16
+msgid "Colour"
+msgstr ""
+
+#: devices/templates/devices/cards/light_rgbcct.html:18
+msgid "White"
+msgstr ""
+
+#: devices/templates/devices/cards/light_rgbcct.html:22
+#: devices/templates/devices/cards/switch.html:12
+msgid "State unknown"
+msgstr ""
+
+#: devices/templates/devices/cards/sensor.html:9
+msgid "No readings yet"
 msgstr ""
 
 #: devices/templates/devices/device.html:10
 msgid "Back to location"
 msgstr ""
 
+#: devices/templates/devices/device.html:21
+msgid "Kind"
+msgstr ""
+
+#: devices/templates/devices/device.html:22
+msgid "MQTT topics"
+msgstr ""
+
+#: devices/templates/devices/device.html:23
+msgid "Driver"
+msgstr ""
+
+#: devices/templates/devices/device.html:31
+msgid "State reported"
+msgstr ""
+
+#: devices/templates/devices/device.html:34
+msgid "Measured"
+msgstr ""
+
 #: devices/templates/devices/favourites.html:18
 msgid "Add favourite devices."
 msgstr ""
 
-#: devices/templates/devices/location.html:30
+#: devices/templates/devices/location.html:19
 #, python-format
 msgid "No devices available in %(name)s."
 msgstr ""
 
-#: devices/templates/devices/location.html:35
+#: devices/templates/devices/location.html:24
 msgid "Back to locations"
 msgstr ""
 
@@ -196,11 +268,16 @@ msgstr ""
 msgid "No locations available."
 msgstr ""
 
-#: smartHomeSite/settings.py:212
+#: devices/templatetags/devices_extras.py:38
+#, python-format
+msgid "%(time)s ago"
+msgstr ""
+
+#: smartHomeSite/settings.py:214
 msgid "English"
 msgstr ""
 
-#: smartHomeSite/settings.py:213
+#: smartHomeSite/settings.py:215
 msgid "Polish"
 msgstr ""
 

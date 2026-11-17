@@ -1,7 +1,8 @@
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views import generic
 
+from . import status as device_status
 from .models import Location, Device
 
 
@@ -21,23 +22,31 @@ class FavouritesView(generic.ListView):
         return Device.objects.none()
 
 
-class DeviceView(generic.DetailView):
-    template_name = 'devices/device.html'
-    model = Device
+def _location_context(location_id):
+    location = get_object_or_404(Location, pk=location_id)
+    devices = Device.objects.filter(location=location).order_by('name')
+    return {'location': location, 'statuses': device_status.statuses(devices)}
 
 
-class LocationView(generic.ListView):
-    template_name = 'devices/location.html'
-    context_object_name = 'devices'
+def location(request, location_id):
+    return render(request, 'devices/location.html', _location_context(location_id))
 
-    def get_queryset(self):
-        self.location = get_object_or_404(Location, pk=self.kwargs['location_id'])
-        return Device.objects.filter(location=self.location).order_by('name')
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['location'] = self.location
-        return context
+def location_cards(request, location_id):
+    """Karty urządzeń lokalizacji – fragment odświeżany przez HTMX."""
+    return render(request, 'devices/cards/list.html', _location_context(location_id))
+
+
+def device(request, slug):
+    device_ = get_object_or_404(Device.objects.select_related('location'), slug=slug)
+    return render(request, 'devices/device.html', {'device': device_, 'status': device_status.status(device_)})
+
+
+def device_card(request, slug):
+    """Karta jednego urządzenia – fragment odświeżany przez HTMX."""
+    device_ = get_object_or_404(Device.objects.select_related('location'), slug=slug)
+    status_ = device_status.status(device_)
+    return render(request, status_.template, {'status': status_})
 
 
 def get_next_url(request):

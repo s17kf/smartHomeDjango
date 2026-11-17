@@ -41,23 +41,24 @@ class LocationViewTests(LoggedInTestCase):
         return self.client.get(reverse('devices:location', args=(location_id,)))
 
     def test_location_not_exist(self):
-        response = self.get_location_response(self.location.id + 1)
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(self.get_location_response(self.location.id + 1).status_code, 404)
+        url = reverse('devices:location_cards', args=(self.location.id + 1,))
+        self.assertEqual(self.client.get(url).status_code, 404)
 
     def test_no_devices(self):
         response = self.get_location_response(self.location.id)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.context['location'], self.location)
-        self.assertQuerySetEqual(response.context['devices'], [])
+        self.assertEqual(response.context['statuses'], [])
         self.assertContains(response, 'No devices available in room.')
 
     def test_only_devices_of_location(self):
         device = DeviceHelper.create_device(self.location, 'lamp')
         DeviceHelper.create_device(LocationHelper.create_location('other room'), 'elsewhere')
         response = self.get_location_response(self.location.id)
-        self.assertQuerySetEqual(response.context['devices'], [device])
+        self.assertEqual([s.device for s in response.context['statuses']], [device])
         self.assertContains(response, self.location.name)
-        self.assertContains(response, reverse('devices:device', args=(device.id,)))
+        self.assertContains(response, reverse('devices:device', args=(device.slug,)))
         self.assertNotContains(response, 'elsewhere')
 
 
@@ -67,18 +68,19 @@ class DeviceViewTests(LoggedInTestCase):
         self.location = LocationHelper.create_location('room')
         self.device = DeviceHelper.create_device(self.location, 'device')
 
-    def get_device_response(self, device_id):
-        return self.client.get(reverse('devices:device', args=(device_id,)))
-
     def test_device_not_exist(self):
-        response = self.get_device_response(self.device.id + 1)
-        self.assertEqual(response.status_code, 404)
+        for name in ('device', 'device_card'):
+            with self.subTest(name):
+                response = self.client.get(reverse(f'devices:{name}', args=('no-such-device',)))
+                self.assertEqual(response.status_code, 404)
 
     def test_device_with_location(self):
-        response = self.get_device_response(self.device.id)
+        # adres urządzenia po slugu
+        response = self.client.get(reverse('devices:device', args=(self.device.slug,)))
         self.assertEqual(response.context['device'], self.device)
         self.assertContains(response, f'{self.device.name} ({self.location.name})')
         self.assertContains(response, reverse('devices:location', args=(self.location.id,)))
+        self.assertContains(response, 'home/device/…')
 
 
 class GetNextUrlTests(SimpleTestCase):

@@ -19,7 +19,8 @@
         {% block additional_stylesheets %}{% endblock %}
     {% endblock %}
 </head>
-<body>
+{# Token CSRF w nagłówku każdego żądania HTMX (POST w widokach sterowania) #}
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 <div id="wrapper">
     {% block wrapper %}
         <header>
@@ -69,7 +70,7 @@
 </div>
 
 <script src="{% static 'devices/vendor/bootstrap/js/bootstrap.bundle.min.js' %}"></script>
-<script src="{% static 'devices/vendor/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'devices/vendor/htmx/htmx.min.js' %}"></script>
 {% block scripts %}{% endblock %}
 </body>
 </html>

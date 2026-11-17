@@ -1,6 +1,6 @@
 {% extends 'devices/base.html' %}
 
-{% load i18n %}
+{% load i18n devices_extras %}
 
 {% block page_title %}
     {{ device.name }} ({{ device.location.name }})
@@ -8,5 +8,33 @@
 
 {% block content %}
     <a href="{% url 'devices:location' device.location_id %}">{% trans "Back to location" %}</a>
-    <p>{{ device.get_kind_display }}</p>
+    <div class="row g-3 mt-1">
+        <div class="col-12 col-md-6 col-lg-4"
+             hx-get="{% url 'devices:device_card' device.slug %}"
+             hx-trigger="every 10s [document.visibilityState === 'visible']"
+             hx-swap="innerHTML">
+            {% include status.template %}
+        </div>
+        <div class="col-12 col-md-6 col-lg-8">
+            <table class="table table-dark table-sm align-middle">
+                <tbody>
+                <tr><th scope="row">{% trans "Kind" %}</th><td>{{ device.get_kind_display }}</td></tr>
+                <tr><th scope="row">{% trans "MQTT topics" %}</th><td><code>home/{{ device.slug }}/…</code></td></tr>
+                <tr><th scope="row">{% trans "Driver" %}</th><td><code>{{ device.driver }}</code></td></tr>
+                {% for reading in status.readings %}
+                    <tr>
+                        <th scope="row">{{ reading.label }}</th>
+                        <td>{{ reading.value|reading }} {{ reading.unit }}</td>
+                    </tr>
+                {% endfor %}
+                {% if status.state_ts %}
+                    <tr><th scope="row">{% trans "State reported" %}</th><td>{{ status.state_ts|date:"Y-m-d H:i:s" }}</td></tr>
+                {% endif %}
+                {% if status.telemetry_ts %}
+                    <tr><th scope="row">{% trans "Measured" %}</th><td>{{ status.telemetry_ts|date:"Y-m-d H:i:s" }}</td></tr>
+                {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 {% endblock %}

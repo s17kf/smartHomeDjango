@@ -33,6 +33,11 @@ projektu – trzymamy tu kod aplikacji i ustalenia o niej samej.
   dodatkowego kodu. Wyjątek tylko przez `@login_not_required` z komentarzem,
   dlaczego (np. endpoint z własnym uwierzytelnianiem). Panel admina ma własne
   logowanie i wymaga `is_staff`.
+- Fragmenty dla HTMX to zwykłe widoki zwracające kawałek strony (np. karty
+  urządzeń odświeżane co 10 s, tylko przy widocznej karcie przeglądarki).
+  Żądania HTMX bez ważnej sesji dostają `HX-Redirect` na logowanie
+  (`devices/middleware.py`), żeby formularz logowania nie trafił do
+  fragmentu. Token CSRF wysyła HTMX w nagłówku (`hx-headers` na `<body>`).
 - Widoki, które zmieniają stan, przyjmują tylko POST (`@require_POST`, żeby
   działała ochrona CSRF). Adres powrotu z formularza (`next`) bierzemy przez
   `get_next_url`, która nie przepuszcza adresów spoza strony.
@@ -75,14 +80,6 @@ projektu – trzymamy tu kod aplikacji i ustalenia o niej samej.
 - Docelowy sprzęt: Raspberry Pi 4 (arm64). Obraz ma wariant amd64 i arm64,
   pilnujemy zużycia RAM (liczba procesów i workerów, ciężkie zależności).
 
-## Stan przejściowy
-
-Część kodu powstała przed przejściem na MQTT i zostanie zastąpiona. Nie
-rozwijamy jej – poprawiamy tylko wtedy, gdy blokuje bieżącą pracę:
-
-- jQuery (`devices/static/devices/vendor/jquery/`) – interaktywność
-  przechodzi na HTMX.
-
 ## Struktura katalogów
 
 ```
@@ -110,7 +107,10 @@ rozwijamy jej – poprawiamy tylko wtedy, gdy blokuje bieżącą pracę:
 
 - Modele, widoki, `urls.py`, admin i menu; rodzaje urządzeń (pola `set`,
   `state`, `telemetry`) w `kinds.py`.
-- Szablony w `templates/devices/`.
+- Szablony w `templates/devices/`. Karta urządzenia per rodzaj:
+  `templates/devices/cards/<kind>.html` (rama i pomiary w `cards/base.html`);
+  stan do wyświetlenia (urządzenie + cache, dostępność z powodem) –
+  `status.py`, filtry szablonów – `templatetags/devices_extras.py`.
 - Statyki w `static/devices/`, biblioteki zewnętrzne w
   `static/devices/vendor/` ([Biblioteki frontendowe](#biblioteki-frontendowe)),
   komendy zarządzania w `management/commands/`.
@@ -182,7 +182,7 @@ sprawdza, że strony nie ładują CSS ani JS z zewnątrz.
 |---|---|---|
 | `bootstrap` | 5.3.3 | `dist/css/bootstrap.min.css`, `dist/js/bootstrap.bundle.min.js` (z `.map`) |
 | `bootstrap-icons` | 1.11.3 | `font/bootstrap-icons.min.css`, `font/fonts/bootstrap-icons.woff2`, `.woff` |
-| `jquery` | 3.7.1 | `dist/jquery.min.js` |
+| `htmx.org` | 2.0.11 | `dist/htmx.min.js` (katalog `vendor/htmx/`) |
 
 Dodanie lub aktualizacja biblioteki:
 

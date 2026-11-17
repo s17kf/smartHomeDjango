@@ -1,0 +1,24 @@
+{% extends 'devices/cards/base.html' %}
+{% load i18n devices_extras %}
+{% block icon %}lightbulb{% endblock %}
+{% block body %}
+    {% if status.state %}
+        <div class="d-flex align-items-center gap-2 flex-wrap">
+            {% if status.state.on %}
+                <span class="badge text-bg-success fs-6">{% trans "ON" %}</span>
+            {% else %}
+                <span class="badge text-bg-secondary fs-6">{% trans "OFF" %}</span>
+            {% endif %}
+            <span>{{ status.state.brightness }}%</span>
+            {% if status.state.mode == 'rgb' %}
+                <span class="color-swatch" style="background-color: {{ status.state.rgb|rgb_css }}"
+                      title="{% trans 'Colour' %}"></span>
+                <span>{% trans "Colour" %}</span>
+            {% else %}
+                <span>{% trans "White" %} {{ status.state.ct }} K</span>
+            {% endif %}
+        </div>
+    {% else %}
+        <span class="text-secondary">{% trans "State unknown" %}</span>
+    {% endif %}
+{% endblock %}

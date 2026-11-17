@@ -21,7 +21,8 @@ described in [CONTRIBUTING.md](CONTRIBUTING.md) (in Polish).
 
 - Manage locations and smart home devices (device control over MQTT is
   being added).
-- Responsive web interface for manage device's state.
+- Device cards per kind (switch, RGBCCT light, sensor) with state, measurements and
+  availability, refreshed every 10 s.
 - Login required for every page (Django sessions). No sign-up – accounts are
   created by an administrator.
 - Admin panel to manage devices and user accounts.
@@ -29,7 +30,7 @@ described in [CONTRIBUTING.md](CONTRIBUTING.md) (in Polish).
 ## Technologies Used
 
 - **Backend:** Python
-- **Frontend:** HTML, CSS, JavaScript; Bootstrap, Bootstrap Icons and jQuery
+- **Frontend:** HTML, CSS, [htmx](https://htmx.org/); Bootstrap, Bootstrap Icons and htmx
   are bundled in the repository (no CDN, the UI works without internet access)
 - **Static files:** [WhiteNoise](https://whitenoise.readthedocs.io/), see
   [Static files](#static-files)

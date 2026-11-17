@@ -7,7 +7,9 @@ app_name = 'devices'
 urlpatterns = [
     path('', redirect_view, {'target': 'locations/'}, name='main'),
     path('locations/', views.LocationListView.as_view(), name='location_list'),
-    path('location/<int:location_id>/', views.LocationView.as_view(), name='location'),
+    path('location/<int:location_id>/', views.location, name='location'),
+    path('location/<int:location_id>/cards/', views.location_cards, name='location_cards'),
     path('favourites/', views.FavouritesView.as_view(), name='favourites'),
-    path('device/<int:pk>/', views.DeviceView.as_view(), name='device'),
+    path('device/<slug:slug>/', views.device, name='device'),
+    path('device/<slug:slug>/card/', views.device_card, name='device_card'),
 ]

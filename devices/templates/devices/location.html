@@ -7,24 +7,13 @@
 {% endblock %}
 
 {% block content %}
-    {% if devices %}
-        <div class="table-responsive">
-            <table class="table table-dark table-hover align-middle">
-                <tbody>
-                {% for device in devices %}
-                    <tr>
-                        <td class="col table-fit">
-                            <a href="{% url 'devices:device' device.id %}"
-                               class="btn btn-outline-primary btn-sm" role="button"
-                            >
-                                {{ device.name }}
-                            </a>
-                        </td>
-                        <td class="col text-nowrap">{{ device.get_kind_display }}</td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+    {% if statuses %}
+        {# Karty odświeżane co 10 s, tylko gdy karta przeglądarki jest widoczna #}
+        <div id="device-cards" class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3 mb-3"
+             hx-get="{% url 'devices:location_cards' location.id %}"
+             hx-trigger="every 10s [document.visibilityState === 'visible']"
+             hx-swap="innerHTML">
+            {% include 'devices/cards/list.html' %}
         </div>
     {% else %}
         <p>{% blocktrans with name=location.name %}No devices available in {{ name }}.{% endblocktrans %}</p>

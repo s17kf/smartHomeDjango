@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-11-17 02:34+0100\n"
+"POT-Creation-Date: 2026-11-17 19:36+0100\n"
 "PO-Revision-Date: 2024-09-15 11:47+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -25,14 +25,18 @@ msgstr ""
 msgid ""
 "The device was saved, but its config did not reach the MQTT broker: "
 "%(error)s. Run \"manage.py mqtt_sync\" when the broker is available."
-msgstr "Urządzenie zapisane, ale jego konfiguracja nie dotarła do brokera MQTT: %(error)s. Uruchom „manage.py mqtt_sync”, gdy broker będzie dostępny."
+msgstr ""
+"Urządzenie zapisane, ale jego konfiguracja nie dotarła do brokera MQTT: "
+"%(error)s. Uruchom „manage.py mqtt_sync”, gdy broker będzie dostępny."
 
 #: devices/admin.py:54
 #, python-format
 msgid ""
 "The device was deleted, but the MQTT broker still has its topics: %(error)s. "
 "Run \"manage.py mqtt_sync --prune\" when the broker is available."
-msgstr "Urządzenie usunięte, ale jego tematy zostały w brokerze MQTT: %(error)s. Uruchom „manage.py mqtt_sync --prune”, gdy broker będzie dostępny."
+msgstr ""
+"Urządzenie usunięte, ale jego tematy zostały w brokerze MQTT: %(error)s. "
+"Uruchom „manage.py mqtt_sync --prune”, gdy broker będzie dostępny."
 
 #: devices/kinds.py:29
 msgid "expected true or false"
@@ -178,28 +182,100 @@ msgstr ""
 msgid "The slug cannot be changed – create a new device instead."
 msgstr "Sluga nie można zmienić – dodaj nowe urządzenie."
 
-#: devices/templates/devices/base.html:31
+#: devices/status.py:24
+msgid "no data from the MQTT worker"
+msgstr "brak danych z workera MQTT"
+
+#: devices/status.py:25
+msgid "gateway offline"
+msgstr "gateway niedostępny"
+
+#: devices/status.py:26
+msgid "device offline"
+msgstr "urządzenie niedostępne"
+
+#: devices/status.py:27
+msgid "no data from the device yet"
+msgstr "brak danych z urządzenia"
+
+#: devices/templates/devices/base.html:32
 msgid "Smart home"
 msgstr ""
 
-#: devices/templates/devices/base.html:58
+#: devices/templates/devices/base.html:59
 msgid "Log out"
 msgstr "Wyloguj"
+
+#: devices/templates/devices/cards/base.html:10
+msgid "online"
+msgstr "dostępne"
+
+#: devices/templates/devices/cards/base.html:12
+msgid "unavailable"
+msgstr "niedostępne"
+
+#: devices/templates/devices/cards/light_rgbcct.html:8
+#: devices/templates/devices/cards/switch.html:7
+msgid "ON"
+msgstr "Włączone"
+
+#: devices/templates/devices/cards/light_rgbcct.html:10
+#: devices/templates/devices/cards/switch.html:9
+msgid "OFF"
+msgstr "Wyłączone"
+
+#: devices/templates/devices/cards/light_rgbcct.html:15
+#: devices/templates/devices/cards/light_rgbcct.html:16
+msgid "Colour"
+msgstr "Kolor"
+
+#: devices/templates/devices/cards/light_rgbcct.html:18
+msgid "White"
+msgstr "Biel"
+
+#: devices/templates/devices/cards/light_rgbcct.html:22
+#: devices/templates/devices/cards/switch.html:12
+msgid "State unknown"
+msgstr "Stan nieznany"
+
+#: devices/templates/devices/cards/sensor.html:9
+msgid "No readings yet"
+msgstr "Brak pomiarów"
 
 #: devices/templates/devices/device.html:10
 msgid "Back to location"
 msgstr "Powrót do lokalizacji"
 
+#: devices/templates/devices/device.html:21
+msgid "Kind"
+msgstr "Rodzaj"
+
+#: devices/templates/devices/device.html:22
+msgid "MQTT topics"
+msgstr "Tematy MQTT"
+
+#: devices/templates/devices/device.html:23
+msgid "Driver"
+msgstr "Sterownik"
+
+#: devices/templates/devices/device.html:31
+msgid "State reported"
+msgstr "Stan zgłoszony"
+
+#: devices/templates/devices/device.html:34
+msgid "Measured"
+msgstr "Pomiar"
+
 #: devices/templates/devices/favourites.html:18
 msgid "Add favourite devices."
 msgstr "Dodaj do ulubionych."
 
-#: devices/templates/devices/location.html:30
+#: devices/templates/devices/location.html:19
 #, python-format
 msgid "No devices available in %(name)s."
 msgstr "Brak urządzeń w lokalizacji %(name)s."
 
-#: devices/templates/devices/location.html:35
+#: devices/templates/devices/location.html:24
 msgid "Back to locations"
 msgstr "Powrót do listy lokalizacji"
 
@@ -207,11 +283,16 @@ msgstr "Powrót do listy lokalizacji"
 msgid "No locations available."
 msgstr "Brak miejsc do wyświetlenia."
 
-#: smartHomeSite/settings.py:212
+#: devices/templatetags/devices_extras.py:38
+#, python-format
+msgid "%(time)s ago"
+msgstr "%(time)s temu"
+
+#: smartHomeSite/settings.py:214
 msgid "English"
 msgstr "angielski"
 
-#: smartHomeSite/settings.py:213
+#: smartHomeSite/settings.py:215
 msgid "Polish"
 msgstr "polski"
 
@@ -284,17 +365,11 @@ msgstr "Konta zakłada administrator."
 #~ msgid "hide edit"
 #~ msgstr "ukryj edycję"
 
-#~ msgid "ON"
-#~ msgstr "Aktywny"
-
 #~ msgid "till "
 #~ msgstr "do"
 
 #~ msgid "cancel"
 #~ msgstr "anuluj"
-
-#~ msgid "OFF"
-#~ msgstr "Nieaktywny"
 
 #~ msgid "one-time ON"
 #~ msgstr "włącz jednorazowo"

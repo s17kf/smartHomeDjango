@@ -119,6 +119,8 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    # Przed LoginRequiredMiddleware: zamienia jego przekierowanie przy żądaniu HTMX na HX-Redirect
+    'devices.middleware.HtmxLoginRedirectMiddleware',
     'django.contrib.auth.middleware.LoginRequiredMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
